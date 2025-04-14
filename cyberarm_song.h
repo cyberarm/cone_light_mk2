@@ -76,7 +76,7 @@ public:
       }
 
 
-      Serial.printf("PIN: %d, NOTEID: %d, NOTE: %d, DURATION: %d\n", m_pin, m_current_note, note, m_last_note_duration);
+      Serial.printf("PIN: %d, NOTEID: %d, NOTE: %d, DURATION: %ld\n", m_pin, m_current_note, note, m_last_note_duration);
 
       m_current_note++;
     }
