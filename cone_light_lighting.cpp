@@ -5,8 +5,8 @@ ConeLightLighting::ConeLightLighting(ConeLight *cone_light)
   m_cone_light = cone_light;
 
   // Set default color based on node group
-  // GOLD for group 0, TEAL for group 1, and PURPLE for not configured.
-  m_color = (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_0) ? COLOR_GOLD : (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_1) ?  COLOR_TEAL : COLOR_PURPLE;
+  // GOLD for group 1, TEAL for group 2, and PURPLE for not configured (group 0).
+  m_color = (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_1) ? COLOR_GOLD : (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_2) ? COLOR_TEAL : COLOR_PURPLE;
 
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(m_leds, NUM_LEDS).setCorrection(UncorrectedColor);
   FastLED.setBrightness(m_brightness);

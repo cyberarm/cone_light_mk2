@@ -8,16 +8,16 @@
 // Play 4 notes on boot up
 #define CONE_LIGHT_BOOT_UP_TUNE false
 
-#define CONE_LIGHT_NODE_ID_UNSET 254
-#define CONE_LIGHT_NODE_GROUP_UNSET 2
+#define CONE_LIGHT_NODE_ID_UNSET 0
+#define CONE_LIGHT_NODE_GROUP_UNSET 0
 #define CONE_LIGHT_NODE_NAME_UNSET "NONAME"
 
 #define CONE_LIGHT_NODE_GROUP_0 0
-#define CONE_LIGHT_NODE_GROUP_0_NAME "BACKSTOP"
+#define CONE_LIGHT_NODE_GROUP_0_NAME "!NOT SET"
 #define CONE_LIGHT_NODE_GROUP_1 1
-#define CONE_LIGHT_NODE_GROUP_1_NAME "STOPSIGN"
+#define CONE_LIGHT_NODE_GROUP_1_NAME "BACKSTOP"
 #define CONE_LIGHT_NODE_GROUP_2 2
-#define CONE_LIGHT_NODE_GROUP_2_NAME "!NOT SET"
+#define CONE_LIGHT_NODE_GROUP_2_NAME "STOPSIGN"
 
 #define CONE_LIGHT_PREFERENCES_ID "cone_light"
 #define CONE_LIGHT_PREFERENCES_NODE_ID "node_id"
@@ -53,13 +53,13 @@ private:
   Preferences m_preferences;
   uint8_t m_node_id = CONE_LIGHT_NODE_ID_UNSET;
   uint8_t m_node_group = CONE_LIGHT_NODE_GROUP_UNSET;
-  const char* m_node_name = CONE_LIGHT_NODE_NAME_UNSET;
+  String m_node_name = CONE_LIGHT_NODE_NAME_UNSET;
 
 public:
   ConeLight();
   ~ConeLight();
   void update();
   uint8_t node_id();
-  uint8_t  node_group();
-  const char *node_name();
+  uint8_t node_group();
+  String node_name();
 };

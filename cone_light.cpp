@@ -18,7 +18,7 @@ ConeLight::ConeLight()
   Serial.println("  Loading node preferences data...");
   m_node_id = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_ID, CONE_LIGHT_NODE_ID_UNSET);
   m_node_group = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_UNSET);
-  // m_node_name = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_NAME, CONE_LIGHT_NODE_NAME_UNSET); // Compiler complains about string -> char * conversion error!?!?!?!
+  m_node_name = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_NAME, CONE_LIGHT_NODE_NAME_UNSET);
 
   // Initialize subsystems...
   Serial.println("  Initializing subsystems...");
@@ -26,7 +26,7 @@ ConeLight::ConeLight()
   m_display = new ConeLightDisplay(this);
   m_speaker = new ConeLightSpeaker(this);
 
-  Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name, m_node_id, m_node_group);
+  Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
 }
 
 ConeLight::~ConeLight()
@@ -56,7 +56,7 @@ uint8_t ConeLight::node_group()
   return m_node_group;
 }
 
-const char *ConeLight::node_name()
+String ConeLight::node_name()
 {
   return m_node_name;
 }
