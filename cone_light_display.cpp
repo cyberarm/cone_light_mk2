@@ -16,12 +16,13 @@ ConeLightDisplay::ConeLightDisplay(ConeLight *cone_light)
 
   if (m_display_inited)
   {
+    Serial.println("    Display initialized successfully.");
     display_bootscreen();
     // display_menu();
   }
   else
   {
-    Serial.println("ERROR: Failed to init display.");
+    Serial.println("    ERROR: Failed to init display.");
   }
 }
 

@@ -35,11 +35,13 @@
 #define LID_PIN D1
 
 #include <Preferences.h>
+#include "cone_light_command_handler.h"
 #include "cone_light_lighting.h"
 #include "cone_light_display.h"
 #include "cone_light_speaker.h"
 
 // Forward declarations... 💔 you C 😿
+class ConeLightCommandHandler;
 class ConeLightLighting;
 class ConeLightDisplay;
 class ConeLightSpeaker;
@@ -47,6 +49,7 @@ class ConeLightSpeaker;
 class ConeLight
 {
 private:
+  ConeLightCommandHandler *m_command_handler = nullptr;
   ConeLightLighting *m_lighting = nullptr;
   ConeLightDisplay *m_display = nullptr;
   ConeLightSpeaker *m_speaker = nullptr;
@@ -62,4 +65,9 @@ public:
   uint8_t node_id();
   uint8_t node_group();
   String node_name();
+
+  ConeLightCommandHandler *command_handler() { return m_command_handler; }
+  ConeLightLighting *lighting() { return m_lighting; }
+  ConeLightDisplay *display() { return m_display; }
+  ConeLightSpeaker *speaker() { return m_speaker; }
 };

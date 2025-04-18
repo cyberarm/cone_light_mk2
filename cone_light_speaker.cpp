@@ -4,7 +4,7 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
 {
   m_cone_light = cone_light;
 
-  Serial.printf("SPEAKER %d\n", ledcAttach(SPEAKER, 32000, 10));
+  // Serial.printf("SPEAKER %d\n", ledcAttach(SPEAKER, 32000, 10));
 
   const int8_t note_count = 7;
   int16_t notes[note_count] = {136, -1, 220, -1, 293, -1, 370};
@@ -18,6 +18,8 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
   {
     reset();
   }
+
+  Serial.println("    Speaker initialized successfully.");
 }
 
 ConeLightSpeaker::~ConeLightSpeaker()

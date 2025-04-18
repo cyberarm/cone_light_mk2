@@ -13,6 +13,8 @@ ConeLightLighting::ConeLightLighting(ConeLight *cone_light)
   FastLED.clear(true);
 
   FastLED.showColor(CRGB(0, 0, 0));
+
+  Serial.println("    FastLED initialized successfully.");
 }
 
 ConeLightLighting::~ConeLightLighting()
@@ -43,4 +45,9 @@ void ConeLightLighting::update()
 void ConeLightLighting::set_color(uint8_t red, uint8_t green, uint8_t blue)
 {
   m_color = CRGB(red, green, blue);
+}
+
+void ConeLightLighting::set_brightness(uint8_t brightness)
+{
+  m_brightness = brightness;
 }
