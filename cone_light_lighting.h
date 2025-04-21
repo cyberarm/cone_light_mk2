@@ -9,7 +9,7 @@
 #define COLOR_ORDER RGB
 
 #define COLOR_GOLD CRGB(255, 127, 0)
-#define COLOR_TEAL CRGB(0, 255, 255)
+#define COLOR_TEAL CRGB(0, 127, 255)
 #define COLOR_PURPLE CRGB(255, 0, 255)
 
 // Forward declaration...

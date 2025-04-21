@@ -6,7 +6,7 @@
 
 #define CONE_LIGHT_PRODUCT_NAME "Cone Light mk. II"
 // Play 4 notes on boot up
-#define CONE_LIGHT_BOOT_UP_TUNE false
+#define CONE_LIGHT_BOOT_UP_TUNE true
 
 #define CONE_LIGHT_NODE_ID_UNSET 0
 #define CONE_LIGHT_NODE_GROUP_UNSET 0
@@ -33,6 +33,9 @@
 #define BTN_B_PIN D9
 #define BTN_C_PIN D8
 #define LID_PIN D1
+
+#define BTN_SPEAKER_CHIRP_FREQUENCY 1760
+#define BTN_SPEAKER_CHIRP_DURATION 50
 
 #include <Preferences.h>
 #include "cone_light_command_handler.h"

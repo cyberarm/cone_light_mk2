@@ -28,7 +28,7 @@ public:
     m_current_note = 0;
     m_complete = false;
     m_last_note_duration = 0;
-    m_last_note_started_at = 0;
+    m_last_note_started_at = millis();
 
     for (size_t i = 0; i < MAX_NOTES; i++)
     {
