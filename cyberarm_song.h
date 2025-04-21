@@ -1,7 +1,7 @@
 #pragma once
 
 #define MAX_NOTES 2048
-#define MAX_CHANNELS 6
+#define MAX_CHANNELS 8
 
 //--- Cyberarm Song Channel
 class CyberarmSongChannel
@@ -74,7 +74,6 @@ public:
       {
         ledcWriteTone(m_pin, note);
       }
-
 
       Serial.printf("PIN: %d, NOTEID: %d, NOTE: %d, DURATION: %ld\n", m_pin, m_current_note, note, m_last_note_duration);
 

@@ -15,10 +15,10 @@ private:
   Adafruit_SSD1306 *m_display = new Adafruit_SSD1306(128, 64, &Wire, -1);
   bool m_display_inited = false, m_bootscreen_shown = false;
   unsigned long m_last_milliseconds = millis();
-  ConeLight* m_cone_light = nullptr;
+  ConeLight *m_cone_light = nullptr;
 
 public:
-  ConeLightDisplay(ConeLight* cone_light);
+  ConeLightDisplay(ConeLight *cone_light);
   ~ConeLightDisplay();
   void update();
   void display_bootscreen();

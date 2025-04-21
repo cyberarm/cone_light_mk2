@@ -14,6 +14,7 @@ class ConeLightSpeaker
 private:
   CyberarmSong *m_song = new CyberarmSong();
   unsigned long m_last_milliseconds = millis();
+  bool m_speaker_inited = false;
   bool m_boot_sound_played = false;
   ConeLight *m_cone_light = nullptr;
 

@@ -4,8 +4,8 @@
 
 class ConeLightSong;
 
-ConeLightSong *cone_light_songs[] = {
-    new ConeLightSong(
+std::vector<ConeLightSong> cone_light_songs = {
+    ConeLightSong(
         "Test",
         {{110, -1, 220, -1, 330, -1, 440, -1},
          {110, -1, 220, -1, 330, -1, 440, -1},

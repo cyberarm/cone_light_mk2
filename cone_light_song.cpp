@@ -18,7 +18,7 @@ String ConeLightSong::name()
 
 std::vector<int16_t> ConeLightSong::channel_notes(uint8_t channel_id)
 {
-  if (m_notes.size() < channel_id)
+  if (channel_id < m_notes.size())
     return m_notes[channel_id];
   else
     return {};
@@ -26,7 +26,7 @@ std::vector<int16_t> ConeLightSong::channel_notes(uint8_t channel_id)
 
 std::vector<uint16_t> ConeLightSong::channel_durations(uint8_t channel_id)
 {
-  if (m_durations.size() < channel_id)
+  if (channel_id < m_durations.size())
     return m_durations[channel_id];
   else
     return {};
