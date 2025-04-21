@@ -22,23 +22,28 @@ void ConeLightCommandHandler::update()
 
     Serial.printf("    CommandHandler buffer: %s\n", buf.c_str());
 
-    int seperator_offset = buf.indexOf(" ");
+    int separator_offset = buf.indexOf(" ");
+    if (separator_offset < 0)
+      separator_offset = buf.length();
 
-    // FIXME: Don't skip if no seperator (could be 'help' after all)
-    if (seperator_offset < 0)
-      return;
-
-    String command = buf.substring(0, seperator_offset);
+    String command = buf.substring(0, separator_offset);
     command.toLowerCase();
 
     // FIXME: convert to a for loop to handle multiple commands
+    // FIXME: Like actually implement a command structure/class to handle this duplication...
     if (command.compareTo("color") == 0)
     {
-      String arguments = buf.substring(seperator_offset + 1);
+      String arguments = buf.substring(separator_offset + 1);
       Serial.printf("    CommandHandler Color: %s\n", arguments.c_str());
 
       int argument_offset = arguments.indexOf(" ");
       uint8_t red, green, blue, brightness;
+
+      if (argument_offset == -1) // not found
+      {
+        Serial.printf("    Command Handler Color: color <red> <green> <blue> <brightness> | color 210 21 2 255\n");
+        return;
+      }
 
       for (size_t i = 0; i < 4; i++)
       {
@@ -72,11 +77,17 @@ void ConeLightCommandHandler::update()
     }
     else if (command.compareTo("tone") == 0)
     {
-      String arguments = buf.substring(seperator_offset + 1);
+      String arguments = buf.substring(separator_offset + 1);
       Serial.printf("    CommandHandler Tone: %s\n", arguments.c_str());
 
       int argument_offset = arguments.indexOf(" ");
       int16_t frequency, duration;
+
+      if (argument_offset == -1) // not found
+      {
+        Serial.printf("    Command Handler Tone: tone <frequency> <duration milliseconds> | tone 440 100\n");
+        return;
+      }
 
       for (size_t i = 0; i < 2; i++)
       {
@@ -103,11 +114,17 @@ void ConeLightCommandHandler::update()
     }
     else if (command.compareTo("song") == 0)
     {
-      String arguments = buf.substring(seperator_offset + 1);
+      String arguments = buf.substring(separator_offset + 1);
       Serial.printf("    CommandHandler Song: %s\n", arguments.c_str());
 
       int argument_offset = arguments.indexOf(" ");
       int16_t song_id;
+
+      if (arguments.length() < 1) // not found
+      {
+        Serial.printf("    Command Handler Song: song <song_id> | song 0\n");
+        return;
+      }
 
       for (size_t i = 0; i < 1; i++)
       {
