@@ -1,5 +1,5 @@
 # Cone Light mk.II Firmware
-ESP32-C6 MCU with an OLED display, 6 WS2812b leds, and an active beeper.
+ESP32-C6 MCU connected to an OLED display, 6 WS2812b leds, and an active beeper.
 
 ## Features
 * Glow to illuminate cone
