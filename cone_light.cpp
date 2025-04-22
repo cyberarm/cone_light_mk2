@@ -63,3 +63,16 @@ String ConeLight::node_name()
 {
   return m_node_name;
 }
+
+bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name)
+{
+  m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_ID, node_id);
+  m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, node_group);
+  m_preferences.putString(CONE_LIGHT_PREFERENCES_NODE_NAME, node_name);
+
+  m_node_id = node_id;
+  m_node_group = node_group;
+  m_node_name = node_name;
+
+  return true;
+}

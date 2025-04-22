@@ -8,13 +8,13 @@ class ConeLight;
 
 class ConeLightCommand
 {
-private:
+protected:
   String m_name;
   String m_help;
   uint8_t m_argument_count;
 
 public:
-  ConeLightCommand(String name, String help, uint8_t argument_count);
+  ConeLightCommand();
   ~ConeLightCommand();
   String name() { return m_name; }
   String help() { return m_help; }
@@ -27,27 +27,67 @@ public:
 class ConeLightCommand_Help : public ConeLightCommand
 {
 public:
-  ConeLightCommand_Help(String name, String help, uint8_t argument_count) : ConeLightCommand(name, help, argument_count) {};
+  ConeLightCommand_Help() {
+    m_name = "help";
+    m_help = "prints out this help info";
+    m_argument_count = 0;
+  };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
 
 class ConeLightCommand_Song : public ConeLightCommand
 {
   public:
-    ConeLightCommand_Song(String name, String help, uint8_t argument_count) : ConeLightCommand(name, help, argument_count) {};
+    ConeLightCommand_Song() {
+      m_name = "song";
+      m_help = "song <song_id> | song 0";
+      m_argument_count = 1;
+    };
     void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
 
 class ConeLightCommand_Tone : public ConeLightCommand
 {
   public:
-    ConeLightCommand_Tone(String name, String help, uint8_t argument_count) : ConeLightCommand(name, help, argument_count) {};
+    ConeLightCommand_Tone() {
+      m_name = "tone";
+      m_help = "tone <frequency> <duration milliseconds> | tone 440 100";
+      m_argument_count = 2;
+    };
     void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
 
 class ConeLightCommand_Color : public ConeLightCommand
 {
   public:
-    ConeLightCommand_Color(String name, String help, uint8_t argument_count) : ConeLightCommand(name, help, argument_count) {};
+    ConeLightCommand_Color() {
+      m_name = "color";
+      m_help = "color <red> <green> <blue> <brightness> | color 210 21 2 255";
+      m_argument_count = 4;
+    };
     void handle(ConeLight *cone_light, std::vector<String> arguments);
+};
+
+class ConeLightCommand_Config : public ConeLightCommand
+{
+public:
+  ConeLightCommand_Config()
+  {
+    m_name = "config";
+    m_help = "prints out nodes configuration information";
+    m_argument_count = 0;
+  };
+  void handle(ConeLight *cone_light, std::vector<String> arguments);
+};
+
+class ConeLightCommand_Configure : public ConeLightCommand
+{
+public:
+  ConeLightCommand_Configure()
+  {
+    m_name = "configure";
+    m_help = "configure <node_id> <node_group_id> <node_name> | configure 0 1 HOBBIT | configures node properties";
+    m_argument_count = 3;
+  };
+  void handle(ConeLight *cone_light, std::vector<String> arguments);
 };

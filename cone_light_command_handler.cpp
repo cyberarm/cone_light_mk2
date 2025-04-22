@@ -5,10 +5,12 @@ ConeLightCommandHandler::ConeLightCommandHandler(ConeLight *cone_light)
   m_cone_light = cone_light;
 
   // Serial.setTimeout(100);
-  m_commands.push_back(new ConeLightCommand_Help("help", "prints out this help info", 0));
-  m_commands.push_back(new ConeLightCommand_Song("song", "song <song_id> | song 0", 1));
-  m_commands.push_back(new ConeLightCommand_Tone("tone", "tone <frequency> <duration milliseconds> | tone 440 100", 2));
-  m_commands.push_back(new ConeLightCommand_Color("color", "color <red> <green> <blue> <brightness> | color 210 21 2 255", 4));
+  m_commands.push_back(new ConeLightCommand_Help);
+  m_commands.push_back(new ConeLightCommand_Song);
+  m_commands.push_back(new ConeLightCommand_Tone);
+  m_commands.push_back(new ConeLightCommand_Color);
+  m_commands.push_back(new ConeLightCommand_Config);
+  m_commands.push_back(new ConeLightCommand_Configure);
 
   Serial.println("    Command Handler initialized successfully.");
 }
@@ -39,10 +41,10 @@ void ConeLightCommandHandler::update()
       {
         ConeLightCommand *cone_light_command = m_commands[i];
 
-        Serial.printf("      Found: %s\n", cone_light_command->name().c_str());
+        // Serial.printf("      Found: %s\n", cone_light_command->name().c_str());
 
         std::vector<String> args = cone_light_command->process(buf.substring(separator_offset + 1, buf.length()));
-        Serial.printf("      Note: number of arguments provided. Got %d, expected %d.\n", args.size(), cone_light_command->argument_count());
+        // Serial.printf("      Note: number of arguments provided. Got %d, expected %d.\n", args.size(), cone_light_command->argument_count());
 
         if (args.size() == cone_light_command->argument_count())
         {
