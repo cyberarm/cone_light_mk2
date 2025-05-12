@@ -1,0 +1,24 @@
+#pragma once
+
+enum ConeLightEvent
+{
+  BUTTON_PRESSED = 0,
+  BUTTON_HELD,
+  BUTTON_RELEASED,
+
+  LID_CLOSED = 16,
+  LID_OPENED,
+};
+
+enum ConeLightButton
+{
+  BUTTON_A = 0,
+  BUTTON_B,
+  BUTTON_C,
+  LID,
+
+  UP_BUTTON = BUTTON_A,
+  SELECT_BUTTON = BUTTON_B,
+  MIDDLE_BUTTON = BUTTON_B,
+  DOWN_BUTTON = BUTTON_C
+};

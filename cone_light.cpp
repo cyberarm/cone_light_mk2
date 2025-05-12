@@ -23,6 +23,7 @@ ConeLight::ConeLight()
   // Initialize subsystems...
   Serial.println("  Initializing subsystems...");
   m_command_handler = new ConeLightCommandHandler(this);
+  m_input_handler = new ConeLightInputHandler(this);
   m_lighting = new ConeLightLighting(this);
   m_display = new ConeLightDisplay(this);
   m_speaker = new ConeLightSpeaker(this);
@@ -35,6 +36,7 @@ ConeLight::~ConeLight()
   delete m_speaker;
   delete m_display;
   delete m_lighting;
+  delete m_input_handler;
   delete m_command_handler;
 
   m_preferences.end();
@@ -44,6 +46,7 @@ ConeLight::~ConeLight()
 void ConeLight::update()
 {
   m_command_handler->update();
+  m_input_handler->update();
   m_lighting->update();
   m_display->update();
   m_speaker->update();

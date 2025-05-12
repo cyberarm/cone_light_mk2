@@ -34,17 +34,23 @@
 #define BTN_C_PIN D8
 #define LID_PIN D1
 
+#define BTN_HELD_AFTER_MS 500
+#define BTN_DEBOUNCE_MS 50
+
 #define BTN_SPEAKER_CHIRP_FREQUENCY 1760
 #define BTN_SPEAKER_CHIRP_DURATION 50
 
 #include <Preferences.h>
+#include "cone_light_enums.h"
 #include "cone_light_command_handler.h"
+#include "cone_light_input_handler.h"
 #include "cone_light_lighting.h"
 #include "cone_light_display.h"
 #include "cone_light_speaker.h"
 
 // Forward declarations... 💔 you C 😿
 class ConeLightCommandHandler;
+class ConeLightInputHandler;
 class ConeLightLighting;
 class ConeLightDisplay;
 class ConeLightSpeaker;
@@ -53,6 +59,7 @@ class ConeLight
 {
 private:
   ConeLightCommandHandler *m_command_handler = nullptr;
+  ConeLightInputHandler *m_input_handler = nullptr;
   ConeLightLighting *m_lighting = nullptr;
   ConeLightDisplay *m_display = nullptr;
   ConeLightSpeaker *m_speaker = nullptr;
@@ -71,6 +78,7 @@ public:
   bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name);
 
   ConeLightCommandHandler *command_handler() { return m_command_handler; }
+  ConeLightInputHandler *input_handler() { return m_input_handler; }
   ConeLightLighting *lighting() { return m_lighting; }
   ConeLightDisplay *display() { return m_display; }
   ConeLightSpeaker *speaker() { return m_speaker; }
