@@ -17,8 +17,6 @@ ConeLightDisplay::ConeLightDisplay(ConeLight *cone_light)
   if (m_display_inited)
   {
     Serial.println("    Display initialized successfully.");
-    // display_bootscreen();
-    // display_menu();
   }
   else
   {
@@ -33,13 +31,6 @@ ConeLightDisplay::~ConeLightDisplay()
 
 void ConeLightDisplay::update()
 {
-  // if (millis() - m_last_milliseconds >= 3'000)
-  // {
-  //   m_bootscreen_shown = true;
-  //   m_last_milliseconds = millis();
-
-  //   display_menu();
-  // }
 }
 
 void ConeLightDisplay::draw_up_arrow(uint16_t x, uint16_t y, uint16_t color)

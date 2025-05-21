@@ -10,10 +10,31 @@ ConeLightDisplay *ConeLightApplication::display() { return m_cone_light->display
 Adafruit_SSD1306 *ConeLightApplication::oled() { return display()->oled(); };
 
 //--- BOOT SCREEN APP ---//
+ConeLight_App_BootScreen::ConeLight_App_BootScreen(ConeLight *cone_light) : ConeLightApplication(cone_light)
+{
+  m_cone_light = cone_light;
+  m_app_name = "BootScreen";
+
+  // Set default color based on node group
+  // GOLD for group 1, TEAL for group 2, and PURPLE for not configured (group 255).
+  if (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_0)
+  {
+    m_group_color = COLOR_GOLD;
+  }
+  else if (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_1)
+  {
+    m_group_color = COLOR_TEAL;
+  }
+  else
+  {
+    m_group_color = COLOR_PURPLE;
+  }
+
+  m_cone_light->lighting()->set_color(m_boot_color);
+};
+
 void ConeLight_App_BootScreen::draw()
 {
-  oled()->clearDisplay();
-
   // Cone
   oled()->fillTriangle(12, 43, 20, 4, 43, 43, SSD1306_WHITE);
   oled()->fillTriangle(20, 4, 35, 4, 43, 43, SSD1306_WHITE);
@@ -32,8 +53,6 @@ void ConeLight_App_BootScreen::draw()
   oled()->print("Cone Light");
   oled()->setCursor(68, 24);
   oled()->print("mk. II");
-
-  oled()->display();
 }
 
 void ConeLight_App_BootScreen::update()
@@ -41,6 +60,22 @@ void ConeLight_App_BootScreen::update()
   // Boot complete
   // if (millis() >= 3'000)
   //   m_cone_light->boot_complete();
+
+  if (millis() - m_last_milliseconds < 667)
+    m_cone_light->lighting()->set_brightness(2);
+  else if (millis() - m_last_milliseconds < (667 + 32) * 2)
+    m_cone_light->lighting()->set_brightness(4);
+  else if (millis() - m_last_milliseconds < (667 + 32 + 32) * 3)
+    m_cone_light->lighting()->set_brightness(6);
+  else if (millis() - m_last_milliseconds < (667 + 32 + 32 + 32) * 4)
+    m_cone_light->lighting()->set_brightness(8);
+  else if (!m_boot_lighting_shown)
+    {
+      m_boot_lighting_shown = true;
+      m_cone_light->lighting()->set_color(m_group_color);
+    }
+
+  m_needs_redraw = false;
 }
 
 void ConeLight_App_BootScreen::button_down(ConeLightButton btn)
@@ -62,8 +97,6 @@ void ConeLight_App_BootScreen::button_down(ConeLightButton btn)
 //--- MAIN MENU APP ---//
 void ConeLight_App_MainMenu::draw()
 {
-  oled()->clearDisplay();
-
   display()->draw_up_arrow(7, 6);
   oled()->drawFastHLine(0, 21, 20, SSD1306_WHITE);
   display()->draw_select_icon(7 + 3, 32);
@@ -84,8 +117,6 @@ void ConeLight_App_MainMenu::draw()
   oled()->print("manual control");
   oled()->setCursor(42, 64 - (7 + 4));
   oled()->print("airplane mode");
-
-  oled()->display();
 }
 
 void ConeLight_App_MainMenu::update()

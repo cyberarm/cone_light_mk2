@@ -60,7 +60,15 @@ void ConeLight::update()
 
   if (m_current_app)
   {
-    m_current_app->draw();
+    if (m_current_app->needs_redraw())
+    {
+      m_display->oled()->clearDisplay();
+
+      m_current_app->draw();
+
+      m_display->oled()->display();
+    }
+
     m_current_app->update();
   }
 }
