@@ -90,6 +90,7 @@ public:
   bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name);
   void boot_complete();
   void button_event(ConeLightButton btn, ConeLightEvent state);
+  void lid_event(ConeLightEvent state);
 
   ConeLightCommandHandler *command_handler() { return m_command_handler; }
   ConeLightInputHandler *input_handler() { return m_input_handler; }

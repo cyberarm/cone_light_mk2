@@ -108,3 +108,14 @@ void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
       m_current_app->button_up(btn);
   }
 }
+
+void ConeLight::lid_event(ConeLightEvent state)
+{
+  if (m_current_app)
+  {
+    if (state == LID_CLOSED)
+      m_current_app->lid_closed();
+    if (state == LID_OPENED)
+      m_current_app->lid_opened();
+  }
+}

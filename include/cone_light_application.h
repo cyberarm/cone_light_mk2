@@ -27,6 +27,8 @@ public:
   virtual void reset() {};
   virtual void button_down(ConeLightButton btn) {};
   virtual void button_up(ConeLightButton btn) {};
+  virtual void lid_closed() {};
+  virtual void lid_opened() {};
 };
 
 class ConeLight_App_BootScreen : public ConeLightApplication
