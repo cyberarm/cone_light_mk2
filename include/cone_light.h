@@ -25,20 +25,25 @@
 #define CONE_LIGHT_PREFERENCES_NODE_NAME "node_name"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.04.22"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.05.20"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 0
 
 #define BTN_A_PIN D10
 #define BTN_B_PIN D9
 #define BTN_C_PIN D8
+#define SPEAKER_PIN D2
 #define LID_PIN D1
+#define VOLTAGE_PIN A0 // On D0
 
 #define BTN_HELD_AFTER_MS 500
 #define BTN_DEBOUNCE_MS 50
 
 #define BTN_SPEAKER_CHIRP_FREQUENCY 1760
 #define BTN_SPEAKER_CHIRP_DURATION 50
+
+#define VOLTAGE_MAX 5.6f
+#define VOLTAGE_MIN 4.72f
 
 #include <Preferences.h>
 #include "cone_light_enums.h"
@@ -47,6 +52,8 @@
 #include "cone_light_lighting.h"
 #include "cone_light_display.h"
 #include "cone_light_speaker.h"
+#include "cone_light_voltage.h"
+#include "cone_light_application.h"
 
 // Forward declarations... 💔 you C 😿
 class ConeLightCommandHandler;
@@ -54,6 +61,8 @@ class ConeLightInputHandler;
 class ConeLightLighting;
 class ConeLightDisplay;
 class ConeLightSpeaker;
+class ConeLightVoltage;
+class ConeLightApplication;
 
 class ConeLight
 {
@@ -63,6 +72,9 @@ private:
   ConeLightLighting *m_lighting = nullptr;
   ConeLightDisplay *m_display = nullptr;
   ConeLightSpeaker *m_speaker = nullptr;
+  ConeLightVoltage *m_voltage = nullptr;
+  ConeLightApplication *m_current_app = nullptr;
+  std::vector<ConeLightApplication *> m_applications = {};
   Preferences m_preferences;
   uint8_t m_node_id = CONE_LIGHT_NODE_ID_UNSET;
   uint8_t m_node_group = CONE_LIGHT_NODE_GROUP_UNSET;
@@ -76,10 +88,13 @@ public:
   uint8_t node_group();
   String node_name();
   bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name);
+  void boot_complete();
+  void button_event(ConeLightButton btn, ConeLightEvent state);
 
   ConeLightCommandHandler *command_handler() { return m_command_handler; }
   ConeLightInputHandler *input_handler() { return m_input_handler; }
   ConeLightLighting *lighting() { return m_lighting; }
   ConeLightDisplay *display() { return m_display; }
   ConeLightSpeaker *speaker() { return m_speaker; }
+  ConeLightVoltage *voltage() { return m_voltage; }
 };

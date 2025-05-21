@@ -20,6 +20,7 @@ private:
 public:
   ConeLightDisplay(ConeLight *cone_light);
   ~ConeLightDisplay();
+  Adafruit_SSD1306 *oled() { return m_display; };
   void update();
   void display_bootscreen();
   void display_menu();

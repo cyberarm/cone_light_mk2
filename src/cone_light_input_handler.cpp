@@ -54,7 +54,7 @@ void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, Co
       btn_state = "RELEASED";
 
     // TODO: Trigger an event in ConeLight to preprocess and/or forward to Application(s)
-    // m_cone_light->event(btn, state);
+    m_cone_light->button_event(btn, current_state);
     Serial.printf("BTN CHANGED: %s -> %s | %d\n", btn_name.c_str(), btn_state.c_str(), millis());
   }
 }

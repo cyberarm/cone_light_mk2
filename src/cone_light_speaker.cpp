@@ -5,7 +5,7 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
 {
   m_cone_light = cone_light;
 
-  m_speaker_inited = ledcAttach(SPEAKER, 8000, 10);
+  m_speaker_inited = ledcAttach(SPEAKER_PIN, 8000, 10);
 
   const int8_t note_count = 7;
   int16_t notes[note_count] = {136, -1, 220, -1, 293, -1, 370};
@@ -14,7 +14,7 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
   // Boot chime
   if (m_speaker_inited && CONE_LIGHT_BOOT_UP_TUNE)
   {
-    m_song->channel(SPEAKER, 0, note_count, notes, durations);
+    m_song->channel(SPEAKER_PIN, 0, note_count, notes, durations);
   }
   else
   {
@@ -72,7 +72,7 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
 
   printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", song.name().c_str(), node_id, notes.size());
 
-  m_song->channel(SPEAKER, node_id, notes.size(), notes.data(), durations.data());
+  m_song->channel(SPEAKER_PIN, node_id, notes.size(), notes.data(), durations.data());
 }
 
 void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
@@ -91,5 +91,5 @@ void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
   notes[0] = frequency;
   durations[0] = duration;
 
-  m_song->channel(SPEAKER, 0, 1, notes, durations);
+  m_song->channel(SPEAKER_PIN, 0, 1, notes, durations);
 }

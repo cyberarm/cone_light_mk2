@@ -1,7 +1,5 @@
 #pragma once
 
-#define SPEAKER D2
-
 #include "cone_light.h"
 #include "cyberarm_song.h"
 

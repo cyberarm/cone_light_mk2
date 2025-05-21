@@ -27,12 +27,18 @@ ConeLight::ConeLight()
   m_lighting = new ConeLightLighting(this);
   m_display = new ConeLightDisplay(this);
   m_speaker = new ConeLightSpeaker(this);
+  m_voltage = new ConeLightVoltage(this);
+
+  m_applications.push_back(new ConeLight_App_BootScreen(this));
+  m_applications.push_back(new ConeLight_App_MainMenu(this));
+  m_current_app = m_applications[0];
 
   Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
 }
 
 ConeLight::~ConeLight()
 {
+  delete m_voltage;
   delete m_speaker;
   delete m_display;
   delete m_lighting;
@@ -50,6 +56,13 @@ void ConeLight::update()
   m_lighting->update();
   m_display->update();
   m_speaker->update();
+  m_voltage->update();
+
+  if (m_current_app)
+  {
+    m_current_app->draw();
+    m_current_app->update();
+  }
 }
 
 uint8_t ConeLight::node_id()
@@ -78,4 +91,20 @@ bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String nod
   m_node_name = node_name;
 
   return true;
+}
+
+void ConeLight::boot_complete()
+{
+  m_current_app = m_applications[1];
+}
+
+void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
+{
+  if (m_current_app)
+  {
+    if (state == BUTTON_PRESSED)
+      m_current_app->button_down(btn);
+    if (state == BUTTON_RELEASED)
+      m_current_app->button_up(btn);
+  }
 }
