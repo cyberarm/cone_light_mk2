@@ -54,6 +54,7 @@
 #include "cone_light_speaker.h"
 #include "cone_light_voltage.h"
 #include "cone_light_application.h"
+#include "cone_light_networking.h"
 
 // Forward declarations... 💔 you C 😿
 class ConeLightCommandHandler;
@@ -63,6 +64,7 @@ class ConeLightDisplay;
 class ConeLightSpeaker;
 class ConeLightVoltage;
 class ConeLightApplication;
+class ConeLightNetworking;
 
 class ConeLight
 {
@@ -73,6 +75,7 @@ private:
   ConeLightDisplay *m_display = nullptr;
   ConeLightSpeaker *m_speaker = nullptr;
   ConeLightVoltage *m_voltage = nullptr;
+  ConeLightNetworking *m_networking = nullptr;
   ConeLightApplication *m_current_app = nullptr;
   std::vector<ConeLightApplication *> m_applications = {};
   Preferences m_preferences;
@@ -98,4 +101,5 @@ public:
   ConeLightDisplay *display() { return m_display; }
   ConeLightSpeaker *speaker() { return m_speaker; }
   ConeLightVoltage *voltage() { return m_voltage; }
+  ConeLightNetworking *networking() { return m_networking; }
 };

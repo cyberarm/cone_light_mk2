@@ -28,6 +28,7 @@ ConeLight::ConeLight()
   m_display = new ConeLightDisplay(this);
   m_speaker = new ConeLightSpeaker(this);
   m_voltage = new ConeLightVoltage(this);
+  m_networking = new ConeLightNetworking(this);
 
   m_applications.push_back(new ConeLight_App_BootScreen(this));
   m_applications.push_back(new ConeLight_App_MainMenu(this));
