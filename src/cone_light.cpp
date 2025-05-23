@@ -39,6 +39,7 @@ ConeLight::ConeLight()
 
 ConeLight::~ConeLight()
 {
+  delete m_networking;
   delete m_voltage;
   delete m_speaker;
   delete m_display;
@@ -58,6 +59,7 @@ void ConeLight::update()
   m_display->update();
   m_speaker->update();
   m_voltage->update();
+  m_networking->update();
 
   if (m_current_app)
   {
@@ -126,5 +128,16 @@ void ConeLight::lid_event(ConeLightEvent state)
       m_current_app->lid_closed();
     if (state == LID_OPENED)
       m_current_app->lid_opened();
+  }
+}
+
+void ConeLight::espnow_event(cone_light_network_packet_t packet)
+{
+  if (m_current_app)
+  {
+    Serial.printf("RECV ID: %d\n", packet.id);
+
+    // TODO: Figure out how core system and app networking works :)
+    // m_current_app->espnow_recv(packet);
   }
 }

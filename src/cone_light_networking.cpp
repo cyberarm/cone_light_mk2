@@ -14,8 +14,8 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
     return;
   }
 
-  // esp_now_register_send_cb(on_data_sent);
-  // esp_now_register_recv_cb(on_data_received);
+  esp_now_register_send_cb(cone_light_networking_send_callback);
+  esp_now_register_recv_cb(cone_light_networking_recv_callback);
 }
 
 void ConeLightNetworking::update()
@@ -36,10 +36,22 @@ void ConeLightNetworking::on_data_sent(const uint8_t *mac_addr, esp_now_send_sta
 {
 }
 
-void ConeLightNetworking::on_data_received(const uint8_t *mac_addr, const uint8_t *data, int len)
+void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len)
 {
   cone_light_network_packet_t packet;
   memcpy(&packet, data, sizeof(packet));
 
-  // m_cone_light->networking_event(packet);
+  m_cone_light->espnow_event(packet);
+}
+
+//--- non-member functions ---//
+extern ConeLight *g_cone_light;
+void cone_light_networking_send_callback(const uint8_t *mac_addr, esp_now_send_status_t status)
+{
+  g_cone_light->networking()->on_data_sent(mac_addr, status);
+}
+
+void cone_light_networking_recv_callback(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len)
+{
+  g_cone_light->networking()->on_data_received(esp_now_info, data, len);
 }

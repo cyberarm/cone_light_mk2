@@ -65,6 +65,7 @@ class ConeLightSpeaker;
 class ConeLightVoltage;
 class ConeLightApplication;
 class ConeLightNetworking;
+typedef struct cone_light_network_packet cone_light_network_packet_t;
 
 class ConeLight
 {
@@ -94,6 +95,7 @@ public:
   void boot_complete();
   void button_event(ConeLightButton btn, ConeLightEvent state);
   void lid_event(ConeLightEvent state);
+  void espnow_event(cone_light_network_packet_t packet);
 
   ConeLightCommandHandler *command_handler() { return m_command_handler; }
   ConeLightInputHandler *input_handler() { return m_input_handler; }
