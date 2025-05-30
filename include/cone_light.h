@@ -25,7 +25,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_NAME "node_name"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.05.20"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.05.29"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 0
 
@@ -38,6 +38,8 @@
 
 #define BTN_HELD_AFTER_MS 500
 #define BTN_DEBOUNCE_MS 50
+
+#define LID_DEBOUNCE_MS 500
 
 #define BTN_SPEAKER_CHIRP_FREQUENCY 1760
 #define BTN_SPEAKER_CHIRP_DURATION 50

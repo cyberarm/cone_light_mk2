@@ -13,14 +13,14 @@ ConeLightInputHandler::~ConeLightInputHandler()
 
 void ConeLightInputHandler::update()
 {
-  handle_button(UP_BUTTON, digitalRead(BTN_A_PIN), m_last_btn_a_state, m_btn_a_state_changed_ms);
-  handle_button(MIDDLE_BUTTON, digitalRead(BTN_B_PIN), m_last_btn_b_state, m_btn_b_state_changed_ms);
-  handle_button(DOWN_BUTTON, digitalRead(BTN_C_PIN), m_last_btn_c_state, m_btn_c_state_changed_ms);
+  handle_button(UP_BUTTON, digitalRead(BTN_A_PIN), m_fuzzy_btn_a_state, m_last_btn_a_state, m_btn_a_state_changed_ms);
+  handle_button(MIDDLE_BUTTON, digitalRead(BTN_B_PIN), m_fuzzy_btn_b_state, m_last_btn_b_state, m_btn_b_state_changed_ms);
+  handle_button(DOWN_BUTTON, digitalRead(BTN_C_PIN), m_fuzzy_btn_c_state, m_last_btn_c_state, m_btn_c_state_changed_ms);
 
   handle_lid(digitalRead(LID_PIN));
 }
 
-void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, ConeLightEvent &previous_state, long &state_changed_ms)
+void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, ConeLightEvent &fuzzy_state, ConeLightEvent &previous_state, long &state_changed_ms)
 {
   bool state_changed = false;
   ConeLightEvent current_state = raw_state == LOW ? BUTTON_PRESSED : BUTTON_RELEASED;
@@ -29,8 +29,18 @@ void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, Co
   if (current_state == BUTTON_PRESSED && previous_state == BUTTON_PRESSED && millis() - state_changed_ms >= BTN_HELD_AFTER_MS)
     current_state = BUTTON_HELD;
 
-  if (current_state != previous_state && millis() - state_changed_ms >= BTN_DEBOUNCE_MS)
-    state_changed = true;
+  if (current_state != fuzzy_state)
+  {
+    // BUTTON_HELD is a special case, since its not actually a physical button state but an artificial one.
+    // and setting the `state_changed_ms` here when `current_state` is BUTTON_HELD breaks the trigger for it.
+    if (current_state != BUTTON_HELD)
+      state_changed_ms = millis();
+
+    fuzzy_state = current_state;
+  }
+
+  if (millis() - state_changed_ms >= BTN_DEBOUNCE_MS)
+    state_changed = current_state != previous_state;
 
   if (state_changed)
   {
@@ -64,8 +74,14 @@ void ConeLightInputHandler::handle_lid(int raw_state)
   bool state_changed = false;
   ConeLightEvent current_state = raw_state == LOW ? LID_CLOSED : LID_OPENED;
 
-  if (current_state != m_last_lid_state && millis() - m_lid_state_changed_ms >= BTN_DEBOUNCE_MS)
-    state_changed = true;
+  if (current_state != m_fuzzy_lid_state)
+  {
+    m_lid_state_changed_ms = millis();
+    m_fuzzy_lid_state = current_state;
+  }
+
+  if (millis() - m_lid_state_changed_ms >= LID_DEBOUNCE_MS)
+    state_changed = current_state != m_last_lid_state;
 
   if (state_changed)
   {
