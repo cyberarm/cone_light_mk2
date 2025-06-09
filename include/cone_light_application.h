@@ -28,6 +28,8 @@ public:
   bool needs_redraw() { return m_needs_redraw; };
   virtual void draw() {};
   virtual void update() {};
+  virtual void focus() {};
+  virtual void blur() {};
   virtual void reset() {};
   virtual void button_down(ConeLightButton btn) {};
   virtual void button_up(ConeLightButton btn) {};
@@ -60,4 +62,6 @@ public:
   };
   void draw();
   void update();
+  void focus();
+  void blur();
 };

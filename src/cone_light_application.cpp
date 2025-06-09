@@ -122,3 +122,11 @@ void ConeLight_App_MainMenu::draw()
 void ConeLight_App_MainMenu::update()
 {
 }
+
+void ConeLight_App_MainMenu::focus()
+{
+}
+
+void ConeLight_App_MainMenu::blur()
+{
+}
