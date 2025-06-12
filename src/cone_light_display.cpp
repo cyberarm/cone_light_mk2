@@ -49,11 +49,11 @@ void ConeLightDisplay::draw_widgets()
   m_display->print(true ? " SYNC" : "     ");
 
   // Display battery voltage meter
-  m_display->drawRect(104, 3, 20, m_widget_bar_height - 6, SSD1306_WHITE);
-  m_display->drawRect(124, m_widget_bar_height / 2 - 2, 1, 4, SSD1306_WHITE);
+  m_display->drawRect(103, 3, 20, m_widget_bar_height - 6, SSD1306_WHITE);
+  m_display->drawRect(123, m_widget_bar_height / 2 - 2, 2, 4, SSD1306_WHITE);
   // --- battery bar
   float voltage_ratio = m_cone_light->voltage()->voltage_percentage() / 100.0;
-  m_display->fillRect(106, 5, (int16_t)(16 * voltage_ratio), m_widget_bar_height - 10, SSD1306_WHITE);
+  m_display->fillRect(105, 5, (int16_t)(16 * voltage_ratio), m_widget_bar_height - 10, SSD1306_WHITE);
 }
 
 void ConeLightDisplay::draw_up_arrow(uint16_t x, uint16_t y, uint16_t color)
