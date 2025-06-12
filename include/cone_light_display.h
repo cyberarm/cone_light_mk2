@@ -16,14 +16,17 @@ private:
   bool m_display_inited = false, m_bootscreen_shown = false;
   unsigned long m_last_milliseconds = millis();
   ConeLight *m_cone_light = nullptr;
+  uint8_t m_widget_bar_height = 14;
 
 public:
   ConeLightDisplay(ConeLight *cone_light);
   ~ConeLightDisplay();
   Adafruit_SSD1306 *oled() { return m_display; };
+  uint8_t widget_bar_height() {return m_widget_bar_height; };
   void update();
   void display_bootscreen();
   void display_menu();
+  void draw_widgets();
   void draw_up_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
   void draw_down_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
   void draw_left_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);

@@ -67,6 +67,10 @@ void ConeLight::update()
     {
       m_display->oled()->clearDisplay();
 
+      // FIXME: Re-draw widgets when they need updates too, not only when app needs a redraw.
+      if (!m_current_app->fullscreen())
+        m_display->draw_widgets();
+
       m_current_app->draw();
 
       m_display->oled()->display();

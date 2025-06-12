@@ -33,5 +33,5 @@ public:
   void update();
   void reset();
   bool button_down(ConeLightButton btn);
-  bool lid_open() { return false; }; // FIXME
+  bool lid_open() { return m_last_lid_state == LID_OPENED; };
 };

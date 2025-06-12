@@ -14,6 +14,7 @@ ConeLight_App_BootScreen::ConeLight_App_BootScreen(ConeLight *cone_light) : Cone
 {
   m_cone_light = cone_light;
   m_app_name = "BootScreen";
+  m_fullscreen = true;
 
   // Set default color based on node group
   // GOLD for group 1, TEAL for group 2, and PURPLE for not configured (group 255).
@@ -58,8 +59,8 @@ void ConeLight_App_BootScreen::draw()
 void ConeLight_App_BootScreen::update()
 {
   // Boot complete
-  // if (millis() >= 3'000)
-  //   m_cone_light->boot_complete();
+  if (millis() >= 3'000)
+    m_cone_light->boot_complete();
 
   if (millis() - m_last_milliseconds < 667)
     m_cone_light->lighting()->set_brightness(2);
@@ -97,23 +98,23 @@ void ConeLight_App_BootScreen::button_down(ConeLightButton btn)
 //--- MAIN MENU APP ---//
 void ConeLight_App_MainMenu::draw()
 {
-  display()->draw_up_arrow(7, 6);
-  oled()->drawFastHLine(0, 21, 20, SSD1306_WHITE);
-  display()->draw_select_icon(7 + 3, 32);
-  oled()->drawFastHLine(0, 42, 20, SSD1306_WHITE);
-  display()->draw_down_arrow(7, 64 - (9 + 8));
+  display()->draw_up_arrow(7, 2 + display()->widget_bar_height());
+  oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
+  display()->draw_select_icon(7 + 3, 32 + (display()->widget_bar_height() / 2) - 1);
+  oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
+  display()->draw_down_arrow(7, 64 - (9 + 4));
 
-  oled()->drawFastVLine(20, 0, 64, SSD1306_WHITE);
+  oled()->drawFastVLine(20, display()->widget_bar_height(), 64, SSD1306_WHITE);
 
   // Border
-  oled()->drawRect(0, 0, 128, 64, SSD1306_WHITE);
+  oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
 
   // Labels
-  oled()->setCursor(32, 32 - 3);
+  oled()->setCursor(32, 32 + ((display()->widget_bar_height() / 2) - 1) - 3);
   // oled()->print("SMART CONTROL");
   oled()->printf("%.3fv (%3.1f%%)", m_cone_light->voltage()->voltage(), m_cone_light->voltage()->voltage_percentage());
 
-  oled()->setCursor(42, 4);
+  oled()->setCursor(42, 4 + 12);
   oled()->print("manual control");
   oled()->setCursor(42, 64 - (7 + 4));
   oled()->print("airplane mode");
