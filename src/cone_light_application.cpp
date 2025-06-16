@@ -217,10 +217,15 @@ void ConeLight_App_NodeInfo::draw()
   oled()->print(m_cone_light->node_name());
   oled()->printf("  v%s", CONE_LIGHT_FIRMWARE_VERSION_NAME);
 
-  oled()->setCursor(56, 12);
+  oled()->setCursor(56, 4);
   oled()->print("Cone Light");
-  oled()->setCursor(68, 24);
+  oled()->setCursor(68, 14);
   oled()->print("mk. II");
+  oled()->setCursor(78, 30);
+  oled()->printf("%d:%d", m_cone_light->node_id(), m_cone_light->node_group());
+  oled()->setCursor(64, 41);
+  oled()->printf("%s", (m_cone_light->node_group() == 0) ? CONE_LIGHT_NODE_GROUP_0_NAME : (m_cone_light->node_group() == 1) ? CONE_LIGHT_NODE_GROUP_1_NAME
+                                                                                                                            : CONE_LIGHT_NODE_GROUP_255_NAME);
 }
 
 void ConeLight_App_NodeInfo::button_down(ConeLightButton btn)
