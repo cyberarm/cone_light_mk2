@@ -61,15 +61,24 @@ void ConeLight::update()
   m_voltage->update();
   m_networking->update();
 
+  // Check if the widget bar needs to be redrawn and the app doesn't need to be redrawn.
+  if (!m_current_app || (m_current_app && !m_current_app->needs_redraw() && !m_current_app->fullscreen()))
+  {
+    if (m_display->widget_bar_needs_redraw())
+    {
+      m_display->draw_widget_bar();
+      m_display->oled()->display();
+    }
+  }
+
   if (m_current_app)
   {
     if (m_current_app->needs_redraw())
     {
       m_display->oled()->clearDisplay();
 
-      // FIXME: Re-draw widgets when they need updates too, not only when app needs a redraw.
       if (!m_current_app->fullscreen())
-        m_display->draw_widgets();
+        m_display->draw_widget_bar();
 
       m_current_app->draw();
 

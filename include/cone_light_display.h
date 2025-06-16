@@ -17,6 +17,11 @@ private:
   unsigned long m_last_milliseconds = millis();
   ConeLight *m_cone_light = nullptr;
   uint8_t m_widget_bar_height = 14;
+  uint8_t m_last_battery_meter_width = 16;
+  uint8_t m_battery_meter_width = 16;
+  bool m_last_lid_state = false;
+  bool m_last_sync_state = false;
+  bool m_widget_bar_needs_redraw = true;
 
 public:
   ConeLightDisplay(ConeLight *cone_light);
@@ -26,7 +31,8 @@ public:
   void update();
   void display_bootscreen();
   void display_menu();
-  void draw_widgets();
+  bool widget_bar_needs_redraw();
+  void draw_widget_bar();
   void draw_up_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
   void draw_down_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
   void draw_left_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);

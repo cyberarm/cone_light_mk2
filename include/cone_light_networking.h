@@ -26,6 +26,7 @@ public:
   ~ConeLightNetworking();
   void update();
   bool espnow_initialized() { return m_espnow_initialized; };
+  bool clock_synced() { return false; };
   void send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet);
   void broadcast_packet(cone_light_network_packet_t packet);
   void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status);
