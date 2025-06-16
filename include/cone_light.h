@@ -95,6 +95,10 @@ public:
   String node_name();
   bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name);
   void boot_complete();
+  ConeLightApplication *current_app() { return m_current_app; };
+  void set_current_app(ConeLightApplication *app) { m_current_app = app; };
+  void set_current_app_main_menu();
+  std::vector<ConeLightApplication *> applications() { return m_applications; };
   void button_event(ConeLightButton btn, ConeLightEvent state);
   void lid_event(ConeLightEvent state);
   void espnow_event(cone_light_network_packet_t packet);

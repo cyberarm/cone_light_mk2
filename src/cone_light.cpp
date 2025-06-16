@@ -32,6 +32,9 @@ ConeLight::ConeLight()
 
   m_applications.push_back(new ConeLight_App_BootScreen(this));
   m_applications.push_back(new ConeLight_App_MainMenu(this));
+  m_applications.push_back(new ConeLight_App_ManualControl(this));
+  m_applications.push_back(new ConeLight_App_SmartControl(this));
+  m_applications.push_back(new ConeLight_App_NodeInfo(this));
   m_current_app = m_applications[0];
 
   Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
@@ -119,8 +122,14 @@ bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String nod
 
 void ConeLight::boot_complete()
 {
-  m_current_app = m_applications[1];
+  set_current_app_main_menu();
 }
+
+void ConeLight::set_current_app_main_menu()
+{
+  m_current_app = m_applications[1];
+  m_current_app->focus();
+};
 
 void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
 {

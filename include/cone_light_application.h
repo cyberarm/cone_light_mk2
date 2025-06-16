@@ -28,7 +28,7 @@ public:
   bool needs_redraw() { return m_needs_redraw; };
   virtual void draw() {};
   virtual void update() {};
-  virtual void focus() {};
+  void focus() { m_needs_redraw = true; };
   virtual void blur() {};
   virtual void reset() {};
   virtual void button_down(ConeLightButton btn) {};
@@ -41,7 +41,6 @@ class ConeLight_App_BootScreen : public ConeLightApplication
 {
 protected:
   unsigned long m_last_milliseconds = millis();
-  bool m_boot_lighting_shown = false;
   CRGB m_boot_color = CRGB(83, 151, 152);
   CRGB m_group_color = CRGB(0, 0, 0);
 
@@ -55,13 +54,54 @@ public:
 class ConeLight_App_MainMenu : public ConeLightApplication
 {
 public:
-  ConeLight_App_MainMenu(ConeLight *cone_light) : ConeLightApplication(cone_light)
-  {
-    m_cone_light = cone_light;
-    m_app_name = "MainMenu";
-  };
+  ConeLight_App_MainMenu(ConeLight *cone_light);
   void draw();
   void update();
-  void focus();
-  void blur();
+  void button_down(ConeLightButton btn);
+
+  uint8_t m_app_index = 2;
+  uint8_t m_max_app_index = 2;
+};
+
+class ConeLight_App_ManualControl : public ConeLightApplication
+{
+public:
+  ConeLight_App_ManualControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "Manual Control";
+  };
+  void draw();
+  // void update();
+  // void button_down(ConeLightButton btn);
+  // void focus();
+  // void blur();
+};
+
+class ConeLight_App_SmartControl : public ConeLightApplication
+{
+public:
+  ConeLight_App_SmartControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "Smart Control";
+  };
+  void draw();
+  // void update();
+  // void button_down(ConeLightButton btn);
+  // void focus();
+  // void blur();
+};
+
+class ConeLight_App_NodeInfo : public ConeLightApplication
+{
+public:
+  ConeLight_App_NodeInfo(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "Node Info";
+    m_fullscreen = true;
+  };
+  void draw();
+  void button_down(ConeLightButton btn);
 };
