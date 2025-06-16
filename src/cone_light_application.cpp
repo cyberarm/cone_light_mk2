@@ -118,24 +118,40 @@ void ConeLight_App_MainMenu::draw()
   oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
 
   // Labels
+  uint8_t previous_app_index = m_app_index - 1;
+  if (previous_app_index < 2)
+    previous_app_index = m_max_app_index;
+  if (previous_app_index > m_max_app_index)
+    previous_app_index = 2;
+
+  uint8_t next_app_index = m_app_index + 1;
+  if (next_app_index < 2)
+    next_app_index = m_max_app_index;
+  if (next_app_index > m_max_app_index)
+    next_app_index = 2;
 
   oled()->setCursor(42, 3 + display()->widget_bar_height());
-  oled()->print(m_cone_light->applications()[2]->name());
+  oled()->print(m_cone_light->applications()[previous_app_index]->name());
 
   oled()->setCursor(32, 32 + ((display()->widget_bar_height() / 2) - 1) - 3);
   oled()->print(m_cone_light->applications()[m_app_index]->name());
   // oled()->printf("%.3fv (%3.1f%%)", m_cone_light->voltage()->voltage(), m_cone_light->voltage()->voltage_percentage());
 
   oled()->setCursor(42, 64 - ((display()->widget_bar_height() / 2) + 4));
-  oled()->print(m_cone_light->applications()[4]->name());
+  oled()->print(m_cone_light->applications()[next_app_index]->name());
 }
 
 void ConeLight_App_MainMenu::update()
 {
-  m_needs_redraw = false;
-
   if (m_max_app_index == 0)
+  {
     m_max_app_index = m_cone_light->applications().size() - 1;
+    m_needs_redraw = true;
+  }
+  else
+  {
+    m_needs_redraw = false;
+  }
 }
 
 void ConeLight_App_MainMenu::button_down(ConeLightButton btn)

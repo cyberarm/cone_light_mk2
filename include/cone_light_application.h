@@ -60,7 +60,7 @@ public:
   void button_down(ConeLightButton btn);
 
   uint8_t m_app_index = 2;
-  uint8_t m_max_app_index = 2;
+  uint8_t m_max_app_index = 0;
 };
 
 class ConeLight_App_ManualControl : public ConeLightApplication
