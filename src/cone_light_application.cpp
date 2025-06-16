@@ -98,12 +98,16 @@ void ConeLight_App_BootScreen::button_down(ConeLightButton btn)
 //--- MAIN MENU APP ---//
 void ConeLight_App_MainMenu::draw()
 {
+  // Draw UP arrow
   display()->draw_up_arrow(7, 2 + display()->widget_bar_height());
   oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
+  // Draw SELECT icon
   display()->draw_select_icon(7 + 3, 32 + (display()->widget_bar_height() / 2) - 1);
   oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
+  // Draw DOWN arrow
   display()->draw_down_arrow(7, 64 - (9 + 4));
 
+  // Draw vertical line to box off the arrows and select icon
   oled()->drawFastVLine(20, display()->widget_bar_height(), 64, SSD1306_WHITE);
 
   // Border
@@ -122,6 +126,7 @@ void ConeLight_App_MainMenu::draw()
 
 void ConeLight_App_MainMenu::update()
 {
+  m_needs_redraw = false;
 }
 
 void ConeLight_App_MainMenu::focus()
