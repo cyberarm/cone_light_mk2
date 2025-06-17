@@ -35,6 +35,7 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_ManualControl(this));
   m_applications.push_back(new ConeLight_App_SmartControl(this));
   m_applications.push_back(new ConeLight_App_NodeInfo(this));
+  m_applications.push_back(new ConeLight_App_BatteryInfo(this));
   m_current_app = m_applications[0];
 
   Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
@@ -127,6 +128,8 @@ void ConeLight::boot_complete()
 
 void ConeLight::set_current_app_main_menu()
 {
+  if (m_current_app)
+    m_current_app->blur();
   m_current_app = m_applications[1];
   m_current_app->focus();
 };

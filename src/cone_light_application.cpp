@@ -131,14 +131,14 @@ void ConeLight_App_MainMenu::draw()
     next_app_index = 2;
 
   oled()->setCursor(42, 3 + display()->widget_bar_height());
-  oled()->print(m_cone_light->applications()[previous_app_index]->name());
+  oled()->print(m_cone_light->applications()[next_app_index]->name());
 
   oled()->setCursor(32, 32 + ((display()->widget_bar_height() / 2) - 1) - 3);
   oled()->print(m_cone_light->applications()[m_app_index]->name());
   // oled()->printf("%.3fv (%3.1f%%)", m_cone_light->voltage()->voltage(), m_cone_light->voltage()->voltage_percentage());
 
   oled()->setCursor(42, 64 - ((display()->widget_bar_height() / 2) + 4));
-  oled()->print(m_cone_light->applications()[next_app_index]->name());
+  oled()->print(m_cone_light->applications()[previous_app_index]->name());
 }
 
 void ConeLight_App_MainMenu::update()
@@ -159,7 +159,7 @@ void ConeLight_App_MainMenu::button_down(ConeLightButton btn)
   switch (btn)
   {
   case UP_BUTTON:
-    m_app_index--;
+    m_app_index++;
     if (m_app_index < 2)
       m_app_index = m_max_app_index;
     if (m_app_index > m_max_app_index)
@@ -176,7 +176,7 @@ void ConeLight_App_MainMenu::button_down(ConeLightButton btn)
     m_cone_light->current_app()->focus();
     break;
   case DOWN_BUTTON:
-    m_app_index++;
+    m_app_index--;
     if (m_app_index < 2)
       m_app_index = m_max_app_index;
     if (m_app_index > m_max_app_index)
@@ -230,6 +230,54 @@ void ConeLight_App_NodeInfo::draw()
 
 void ConeLight_App_NodeInfo::button_down(ConeLightButton btn)
 {
-  blur();
+  m_cone_light->set_current_app_main_menu();
+}
+
+//--- BATTERY INFORMATION APP ---//
+void ConeLight_App_BatteryInfo::draw()
+{
+  uint8_t half_widget_height = display()->widget_bar_height() / 2;
+  uint8_t battery_width = 48;
+  uint8_t battery_height = 20;
+  uint8_t battery_bar_width = battery_width - 6;
+  uint8_t battery_bar_height = battery_height - 6;
+
+  battery_bar_width = battery_bar_width * std::clamp(m_voltage_ratio, 0.0f, 1.0f);
+
+  // Display battery voltage meter
+  oled()->drawRect(128 / 2 - battery_width / 2, 64 / 2 - battery_height / 2 + half_widget_height, battery_width, battery_height, SSD1306_WHITE);
+  oled()->fillRect(128 / 2 + battery_width / 2, 64 / 2 - 5 + half_widget_height, 3, 10, SSD1306_WHITE);
+  // --- battery bar
+  oled()->fillRect(128 / 2 - battery_width / 2 + 3, 64 / 2 - battery_height / 2 + 3 + half_widget_height, battery_bar_width, battery_bar_height, SSD1306_WHITE);
+
+  // Voltage percentage
+  oled()->setCursor(128 / 2 - 20, 64 / 2 - battery_height / 2 - 4);
+  oled()->print(std::format("{:6.2f}%", m_voltage_percentage).c_str());
+
+  // Minimum voltage
+  oled()->setCursor(6, 64 / 2 - 4 + half_widget_height);
+  oled()->printf("%.2fv", VOLTAGE_MIN);
+
+  // Maximum voltage
+  oled()->setCursor(96, 64 / 2 - 4 + half_widget_height);
+  oled()->printf("%.2fv", VOLTAGE_MAX);
+
+  // Current voltage
+  oled()->setCursor(128 / 2 - 20, 64 / 2 - battery_height / 2 + half_widget_height + battery_height + 4);
+  oled()->printf("%.4fv", m_cone_light->voltage()->voltage());
+}
+
+void ConeLight_App_BatteryInfo::update()
+{
+  m_voltage_percentage = m_cone_light->voltage()->voltage_percentage();
+  m_voltage_ratio = m_voltage_percentage / 100.0;
+
+  m_needs_redraw = m_last_battery_voltage_percentage != m_voltage_percentage;
+
+  m_last_battery_voltage_percentage = m_voltage_percentage;
+}
+
+void ConeLight_App_BatteryInfo::button_down(ConeLightButton btn)
+{
   m_cone_light->set_current_app_main_menu();
 }

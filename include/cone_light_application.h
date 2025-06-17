@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
+#include <format>
 #include "cone_light.h"
 #include "cone_light_lighting.h"
 
@@ -104,4 +105,22 @@ public:
   };
   void draw();
   void button_down(ConeLightButton btn);
+};
+
+class ConeLight_App_BatteryInfo : public ConeLightApplication
+{
+public:
+  ConeLight_App_BatteryInfo(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "Battery Info";
+    m_fullscreen = false;
+  };
+  void draw();
+  void update();
+  void button_down(ConeLightButton btn);
+
+  float m_last_battery_voltage_percentage = 0.0f;
+  float m_voltage_percentage = 0.0f;
+  float m_voltage_ratio = 0.0f;
 };
