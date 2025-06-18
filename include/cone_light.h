@@ -25,7 +25,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_NAME "node_name"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.06.16"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.06.18"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 0
 
@@ -46,6 +46,8 @@
 
 #define VOLTAGE_MAX 5.6f
 #define VOLTAGE_MIN 4.72f
+
+#define SCREENSAVER_TIMEOUT_MS 10'000
 
 #include <Preferences.h>
 #include "cone_light_enums.h"
@@ -85,6 +87,8 @@ private:
   uint8_t m_node_id = CONE_LIGHT_NODE_ID_UNSET;
   uint8_t m_node_group = CONE_LIGHT_NODE_GROUP_UNSET;
   String m_node_name = CONE_LIGHT_NODE_NAME_UNSET;
+  unsigned long m_last_input_change_ms = 0;
+  bool m_screensaver = false;
 
 public:
   ConeLight();
@@ -95,6 +99,8 @@ public:
   String node_name();
   bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name);
   void boot_complete();
+  bool screensaver() { return m_screensaver; };
+  void update_screensaver();
   ConeLightApplication *current_app() { return m_current_app; };
   void set_current_app(ConeLightApplication *app) { m_current_app = app; };
   void set_current_app_main_menu();

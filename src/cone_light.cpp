@@ -38,6 +38,9 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
   m_current_app = m_applications[0];
 
+  m_last_input_change_ms = millis();
+  m_screensaver = false;
+
   Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
 }
 
@@ -64,6 +67,10 @@ void ConeLight::update()
   m_speaker->update();
   m_voltage->update();
   m_networking->update();
+
+  update_screensaver();
+  if (m_screensaver)
+    return;
 
   // Check if the widget bar needs to be redrawn and the app doesn't need to be redrawn.
   if (!m_current_app || (m_current_app && !m_current_app->needs_redraw() && !m_current_app->fullscreen()))
@@ -132,17 +139,19 @@ void ConeLight::set_current_app_main_menu()
     m_current_app->blur();
   m_current_app = m_applications[1];
   m_current_app->focus();
-};
+}
 
 void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
 {
-  if (m_current_app)
+  if (m_current_app && !m_screensaver) // 'Ignore' button press if screen is off (triggers wake up)
   {
     if (state == BUTTON_PRESSED)
       m_current_app->button_down(btn);
     if (state == BUTTON_RELEASED)
       m_current_app->button_up(btn);
   }
+
+  m_last_input_change_ms = millis();
 }
 
 void ConeLight::lid_event(ConeLightEvent state)
@@ -154,6 +163,8 @@ void ConeLight::lid_event(ConeLightEvent state)
     if (state == LID_OPENED)
       m_current_app->lid_opened();
   }
+
+  m_last_input_change_ms = millis();
 }
 
 void ConeLight::espnow_event(cone_light_network_packet_t packet)
@@ -164,5 +175,36 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
 
     // TODO: Figure out how core system and app networking works :)
     // m_current_app->espnow_recv(packet);
+  }
+}
+
+void ConeLight::update_screensaver()
+{
+  // Put display to 'sleep' after a bit of inactivity to preserve the oled display
+  if (millis() - m_last_input_change_ms >= SCREENSAVER_TIMEOUT_MS)
+  {
+    if (!m_screensaver)
+    {
+      m_display->oled()->clearDisplay();
+      m_display->oled()->display();
+
+      m_screensaver = true;
+    }
+
+    if (m_current_app)
+    {
+      m_current_app->update();
+    }
+
+    return;
+  }
+
+  if (m_screensaver)
+  {
+    m_screensaver = false;
+
+    // NOTE: May produce unexpected behavior. May be better to allow apps to be forced to be redrawn instead.
+    if (m_current_app)
+      m_current_app->focus();
   }
 }
