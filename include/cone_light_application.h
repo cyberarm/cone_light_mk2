@@ -5,9 +5,12 @@
 #include <format>
 #include "cone_light.h"
 #include "cone_light_lighting.h"
+#include "cone_light_networking.h"
 
+// Forward declarations... 💔 you C 😿
 class ConeLight;
 class ConeLightDisplay;
+typedef struct cone_light_network_packet cone_light_network_packet_t;
 
 class ConeLightApplication
 {
@@ -29,13 +32,14 @@ public:
   bool needs_redraw() { return m_needs_redraw; };
   virtual void draw() {};
   virtual void update() {};
-  void focus() { m_needs_redraw = true; };
+  virtual void focus() { m_needs_redraw = true; };
   virtual void blur() {};
   virtual void reset() {};
   virtual void button_down(ConeLightButton btn) {};
   virtual void button_up(ConeLightButton btn) {};
   virtual void lid_closed() {};
   virtual void lid_opened() {};
+  virtual void espnow_recv(cone_light_network_packet_t packet) {};
 };
 
 class ConeLight_App_BootScreen : public ConeLightApplication
@@ -123,4 +127,41 @@ public:
   float m_last_battery_voltage_percentage = 0.0f;
   float m_voltage_percentage = 0.0f;
   float m_voltage_ratio = 0.0f;
+};
+
+class ConeLight_App_Debug_ESPNow_Sender : public ConeLightApplication
+{
+private:
+  uint16_t m_packet_id = 0;
+  unsigned long m_last_transmit_ms = 0;
+
+public:
+  ConeLight_App_Debug_ESPNow_Sender(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "D: ESPNOW SEND";
+    m_fullscreen = false;
+  };
+  void draw();
+  void update();
+  void button_down(ConeLightButton btn);
+};
+
+class ConeLight_App_Debug_ESPNow_Receiver : public ConeLightApplication
+{
+private:
+  uint16_t m_last_packet_id = 0;
+  unsigned int m_packets_lost = 0;
+
+public:
+  ConeLight_App_Debug_ESPNow_Receiver(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "D: ESPNOW RECV";
+    m_fullscreen = false;
+  };
+  void draw();
+  void update();
+  void button_down(ConeLightButton btn);
+  void espnow_recv(cone_light_network_packet_t packet);
 };

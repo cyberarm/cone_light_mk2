@@ -1,18 +1,14 @@
 #pragma once
 
+#include "cone_light_network_packet.h"
 #include "cone_light.h"
 #include <esp_now.h>
+#include <esp_wifi.h>
 #include <WiFi.h>
 #include <functional>
 
 // Forward declaration...
 class ConeLight;
-
-typedef struct cone_light_network_packet
-{
-  uint16_t id;
-  uint8_t peer_id;
-} cone_light_network_packet_t;
 
 class ConeLightNetworking
 {

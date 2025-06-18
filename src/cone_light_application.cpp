@@ -171,7 +171,7 @@ void ConeLight_App_MainMenu::button_down(ConeLightButton btn)
     break;
   case SELECT_BUTTON:
     m_cone_light->current_app()->blur();
-    Serial.printf("SELECTED: %s\n", m_cone_light->applications()[m_app_index]->name());
+    Serial.printf("SELECTED: %s\n", m_cone_light->applications()[m_app_index]->name().c_str());
     m_cone_light->set_current_app(m_cone_light->applications()[m_app_index]);
     m_cone_light->current_app()->focus();
     break;
@@ -280,4 +280,64 @@ void ConeLight_App_BatteryInfo::update()
 void ConeLight_App_BatteryInfo::button_down(ConeLightButton btn)
 {
   m_cone_light->set_current_app_main_menu();
+}
+
+//--- DEBUG: ESPNOW SENDER APP ---//
+void ConeLight_App_Debug_ESPNow_Sender::draw()
+{
+  oled()->setCursor(24, 18);
+  oled()->printf("SENT: %d", m_packet_id);
+}
+
+void ConeLight_App_Debug_ESPNow_Sender::update()
+{
+  if (millis() - m_last_transmit_ms < 500)
+    return;
+
+  cone_light_network_packet_t packet;
+  packet.id = m_packet_id++;
+  packet.peer_id = m_cone_light->node_id();
+
+  m_cone_light->networking()->broadcast_packet(packet);
+
+  m_last_transmit_ms = millis();
+}
+
+void ConeLight_App_Debug_ESPNow_Sender::button_down(ConeLightButton btn)
+{
+  blur();
+  m_cone_light->set_current_app_main_menu();
+}
+
+//--- DEBUG: ESPNOW RECEIVER APP ---//
+void ConeLight_App_Debug_ESPNow_Receiver::draw()
+{
+  oled()->setCursor(24, 18);
+  oled()->printf("RECV: %d", m_last_packet_id);
+  oled()->setCursor(24, 26);
+  oled()->printf("LOST: %d", m_packets_lost);
+}
+
+void ConeLight_App_Debug_ESPNow_Receiver::update()
+{
+}
+
+void ConeLight_App_Debug_ESPNow_Receiver::button_down(ConeLightButton btn)
+{
+  blur();
+  m_cone_light->set_current_app_main_menu();
+}
+
+void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_t packet)
+{
+  unsigned int packets_lost = packet.id - m_last_packet_id;
+  // If 1 packet is 'lost' then we haven't lost any (2 - 1 = 1) [PKT_ID - LAST_PKT_ID = 1]
+  if (packets_lost == 1)
+    packets_lost = 0;
+
+  m_packets_lost += packets_lost;
+
+  // Serial.printf("PKT LOSS: %d (%d)\n", m_packets_lost, packets_lost);
+
+  m_last_packet_id = packet.id;
 }

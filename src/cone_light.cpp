@@ -36,6 +36,8 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_SmartControl(this));
   m_applications.push_back(new ConeLight_App_NodeInfo(this));
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
+  m_applications.push_back(new ConeLight_App_Debug_ESPNow_Sender(this));
+  m_applications.push_back(new ConeLight_App_Debug_ESPNow_Receiver(this));
   m_current_app = m_applications[0];
 
   m_last_input_change_ms = millis();
@@ -174,7 +176,7 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
     Serial.printf("RECV ID: %d\n", packet.id);
 
     // TODO: Figure out how core system and app networking works :)
-    // m_current_app->espnow_recv(packet);
+    m_current_app->espnow_recv(packet);
   }
 }
 

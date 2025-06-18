@@ -6,16 +6,31 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
 
   WiFi.mode(WIFI_MODE_STA);
 
-  Serial.println(WiFi.macAddress());
-
   if (esp_now_init() != ESP_OK)
   {
     Serial.println("Error initializing ESP-NOW");
     return;
   }
 
+  // Set Long Range mode
+  esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_LR);
+
   esp_now_register_send_cb(cone_light_networking_send_callback);
   esp_now_register_recv_cb(cone_light_networking_recv_callback);
+
+  esp_now_peer_info_t peerInfo;
+  memcpy(peerInfo.peer_addr, m_broadcast_address, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  if (esp_now_add_peer(&peerInfo) != ESP_OK)
+  {
+    Serial.println("Failed to add broadcast peer!");
+
+    return;
+  }
+
+  Serial.printf("    Networking initialized successfully. (MAC ADDR: %s)\n", WiFi.macAddress().c_str());
 }
 
 void ConeLightNetworking::update()
@@ -24,12 +39,15 @@ void ConeLightNetworking::update()
 
 void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet)
 {
-  esp_now_send(mac_addr, (uint8_t *)&packet, sizeof(packet));
+  esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&packet, sizeof(packet));
+
+  if (result != ESP_OK)
+    Serial.printf("ESPNow failed to send packet: [%d] %s\n", result, esp_err_to_name(result));
 }
 
 void ConeLightNetworking::broadcast_packet(cone_light_network_packet_t packet)
 {
-  esp_now_send(m_broadcast_address, (uint8_t *)&packet, sizeof(packet));
+  send_packet(m_broadcast_address, packet);
 }
 
 void ConeLightNetworking::on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status)
