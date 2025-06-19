@@ -152,6 +152,7 @@ class ConeLight_App_Debug_ESPNow_Receiver : public ConeLightApplication
 private:
   uint16_t m_last_packet_id = 0;
   unsigned int m_packets_lost = 0;
+  unsigned int m_total_packets_lost = 0;
 
 public:
   ConeLight_App_Debug_ESPNow_Receiver(ConeLight *cone_light) : ConeLightApplication(cone_light)

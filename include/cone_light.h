@@ -25,7 +25,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_NAME "node_name"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.06.18"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.06.19"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 0
 
@@ -47,7 +47,7 @@
 #define VOLTAGE_MAX 5.6f
 #define VOLTAGE_MIN 4.72f
 
-#define SCREENSAVER_TIMEOUT_MS 10'000
+#define SCREENSAVER_TIMEOUT_MS 60'000
 
 #include <Preferences.h>
 #include "cone_light_enums.h"

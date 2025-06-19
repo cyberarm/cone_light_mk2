@@ -315,7 +315,9 @@ void ConeLight_App_Debug_ESPNow_Receiver::draw()
   oled()->setCursor(24, 18);
   oled()->printf("RECV: %d", m_last_packet_id);
   oled()->setCursor(24, 26);
-  oled()->printf("LOST: %d", m_packets_lost);
+  oled()->printf("LOST: %d", m_total_packets_lost);
+  oled()->setCursor(24, 34);
+  oled()->printf("LAST: +%d", m_packets_lost);
 }
 
 void ConeLight_App_Debug_ESPNow_Receiver::update()
@@ -335,7 +337,8 @@ void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_
   if (packets_lost == 1)
     packets_lost = 0;
 
-  m_packets_lost += packets_lost;
+  m_total_packets_lost += packets_lost;
+  m_packets_lost = packets_lost;
 
   // Serial.printf("PKT LOSS: %d (%d)\n", m_packets_lost, packets_lost);
 
