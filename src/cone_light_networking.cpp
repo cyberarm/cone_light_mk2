@@ -39,6 +39,17 @@ void ConeLightNetworking::update()
 
 void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet)
 {
+  const char *node_name = m_cone_light->node_name().c_str();
+
+  packet.firmware_version = CONE_LIGHT_FIRMWARE_VERSION;
+  packet.packet_id = m_packet_id++;
+  packet.node_id = m_cone_light->node_id();
+  for (size_t i = 0; i < 6; i++)
+  {
+    packet.node_name[i] = node_name[i];
+  }
+  packet.node_group_id = m_cone_light->node_group_id();
+
   esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&packet, sizeof(packet));
 
   if (result != ESP_OK)

@@ -107,7 +107,7 @@ uint8_t ConeLight::node_id()
   return m_node_id;
 }
 
-uint8_t ConeLight::node_group()
+uint8_t ConeLight::node_group_id()
 {
   return m_node_group;
 }
@@ -173,7 +173,7 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
 {
   if (m_current_app)
   {
-    Serial.printf("RECV ID: %d\n", packet.id);
+    // Serial.printf("RECV ID: %d\n", packet.packet_id);
 
     // TODO: Figure out how core system and app networking works :)
     m_current_app->espnow_recv(packet);

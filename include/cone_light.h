@@ -95,7 +95,7 @@ public:
   ~ConeLight();
   void update();
   uint8_t node_id();
-  uint8_t node_group();
+  uint8_t node_group_id();
   String node_name();
   bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name);
   void boot_complete();

@@ -18,11 +18,11 @@ ConeLight_App_BootScreen::ConeLight_App_BootScreen(ConeLight *cone_light) : Cone
 
   // Set default color based on node group
   // GOLD for group 1, TEAL for group 2, and PURPLE for not configured (group 255).
-  if (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_0)
+  if (m_cone_light->node_group_id() == CONE_LIGHT_NODE_GROUP_0)
   {
     m_group_color = COLOR_GOLD;
   }
-  else if (m_cone_light->node_group() == CONE_LIGHT_NODE_GROUP_1)
+  else if (m_cone_light->node_group_id() == CONE_LIGHT_NODE_GROUP_1)
   {
     m_group_color = COLOR_TEAL;
   }
@@ -222,10 +222,10 @@ void ConeLight_App_NodeInfo::draw()
   oled()->setCursor(68, 14);
   oled()->print("mk. II");
   oled()->setCursor(78, 30);
-  oled()->printf("%d:%d", m_cone_light->node_id(), m_cone_light->node_group());
+  oled()->printf("%d:%d", m_cone_light->node_id(), m_cone_light->node_group_id());
   oled()->setCursor(64, 41);
-  oled()->printf("%s", (m_cone_light->node_group() == 0) ? CONE_LIGHT_NODE_GROUP_0_NAME : (m_cone_light->node_group() == 1) ? CONE_LIGHT_NODE_GROUP_1_NAME
-                                                                                                                            : CONE_LIGHT_NODE_GROUP_255_NAME);
+  oled()->printf("%s", (m_cone_light->node_group_id() == 0) ? CONE_LIGHT_NODE_GROUP_0_NAME : (m_cone_light->node_group_id() == 1) ? CONE_LIGHT_NODE_GROUP_1_NAME
+                                                                                                                                  : CONE_LIGHT_NODE_GROUP_255_NAME);
 }
 
 void ConeLight_App_NodeInfo::button_down(ConeLightButton btn)
@@ -295,8 +295,8 @@ void ConeLight_App_Debug_ESPNow_Sender::update()
     return;
 
   cone_light_network_packet_t packet;
-  packet.id = m_packet_id++;
-  packet.peer_id = m_cone_light->node_id();
+  packet.packet_id = m_packet_id++;
+  packet.node_id = m_cone_light->node_id();
 
   m_cone_light->networking()->broadcast_packet(packet);
 
@@ -332,7 +332,7 @@ void ConeLight_App_Debug_ESPNow_Receiver::button_down(ConeLightButton btn)
 
 void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_t packet)
 {
-  unsigned int packets_lost = packet.id - m_last_packet_id;
+  unsigned int packets_lost = packet.packet_id - m_last_packet_id;
   // If 1 packet is 'lost' then we haven't lost any (2 - 1 = 1) [PKT_ID - LAST_PKT_ID = 1]
   if (packets_lost == 1)
     packets_lost = 0;
@@ -342,5 +342,5 @@ void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_
 
   // Serial.printf("PKT LOSS: %d (%d)\n", m_packets_lost, packets_lost);
 
-  m_last_packet_id = packet.id;
+  m_last_packet_id = packet.packet_id;
 }

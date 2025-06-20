@@ -79,7 +79,7 @@ void ConeLightCommand_Color::handle(ConeLight *cone_light, std::vector<String> a
 void ConeLightCommand_Config::handle(ConeLight *cone_light, std::vector<String> arguments)
 {
   Serial.printf("Firmware Info: %s v%s (internal v%d)\n", CONE_LIGHT_PRODUCT_NAME, CONE_LIGHT_FIRMWARE_VERSION_NAME, CONE_LIGHT_FIRMWARE_VERSION);
-  Serial.printf("Node Info: %s (id: %d, group: %d)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group());
+  Serial.printf("Node Info: %s (id: %d, group: %d)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id());
 }
 
 // CONFIGURE
@@ -93,5 +93,5 @@ void ConeLightCommand_Configure::handle(ConeLight *cone_light, std::vector<Strin
   cone_light->reconfigure_node(node_id, node_group, node_name);
 
   Serial.println("Reconfigured node.");
-  Serial.printf("Node Info: %s (id: %d, group: %d)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group());
+  Serial.printf("Node Info: %s (id: %d, group: %d)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id());
 }

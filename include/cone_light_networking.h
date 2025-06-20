@@ -16,6 +16,7 @@ private:
   ConeLight *m_cone_light = nullptr;
   uint8_t m_broadcast_address[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   bool m_espnow_initialized = false;
+  uint16_t m_packet_id = 0;
 
 public:
   ConeLightNetworking(ConeLight *cone_light);
