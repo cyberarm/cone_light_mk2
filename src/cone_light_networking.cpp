@@ -18,7 +18,7 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
   esp_now_register_send_cb(cone_light_networking_send_callback);
   esp_now_register_recv_cb(cone_light_networking_recv_callback);
 
-  esp_now_peer_info_t peerInfo;
+  esp_now_peer_info_t peerInfo = {};
   memcpy(peerInfo.peer_addr, m_broadcast_address, 6);
   peerInfo.channel = 0;
   peerInfo.encrypt = false;
