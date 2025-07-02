@@ -4,6 +4,13 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
 {
   m_cone_light = cone_light;
 
+  // See: https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/
+  pinMode(WIFI_ENABLE, OUTPUT);   // pinMode(3, OUTPUT);
+  digitalWrite(WIFI_ENABLE, LOW); // digitalWrite(3, LOW); // Activate RF switch control
+  delay(100);
+  pinMode(WIFI_ANT_CONFIG, OUTPUT);    // pinMode(14, OUTPUT);
+  digitalWrite(WIFI_ANT_CONFIG, HIGH); // digitalWrite(14, HIGH); // Use external antenna
+
   WiFi.mode(WIFI_MODE_STA);
 
   if (esp_now_init() != ESP_OK)
