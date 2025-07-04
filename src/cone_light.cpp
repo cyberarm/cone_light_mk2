@@ -33,7 +33,7 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_BootScreen(this));
   m_applications.push_back(new ConeLight_App_MainMenu(this));
   m_applications.push_back(new ConeLight_App_ManualControl(this));
-  m_applications.push_back(new ConeLight_App_SmartControl(this));
+  m_applications.push_back(new ConeLight_App_SyncedControl(this));
   m_applications.push_back(new ConeLight_App_NodeInfo(this));
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
   m_applications.push_back(new ConeLight_App_Debug_ESPNow_Sender(this));
@@ -147,10 +147,17 @@ void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
 {
   if (m_current_app && !m_screensaver) // 'Ignore' button press if screen is off (triggers wake up)
   {
+    // TODO: Don't play button chirp if a song is playing.
+
     if (state == BUTTON_PRESSED)
-      m_current_app->button_down(btn);
+      if (m_current_app->button_down(btn))
+        speaker()->play_tone(BTN_PRESSED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
+    if (state == BUTTON_HELD)
+      if (m_current_app->button_held(btn))
+        speaker()->play_tone(BTN_HELD_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
     if (state == BUTTON_RELEASED)
-      m_current_app->button_up(btn);
+      if (m_current_app->button_up(btn))
+        speaker()->play_tone(BTN_RELEASED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
   }
 
   m_last_input_change_ms = millis();

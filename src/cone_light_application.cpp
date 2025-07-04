@@ -75,20 +75,25 @@ void ConeLight_App_BootScreen::update()
   m_needs_redraw = false;
 }
 
-void ConeLight_App_BootScreen::button_down(ConeLightButton btn)
+bool ConeLight_App_BootScreen::button_down(ConeLightButton btn)
 {
   if (millis() >= 3'000 && btn == BUTTON_A)
   {
     m_cone_light->lighting()->set_color(210, 21, 2);
     m_cone_light->lighting()->set_brightness(255);
+    return true;
   }
 
   // Boot complete
   if (millis() >= 3'000 && btn == BUTTON_B)
     m_cone_light->boot_complete();
+  return true;
 
   if (millis() >= 3'000 && btn == BUTTON_C)
     m_cone_light->speaker()->play_song(0);
+  return true;
+
+  return false;
 }
 
 //--- MAIN MENU APP ---//
@@ -154,7 +159,7 @@ void ConeLight_App_MainMenu::update()
   }
 }
 
-void ConeLight_App_MainMenu::button_down(ConeLightButton btn)
+bool ConeLight_App_MainMenu::button_down(ConeLightButton btn)
 {
   switch (btn)
   {
@@ -188,15 +193,99 @@ void ConeLight_App_MainMenu::button_down(ConeLightButton btn)
     break;
 
   default:
+    return false;
+    break;
+  }
+
+  return true;
+}
+
+//--- MANUAL CONTROL APP ---//
+void ConeLight_App_ManualControl::draw()
+{
+  // Draw UP arrow
+  display()->draw_up_arrow(7, 2 + display()->widget_bar_height());
+  oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
+  // Draw SELECT icon
+  display()->draw_select_icon(7 + 3, 32 + (display()->widget_bar_height() / 2) - 1);
+  oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
+  // Draw DOWN arrow
+  display()->draw_down_arrow(7, 64 - (9 + 4));
+
+  // Draw vertical line to box off the arrows and select icon
+  oled()->drawFastVLine(20, display()->widget_bar_height(), 64, SSD1306_WHITE);
+
+  // Border
+  oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
+
+  for (size_t i = 0; i < 4; i++)
+  {
+    uint16_t width = 64;
+    uint16_t height = 8;
+    uint16_t padding = 4;
+    uint16_t x = 34;
+    uint16_t y = display()->widget_bar_height() + 2 + ((height + padding) * i);
+
+    // label
+    oled()->setCursor(25, y + 1);
+    oled()->print(m_labels[i].c_str());
+    // box
+    oled()->drawRect(x, y, width, height, WHITE);
+    // bar
+    oled()->fillRect(x + 2, y + 2, width - 4, height - 4, WHITE);
+    // percentage
+    oled()->setCursor(x + width + 2, y + 1);
+    oled()->print("100%");
+  }
+}
+
+void ConeLight_App_ManualControl::update()
+{
+}
+
+bool ConeLight_App_ManualControl::button_held(ConeLightButton btn)
+{
+  switch (btn)
+  {
+  case UP_BUTTON:
+    if (!m_selected)
+      m_cone_light->set_current_app_main_menu();
+    return true;
+    break;
+
+  default:
+    return false;
     break;
   }
 }
 
-//--- MANUAL CONTROL APP ---//
-void ConeLight_App_ManualControl::draw() {}
+bool ConeLight_App_ManualControl::button_down(ConeLightButton btn)
+{
+  switch (btn)
+  {
+  case UP_BUTTON:
+    break;
+  case SELECT_BUTTON:
+    break;
+  case DOWN_BUTTON:
+    break;
+  default:
+    return false;
+    break;
+  }
+
+  return false;
+}
 
 //--- SMART CONTROL APP ---//
-void ConeLight_App_SmartControl::draw() {}
+void ConeLight_App_SyncedControl::draw() {}
+
+bool ConeLight_App_SyncedControl::button_down(ConeLightButton btn)
+{
+  m_cone_light->set_current_app_main_menu();
+
+  return true;
+}
 
 //--- NODE CONFIGURATION APP ---//
 void ConeLight_App_NodeInfo::draw()
@@ -228,9 +317,11 @@ void ConeLight_App_NodeInfo::draw()
                                                                                                                                   : CONE_LIGHT_NODE_GROUP_255_NAME);
 }
 
-void ConeLight_App_NodeInfo::button_down(ConeLightButton btn)
+bool ConeLight_App_NodeInfo::button_down(ConeLightButton btn)
 {
   m_cone_light->set_current_app_main_menu();
+
+  return true;
 }
 
 //--- BATTERY INFORMATION APP ---//
@@ -277,9 +368,11 @@ void ConeLight_App_BatteryInfo::update()
   m_last_battery_voltage_percentage = m_voltage_percentage;
 }
 
-void ConeLight_App_BatteryInfo::button_down(ConeLightButton btn)
+bool ConeLight_App_BatteryInfo::button_down(ConeLightButton btn)
 {
   m_cone_light->set_current_app_main_menu();
+
+  return true;
 }
 
 //--- DEBUG: ESPNOW SENDER APP ---//
@@ -303,10 +396,12 @@ void ConeLight_App_Debug_ESPNow_Sender::update()
   m_last_transmit_ms = millis();
 }
 
-void ConeLight_App_Debug_ESPNow_Sender::button_down(ConeLightButton btn)
+bool ConeLight_App_Debug_ESPNow_Sender::button_down(ConeLightButton btn)
 {
   blur();
   m_cone_light->set_current_app_main_menu();
+
+  return true;
 }
 
 //--- DEBUG: ESPNOW RECEIVER APP ---//
@@ -324,10 +419,12 @@ void ConeLight_App_Debug_ESPNow_Receiver::update()
 {
 }
 
-void ConeLight_App_Debug_ESPNow_Receiver::button_down(ConeLightButton btn)
+bool ConeLight_App_Debug_ESPNow_Receiver::button_down(ConeLightButton btn)
 {
   blur();
   m_cone_light->set_current_app_main_menu();
+
+  return true;
 }
 
 void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_t packet)
