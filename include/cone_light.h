@@ -25,7 +25,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_NAME "node_name"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.03"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.05"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 0
 
@@ -61,6 +61,7 @@
 #include "cone_light_voltage.h"
 #include "cone_light_application.h"
 #include "cone_light_networking.h"
+#include "cone_light_network_time.h"
 
 // Forward declarations... 💔 you C 😿
 class ConeLightCommandHandler;
@@ -71,6 +72,7 @@ class ConeLightSpeaker;
 class ConeLightVoltage;
 class ConeLightApplication;
 class ConeLightNetworking;
+class ConeLightNetworkTime;
 typedef struct cone_light_network_packet cone_light_network_packet_t;
 
 class ConeLight
@@ -83,6 +85,7 @@ private:
   ConeLightSpeaker *m_speaker = nullptr;
   ConeLightVoltage *m_voltage = nullptr;
   ConeLightNetworking *m_networking = nullptr;
+  ConeLightNetworkTime *m_network_time = nullptr;
   ConeLightApplication *m_current_app = nullptr;
   std::vector<ConeLightApplication *> m_applications = {};
   Preferences m_preferences;

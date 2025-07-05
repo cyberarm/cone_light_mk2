@@ -22,3 +22,9 @@ enum ConeLightButton
   MIDDLE_BUTTON = BUTTON_B,
   DOWN_BUTTON = BUTTON_C
 };
+
+enum ConeLightNetworkCommand
+{
+  NONE = 0, // This message is not a "command" is should be forwarded to the active app for processing.
+  CLOCK = 10
+};

@@ -29,6 +29,7 @@ ConeLight::ConeLight()
   m_speaker = new ConeLightSpeaker(this);
   m_voltage = new ConeLightVoltage(this);
   m_networking = new ConeLightNetworking(this);
+  m_network_time = new ConeLightNetworkTime(); // Network Time only cares about time.
 
   m_applications.push_back(new ConeLight_App_BootScreen(this));
   m_applications.push_back(new ConeLight_App_MainMenu(this));
@@ -48,6 +49,7 @@ ConeLight::ConeLight()
 
 ConeLight::~ConeLight()
 {
+  delete m_network_time;
   delete m_networking;
   delete m_voltage;
   delete m_speaker;
@@ -69,6 +71,7 @@ void ConeLight::update()
   m_speaker->update();
   m_voltage->update();
   m_networking->update();
+  m_network_time->update();
 
   update_screensaver();
   if (m_screensaver)
@@ -178,12 +181,15 @@ void ConeLight::lid_event(ConeLightEvent state)
 
 void ConeLight::espnow_event(cone_light_network_packet_t packet)
 {
-  if (m_current_app)
-  {
-    // Serial.printf("RECV ID: %d\n", packet.packet_id);
+  // Serial.printf("RECV ID: %d\n", packet.packet_id);
 
-    // TODO: Figure out how core system and app networking works :)
+  if (packet.command_id == ConeLightNetworkCommand::NONE && m_current_app)
+  {
     m_current_app->espnow_recv(packet);
+  }
+  else
+  {
+    // Handle COMMAND!
   }
 }
 
