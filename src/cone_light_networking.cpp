@@ -77,8 +77,15 @@ void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_in
     return;
   }
 
-  cone_light_network_packet_t packet;
+  cone_light_network_packet_t packet = {};
   memcpy(&packet, data, sizeof(cone_light_network_packet_t));
+
+  // Received packet cannot be handled, incompatible firmware (protocol) version
+  if (packet.firmware_version != CONE_LIGHT_FIRMWARE_VERSION)
+  {
+    Serial.printf("Networking: Rejected packet due to firmware version mismatch. Got: %u, expected: %u\n", packet.firmware_version, CONE_LIGHT_FIRMWARE_VERSION);
+    return;
+  }
 
   m_cone_light->espnow_event(packet);
 }
