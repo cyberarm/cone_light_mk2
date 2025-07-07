@@ -203,6 +203,15 @@ bool ConeLight_App_MainMenu::button_down(ConeLightButton btn)
 //--- MANUAL CONTROL APP ---//
 void ConeLight_App_ManualControl::draw()
 {
+  // Draw top bar
+  oled()->drawRect(0, 0, 128, display()->widget_bar_height(), SSD1306_WHITE);
+  // Draw back label
+  oled()->setCursor(4, 4);
+  oled()->print(m_labels[m_index].c_str());
+  // Draw hex colour label
+  oled()->setCursor(72, 4);
+  oled()->print(hex_color(m_values[1], m_values[2], m_values[3], m_values[4]).c_str());
+
   // Draw UP arrow
   display()->draw_up_arrow(7, 2 + display()->widget_bar_height());
   oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
@@ -218,38 +227,135 @@ void ConeLight_App_ManualControl::draw()
   // Border
   oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
 
-  for (size_t i = 0; i < 4; i++)
+  for (size_t i = 1; i <= m_max_index; i++)
   {
     uint16_t width = 64;
     uint16_t height = 8;
     uint16_t padding = 4;
     uint16_t x = 34;
-    uint16_t y = display()->widget_bar_height() + 2 + ((height + padding) * i);
+    uint16_t y = display()->widget_bar_height() + 2 + ((height + padding) * (i - 1));
+
+    float ratio = 0.0f;
+    ratio = std::clamp(0.0f, 1.0f, (float)m_values[i] / 255.0f);
 
     // label
     oled()->setCursor(25, y + 1);
-    oled()->print(m_labels[i].c_str());
+    oled()->print(m_labels[i].c_str()[0]);
     // box
-    oled()->drawRect(x, y, width, height, WHITE);
+    if (m_selected && m_index == i)
+      oled()->drawRect(x, y, width, height, WHITE);
     // bar
-    oled()->fillRect(x + 2, y + 2, width - 4, height - 4, WHITE);
+    oled()->fillRect(x + 2, y + 2, (width - 4) * ratio, height - 4, WHITE);
     // percentage
     oled()->setCursor(x + width + 2, y + 1);
-    oled()->print("100%");
+    oled()->print(std::format("{:3}%", uint8_t(ratio * 100.0f)).c_str());
+
+    if (!m_selected && m_index == i)
+    {
+      display()->draw_right_arrow(30, y + 4, BLACK, false);
+      display()->draw_right_arrow(28, y + 4, WHITE, false);
+    }
   }
 }
 
 void ConeLight_App_ManualControl::update()
 {
+  if (m_held_direction != ConeLightDirection::NONE && millis() - m_last_held_increment_ms >= 50)
+  {
+    m_last_held_increment_ms = millis();
+    m_values[m_index] += m_held_direction;
+    apply_color();
+  }
+
+  // Continually reset last held when not held
+  if (m_held_direction == ConeLightDirection::NONE)
+    m_last_held_increment_ms = millis();
+
+  m_needs_redraw = m_held_direction != ConeLightDirection::NONE;
+}
+
+bool ConeLight_App_ManualControl::button_down(ConeLightButton btn)
+{
+  m_needs_redraw = true;
+
+  switch (btn)
+  {
+  case UP_BUTTON:
+    if (m_selected)
+    {
+      m_values[m_index]++;
+      apply_color();
+    }
+    else
+    {
+      m_index--;
+      if (m_index < 0)
+        m_index = m_max_index;
+      // Handle integer underflow
+      if (m_index > m_max_index)
+        m_index = m_max_index;
+    }
+    return true;
+
+    break;
+
+  case SELECT_BUTTON:
+    if (m_selected)
+    {
+      m_selected = false;
+      return true;
+    }
+    else
+    {
+      if (m_index == 0)
+      {
+        m_cone_light->set_current_app_main_menu();
+        m_selected = false;
+      }
+      else
+      {
+        m_selected = true;
+      }
+      return true;
+    }
+    break;
+
+  case DOWN_BUTTON:
+    if (m_selected)
+    {
+      m_values[m_index]--;
+      apply_color();
+    }
+    else
+    {
+      m_index++;
+      if (m_index > m_max_index)
+        m_index = 0;
+    }
+    return true;
+
+    break;
+
+  default:
+    return false;
+    break;
+  }
+
+  return false;
 }
 
 bool ConeLight_App_ManualControl::button_held(ConeLightButton btn)
 {
+  m_needs_redraw = true;
+
   switch (btn)
   {
   case UP_BUTTON:
-    if (!m_selected)
-      m_cone_light->set_current_app_main_menu();
+    m_held_direction = ConeLightDirection::UP;
+    return true;
+    break;
+  case DOWN_BUTTON:
+    m_held_direction = ConeLightDirection::DOWN;
     return true;
     break;
 
@@ -257,24 +363,44 @@ bool ConeLight_App_ManualControl::button_held(ConeLightButton btn)
     return false;
     break;
   }
+
+  return false;
 }
 
-bool ConeLight_App_ManualControl::button_down(ConeLightButton btn)
+bool ConeLight_App_ManualControl::button_up(ConeLightButton btn)
 {
-  switch (btn)
+  m_needs_redraw = true;
+
+  if (m_held_direction != ConeLightDirection::NONE)
   {
-  case UP_BUTTON:
-    break;
-  case SELECT_BUTTON:
-    break;
-  case DOWN_BUTTON:
-    break;
-  default:
-    return false;
-    break;
+    m_held_direction = ConeLightDirection::NONE;
+    return true;
   }
 
   return false;
+}
+
+void ConeLight_App_ManualControl::focus()
+{
+  m_needs_redraw = true;
+
+  if (!m_has_been_focused_once)
+  {
+    m_has_been_focused_once = true;
+
+    CRGB color = m_cone_light->lighting()->get_color();
+    m_values[1] = color.red;
+    m_values[2] = color.green;
+    m_values[3] = color.blue;
+
+    m_values[4] = m_cone_light->lighting()->get_brightness();
+  }
+}
+
+void ConeLight_App_ManualControl::apply_color()
+{
+  m_cone_light->lighting()->set_color(CRGB(m_values[1], m_values[2], m_values[3]));
+  m_cone_light->lighting()->set_brightness(m_values[4]);
 }
 
 //--- SMART CONTROL APP ---//
@@ -390,6 +516,7 @@ void ConeLight_App_Debug_ESPNow_Sender::update()
   cone_light_network_packet_t packet;
   packet.packet_id = m_packet_id++;
   packet.node_id = m_cone_light->node_id();
+  packet.command_type = ConeLightNetworkCommand::NOT_A_COMMAND;
 
   m_cone_light->networking()->broadcast_packet(packet);
 

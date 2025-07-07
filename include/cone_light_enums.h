@@ -25,6 +25,13 @@ enum ConeLightButton
 
 enum ConeLightNetworkCommand
 {
-  NONE = 0, // This message is not a "command" is should be forwarded to the active app for processing.
+  NOT_A_COMMAND = 0, // This message is not a "command" and should be forwarded to the active app for processing.
   CLOCK = 10
+};
+
+enum ConeLightDirection
+{
+  UP = 1,
+  NONE = 0,
+  DOWN = -1
 };

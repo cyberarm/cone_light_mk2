@@ -37,5 +37,6 @@ public:
   void draw_down_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
   void draw_left_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
   void draw_right_arrow(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
+  void draw_right_arrow(uint16_t x, uint16_t y, uint16_t color, bool tail);
   void draw_select_icon(uint16_t x, uint16_t y, uint16_t color = SSD1306_WHITE);
 };

@@ -183,13 +183,15 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
 {
   // Serial.printf("RECV ID: %d\n", packet.packet_id);
 
-  if (packet.command_id == ConeLightNetworkCommand::NONE && m_current_app)
+  switch (packet.command_id)
   {
-    m_current_app->espnow_recv(packet);
-  }
-  else
-  {
-    // Handle COMMAND!
+  case ConeLightNetworkCommand::NOT_A_COMMAND:
+    if (m_current_app)
+      m_current_app->espnow_recv(packet);
+    break;
+
+  default:
+    break;
   }
 }
 

@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include <format>
+#include <algorithm>
 #include "cone_light.h"
 #include "cone_light_lighting.h"
 #include "cone_light_networking.h"
@@ -74,22 +75,34 @@ public:
 class ConeLight_App_ManualControl : public ConeLightApplication
 {
 private:
+  bool m_has_been_focused_once = false;
   bool m_selected = false;
   size_t m_index = 0;
-  const std::string m_labels[4] = {"R", "G", "B", "L"};
+  size_t m_max_index = 4;
+  const std::string m_labels[5] = {"Main Menu", "Red", "Green", "Blue", "Lightness"};
+  uint8_t m_values[5] = {0, 0, 0, 0, 8};
+  int8_t m_held_direction = 0;
+  uint64_t m_last_held_increment_ms = 0;
 
 public:
   ConeLight_App_ManualControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
   {
     m_cone_light = cone_light;
     m_app_name = "Manual Control";
+    m_fullscreen = true;
   };
   void draw();
   void update();
   bool button_down(ConeLightButton btn);
   bool button_held(ConeLightButton btn);
-  // void focus();
+  bool button_up(ConeLightButton btn);
+  void focus();
   // void blur();
+  std::string hex_color(uint8_t red, uint8_t green, uint8_t blue, uint8_t lightness)
+  {
+    return std::format("#{:02X}{:02X}{:02X}{:02X}", red, green, blue, lightness);
+  };
+  void apply_color();
 };
 
 class ConeLight_App_SyncedControl : public ConeLightApplication

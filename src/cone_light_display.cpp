@@ -93,10 +93,16 @@ void ConeLightDisplay::draw_left_arrow(uint16_t x, uint16_t y, uint16_t color)
   m_display->fillTriangle(x + 3, y - 3, x, y, x + 3, y + 3, color);
 }
 
+void ConeLightDisplay::draw_right_arrow(uint16_t x, uint16_t y, uint16_t color, bool tail)
+{
+  if (tail)
+    m_display->drawFastHLine(x, y, 6, color);
+  m_display->fillTriangle(x + 6, y - 3, x + 6 + 3, y, x + 6, y + 3, color);
+}
+
 void ConeLightDisplay::draw_right_arrow(uint16_t x, uint16_t y, uint16_t color)
 {
-  m_display->drawFastHLine(x, y, 6, color);
-  m_display->fillTriangle(x + 6, y - 3, x + 6 + 3, y, x + 6, y + 3, color);
+  ConeLightDisplay::draw_right_arrow(x, y, color, true);
 }
 
 void ConeLightDisplay::draw_select_icon(uint16_t x, uint16_t y, uint16_t color)
