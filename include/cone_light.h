@@ -5,11 +5,13 @@
 // #define NODE_NAME "KETTLE" // HOBBIT FIDDLE DRAGON FLOWER LOCKET MIRROR PILLOW
 
 #define CONE_LIGHT_PRODUCT_NAME "Cone Light mk. II"
+// Whether buttons cause beeps and chirps
+#define CONE_LIGHT_MUTED true
 // Play 4 notes on boot up
 #define CONE_LIGHT_BOOT_UP_TUNE false
 
 #define CONE_LIGHT_NODE_ID_UNSET 255
-#define CONE_LIGHT_NODE_GROUP_UNSET 255
+#define CONE_LIGHT_NODE_GROUP_ID_UNSET 255
 #define CONE_LIGHT_NODE_NAME_UNSET "NONAME"
 
 #define CONE_LIGHT_NODE_GROUP_0 0
@@ -90,10 +92,11 @@ private:
   std::vector<ConeLightApplication *> m_applications = {};
   Preferences m_preferences;
   uint8_t m_node_id = CONE_LIGHT_NODE_ID_UNSET;
-  uint8_t m_node_group = CONE_LIGHT_NODE_GROUP_UNSET;
+  uint8_t m_node_group = CONE_LIGHT_NODE_GROUP_ID_UNSET;
   String m_node_name = CONE_LIGHT_NODE_NAME_UNSET;
-  unsigned long m_last_input_change_ms = 0;
+  uint32_t m_last_input_change_ms = 0;
   bool m_screensaver = false;
+  bool m_muted = CONE_LIGHT_MUTED;
 
 public:
   ConeLight();
@@ -106,6 +109,8 @@ public:
   void boot_complete();
   bool screensaver() { return m_screensaver; };
   void update_screensaver();
+  bool muted() { return m_muted; };
+  void set_muted(bool mute) { m_muted = mute; };
   ConeLightApplication *current_app() { return m_current_app; };
   void set_current_app(ConeLightApplication *app) { m_current_app = app; };
   void set_current_app_main_menu();
@@ -121,4 +126,5 @@ public:
   ConeLightSpeaker *speaker() { return m_speaker; }
   ConeLightVoltage *voltage() { return m_voltage; }
   ConeLightNetworking *networking() { return m_networking; }
+  ConeLightNetworkTime *network_time() { return m_network_time; }
 };

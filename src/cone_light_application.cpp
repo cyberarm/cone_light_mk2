@@ -506,6 +506,8 @@ void ConeLight_App_Debug_ESPNow_Sender::draw()
 {
   oled()->setCursor(24, 18);
   oled()->printf("SENT: %d", m_packet_id);
+
+  m_needs_redraw = false;
 }
 
 void ConeLight_App_Debug_ESPNow_Sender::update()
@@ -514,13 +516,14 @@ void ConeLight_App_Debug_ESPNow_Sender::update()
     return;
 
   cone_light_network_packet_t packet;
-  packet.packet_id = m_packet_id++;
-  packet.node_id = m_cone_light->node_id();
   packet.command_type = ConeLightNetworkCommand::NOT_A_COMMAND;
+  packet.command_parameters = m_packet_id++;
 
   m_cone_light->networking()->broadcast_packet(packet);
 
   m_last_transmit_ms = millis();
+
+  m_needs_redraw = true;
 }
 
 bool ConeLight_App_Debug_ESPNow_Sender::button_down(ConeLightButton btn)
@@ -540,6 +543,10 @@ void ConeLight_App_Debug_ESPNow_Receiver::draw()
   oled()->printf("LOST: %d", m_total_packets_lost);
   oled()->setCursor(24, 34);
   oled()->printf("LAST: +%d", m_packets_lost);
+  oled()->setCursor(24, 42);
+  oled()->printf("FROM: %d:%s:%d", m_last_sender_id, m_last_sender_name, m_last_sender_group_id);
+
+  m_needs_redraw = false;
 }
 
 void ConeLight_App_Debug_ESPNow_Receiver::update()
@@ -556,7 +563,7 @@ bool ConeLight_App_Debug_ESPNow_Receiver::button_down(ConeLightButton btn)
 
 void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_t packet)
 {
-  unsigned int packets_lost = packet.packet_id - m_last_packet_id;
+  uint16_t packets_lost = packet.packet_id - m_last_packet_id;
   // If 1 packet is 'lost' then we haven't lost any (2 - 1 = 1) [PKT_ID - LAST_PKT_ID = 1]
   if (packets_lost == 1)
     packets_lost = 0;
@@ -567,4 +574,9 @@ void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_
   // Serial.printf("PKT LOSS: %d (%d)\n", m_packets_lost, packets_lost);
 
   m_last_packet_id = packet.packet_id;
+  m_last_sender_id = packet.node_id;
+  strncpy(m_last_sender_name, packet.node_name, 7);
+  m_last_sender_group_id = packet.node_group_id;
+
+  m_needs_redraw = true;
 }

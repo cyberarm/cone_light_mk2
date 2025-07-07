@@ -20,7 +20,7 @@ void ConeLightInputHandler::update()
   handle_lid(digitalRead(LID_PIN));
 }
 
-void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, ConeLightEvent &fuzzy_state, ConeLightEvent &previous_state, long &state_changed_ms)
+void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, ConeLightEvent &fuzzy_state, ConeLightEvent &previous_state, uint32_t &state_changed_ms)
 {
   bool state_changed = false;
   ConeLightEvent current_state = raw_state == LOW ? BUTTON_PRESSED : BUTTON_RELEASED;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cinttypes>
+#include <Arduino.h>
 #include "cone_light_enums.h"
 #include "cone_light_network_packet.h"
 
@@ -22,4 +22,5 @@ public:
   bool is_master_clock() { return m_node_master_clock; };
   // Master clock is always in sync because it is the Master of Time :)
   bool is_clock_synced() { return is_master_clock() || m_clock_synced; };
+  uint32_t timestamp() { return millis() + m_offset_ms; };
 };

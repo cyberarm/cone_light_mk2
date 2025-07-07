@@ -13,8 +13,8 @@ private:
   uint16_t m_note_count = 0;
   uint16_t m_current_note = 0;
   bool m_complete = true;
-  long m_last_note_duration = 0;
-  long m_last_note_started_at = 0;
+  uint32_t m_last_note_duration = 0;
+  uint32_t m_last_note_started_at = 0;
 
 public:
   CyberarmSongChannel() {}

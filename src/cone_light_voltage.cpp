@@ -33,7 +33,7 @@ void ConeLightVoltage::reset()
 float ConeLightVoltage::read_voltage()
 {
   uint32_t voltage_sampler = 0;
-  for (int i = 0; i < m_voltage_samples; i++)
+  for (uint8_t i = 0; i < m_voltage_samples; i++)
   {
     voltage_sampler += analogReadMilliVolts(VOLTAGE_PIN);
   }

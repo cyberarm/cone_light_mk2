@@ -14,7 +14,7 @@ class ConeLightDisplay
 private:
   Adafruit_SSD1306 *m_display = new Adafruit_SSD1306(128, 64, &Wire, -1);
   bool m_display_inited = false, m_bootscreen_shown = false;
-  unsigned long m_last_milliseconds = millis();
+  uint32_t m_last_milliseconds = millis();
   ConeLight *m_cone_light = nullptr;
   uint8_t m_widget_bar_height = 14;
   uint8_t m_last_battery_meter_width = 16;

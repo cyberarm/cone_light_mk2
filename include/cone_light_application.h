@@ -20,8 +20,8 @@ protected:
   String m_app_name = "";
   bool m_fullscreen = false;
   bool m_needs_redraw = true;
-  unsigned int m_last_updated_ms = 0;
-  unsigned int m_update_interval_ms = 3'000;
+  uint32_t m_last_updated_ms = 0;
+  uint32_t m_update_interval_ms = 3'000;
   ConeLightDisplay *display();
   Adafruit_SSD1306 *oled();
 
@@ -49,7 +49,7 @@ public:
 class ConeLight_App_BootScreen : public ConeLightApplication
 {
 protected:
-  unsigned long m_last_milliseconds = millis();
+  uint32_t m_last_milliseconds = millis();
   CRGB m_boot_color = CRGB(83, 151, 152);
   CRGB m_group_color = CRGB(0, 0, 0);
 
@@ -82,7 +82,7 @@ private:
   const std::string m_labels[5] = {"Main Menu", "Red", "Green", "Blue", "Lightness"};
   uint8_t m_values[5] = {0, 0, 0, 0, 8};
   int8_t m_held_direction = 0;
-  uint64_t m_last_held_increment_ms = 0;
+  uint32_t m_last_held_increment_ms = 0;
 
 public:
   ConeLight_App_ManualControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
@@ -155,7 +155,7 @@ class ConeLight_App_Debug_ESPNow_Sender : public ConeLightApplication
 {
 private:
   uint16_t m_packet_id = 0;
-  unsigned long m_last_transmit_ms = 0;
+  uint32_t m_last_transmit_ms = 0;
 
 public:
   ConeLight_App_Debug_ESPNow_Sender(ConeLight *cone_light) : ConeLightApplication(cone_light)
@@ -173,8 +173,11 @@ class ConeLight_App_Debug_ESPNow_Receiver : public ConeLightApplication
 {
 private:
   uint16_t m_last_packet_id = 0;
-  unsigned int m_packets_lost = 0;
-  unsigned int m_total_packets_lost = 0;
+  uint32_t m_packets_lost = 0;
+  uint32_t m_total_packets_lost = 0;
+  uint8_t m_last_sender_id = CONE_LIGHT_NODE_ID_UNSET;
+  char m_last_sender_name[7] = {CONE_LIGHT_NODE_NAME_UNSET};
+  uint8_t m_last_sender_group_id = CONE_LIGHT_NODE_GROUP_ID_UNSET;
 
 public:
   ConeLight_App_Debug_ESPNow_Receiver(ConeLight *cone_light) : ConeLightApplication(cone_light)

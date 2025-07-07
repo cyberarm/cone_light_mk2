@@ -17,7 +17,7 @@ ConeLight::ConeLight()
   // Load node specific data from Preferences
   Serial.println("  Loading node preferences data...");
   m_node_id = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_ID, CONE_LIGHT_NODE_ID_UNSET);
-  m_node_group = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_UNSET);
+  m_node_group = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_ID_UNSET);
   m_node_name = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_NAME, CONE_LIGHT_NODE_NAME_UNSET);
 
   // Initialize subsystems...
@@ -154,13 +154,16 @@ void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
 
     if (state == BUTTON_PRESSED)
       if (m_current_app->button_down(btn))
-        speaker()->play_tone(BTN_PRESSED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
+        if (!muted())
+          speaker()->play_tone(BTN_PRESSED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
     if (state == BUTTON_HELD)
       if (m_current_app->button_held(btn))
-        speaker()->play_tone(BTN_HELD_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
+        if (!muted())
+          speaker()->play_tone(BTN_HELD_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
     if (state == BUTTON_RELEASED)
       if (m_current_app->button_up(btn))
-        speaker()->play_tone(BTN_RELEASED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
+        if (!muted())
+          speaker()->play_tone(BTN_RELEASED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
   }
 
   m_last_input_change_ms = millis();
