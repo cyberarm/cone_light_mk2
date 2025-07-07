@@ -9,7 +9,9 @@ ConeLightDisplay *ConeLightApplication::display() { return m_cone_light->display
 
 Adafruit_SSD1306 *ConeLightApplication::oled() { return display()->oled(); };
 
+///////////////////////////
 //--- BOOT SCREEN APP ---//
+///////////////////////////
 ConeLight_App_BootScreen::ConeLight_App_BootScreen(ConeLight *cone_light) : ConeLightApplication(cone_light)
 {
   m_cone_light = cone_light;
@@ -96,7 +98,9 @@ bool ConeLight_App_BootScreen::button_down(ConeLightButton btn)
   return false;
 }
 
+/////////////////////////
 //--- MAIN MENU APP ---//
+/////////////////////////
 ConeLight_App_MainMenu::ConeLight_App_MainMenu(ConeLight *cone_light) : ConeLightApplication(cone_light)
 {
   m_cone_light = cone_light;
@@ -200,7 +204,9 @@ bool ConeLight_App_MainMenu::button_down(ConeLightButton btn)
   return true;
 }
 
+//////////////////////////////
 //--- MANUAL CONTROL APP ---//
+//////////////////////////////
 void ConeLight_App_ManualControl::draw()
 {
   // Draw top bar
@@ -403,17 +409,225 @@ void ConeLight_App_ManualControl::apply_color()
   m_cone_light->lighting()->set_brightness(m_values[4]);
 }
 
-//--- SMART CONTROL APP ---//
-void ConeLight_App_SyncedControl::draw() {}
+//////////////////////////////
+//--- SYNCED CONTROL APP ---//
+//////////////////////////////
+void ConeLight_App_SyncedControl::draw()
+{
+  // Draw top bar
+  oled()->drawRect(0, 0, 128, display()->widget_bar_height(), SSD1306_WHITE);
+  // Draw back label
+  oled()->setCursor(4, 4);
+  oled()->print(m_labels[m_index].c_str());
+  // Draw hex colour label
+  oled()->setCursor(72, 4);
+  oled()->print(hex_color(m_values[1], m_values[2], m_values[3], m_values[4]).c_str());
+
+  // Draw UP arrow
+  display()->draw_up_arrow(7, 2 + display()->widget_bar_height());
+  oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
+  // Draw SELECT icon
+  display()->draw_select_icon(7 + 3, 32 + (display()->widget_bar_height() / 2) - 1);
+  oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
+  // Draw DOWN arrow
+  display()->draw_down_arrow(7, 64 - (9 + 4));
+
+  // Draw vertical line to box off the arrows and select icon
+  oled()->drawFastVLine(20, display()->widget_bar_height(), 64, SSD1306_WHITE);
+
+  // Border
+  oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
+
+  for (size_t i = 1; i <= m_max_index; i++)
+  {
+    uint16_t width = 64;
+    uint16_t height = 8;
+    uint16_t padding = 4;
+    uint16_t x = 34;
+    uint16_t y = display()->widget_bar_height() + 2 + ((height + padding) * (i - 1));
+
+    float ratio = 0.0f;
+    ratio = std::clamp(0.0f, 1.0f, (float)m_values[i] / 255.0f);
+
+    // label
+    oled()->setCursor(25, y + 1);
+    oled()->print(m_labels[i].c_str()[0]);
+    // box
+    if (m_selected && m_index == i)
+      oled()->drawRect(x, y, width, height, WHITE);
+    // bar
+    oled()->fillRect(x + 2, y + 2, (width - 4) * ratio, height - 4, WHITE);
+    // percentage
+    oled()->setCursor(x + width + 2, y + 1);
+    oled()->print(std::format("{:3}%", uint8_t(ratio * 100.0f)).c_str());
+
+    if (!m_selected && m_index == i)
+    {
+      display()->draw_right_arrow(30, y + 4, BLACK, false);
+      display()->draw_right_arrow(28, y + 4, WHITE, false);
+    }
+  }
+}
+
+void ConeLight_App_SyncedControl::update()
+{
+  if (m_held_direction != ConeLightDirection::NONE && millis() - m_last_held_increment_ms >= 50)
+  {
+    m_last_held_increment_ms = millis();
+    m_values[m_index] += m_held_direction;
+    apply_color();
+  }
+
+  // Continually reset last held when not held
+  if (m_held_direction == ConeLightDirection::NONE)
+    m_last_held_increment_ms = millis();
+
+  m_needs_redraw = m_held_direction != ConeLightDirection::NONE;
+}
 
 bool ConeLight_App_SyncedControl::button_down(ConeLightButton btn)
 {
-  m_cone_light->set_current_app_main_menu();
+  m_needs_redraw = true;
 
-  return true;
+  switch (btn)
+  {
+  case UP_BUTTON:
+    if (m_selected)
+    {
+      m_values[m_index]++;
+      apply_color();
+    }
+    else
+    {
+      m_index--;
+      if (m_index < 0)
+        m_index = m_max_index;
+      // Handle integer underflow
+      if (m_index > m_max_index)
+        m_index = m_max_index;
+    }
+    return true;
+
+    break;
+
+  case SELECT_BUTTON:
+    if (m_selected)
+    {
+      m_selected = false;
+      return true;
+    }
+    else
+    {
+      if (m_index == 0)
+      {
+        m_cone_light->set_current_app_main_menu();
+        m_selected = false;
+      }
+      else
+      {
+        m_selected = true;
+      }
+      return true;
+    }
+    break;
+
+  case DOWN_BUTTON:
+    if (m_selected)
+    {
+      m_values[m_index]--;
+      apply_color();
+    }
+    else
+    {
+      m_index++;
+      if (m_index > m_max_index)
+        m_index = 0;
+    }
+    return true;
+
+    break;
+
+  default:
+    return false;
+    break;
+  }
+
+  return false;
 }
 
+bool ConeLight_App_SyncedControl::button_held(ConeLightButton btn)
+{
+  m_needs_redraw = true;
+
+  switch (btn)
+  {
+  case UP_BUTTON:
+    m_held_direction = ConeLightDirection::UP;
+    return true;
+    break;
+  case DOWN_BUTTON:
+    m_held_direction = ConeLightDirection::DOWN;
+    return true;
+    break;
+
+  default:
+    return false;
+    break;
+  }
+
+  return false;
+}
+
+bool ConeLight_App_SyncedControl::button_up(ConeLightButton btn)
+{
+  m_needs_redraw = true;
+
+  if (m_held_direction != ConeLightDirection::NONE)
+  {
+    m_held_direction = ConeLightDirection::NONE;
+    return true;
+  }
+
+  return false;
+}
+
+void ConeLight_App_SyncedControl::focus()
+{
+  m_needs_redraw = true;
+
+  if (!m_has_been_focused_once)
+  {
+    m_has_been_focused_once = true;
+
+    CRGB color = m_cone_light->lighting()->get_color();
+    m_values[1] = color.red;
+    m_values[2] = color.green;
+    m_values[3] = color.blue;
+
+    m_values[4] = m_cone_light->lighting()->get_brightness();
+  }
+}
+
+void ConeLight_App_SyncedControl::apply_color()
+{
+  CRGB color = CRGB(m_values[1], m_values[2], m_values[3]);
+  uint32_t packed_color = uint32_t{m_values[4]} << 24 |
+                          (uint32_t{color.red} << 16) |
+                          (uint32_t{color.green} << 8) |
+                          (uint32_t{color.blue});
+  cone_light_network_packet_t packet = {};
+  packet.command_type = ConeLightNetworkCommand::SET_COLOR; // FIXME: Support setting color for group ONLY
+  packet.command_parameters = packed_color;
+
+  m_cone_light->lighting()->set_color(color);
+  m_cone_light->lighting()->set_brightness(m_values[4]);
+
+  m_cone_light->networking()->broadcast_packet(packet);
+}
+
+//////////////////////////////////
 //--- NODE CONFIGURATION APP ---//
+//////////////////////////////////
 void ConeLight_App_NodeInfo::draw()
 {
   // FIXME: This is duplicated from the BootScreen App, this should probably be shared :)
@@ -450,7 +664,9 @@ bool ConeLight_App_NodeInfo::button_down(ConeLightButton btn)
   return true;
 }
 
+///////////////////////////////////
 //--- BATTERY INFORMATION APP ---//
+///////////////////////////////////
 void ConeLight_App_BatteryInfo::draw()
 {
   uint8_t half_widget_height = display()->widget_bar_height() / 2;
@@ -501,7 +717,9 @@ bool ConeLight_App_BatteryInfo::button_down(ConeLightButton btn)
   return true;
 }
 
+////////////////////////////////////
 //--- DEBUG: ESPNOW SENDER APP ---//
+////////////////////////////////////
 void ConeLight_App_Debug_ESPNow_Sender::draw()
 {
   oled()->setCursor(24, 18);
@@ -534,7 +752,9 @@ bool ConeLight_App_Debug_ESPNow_Sender::button_down(ConeLightButton btn)
   return true;
 }
 
+//////////////////////////////////////
 //--- DEBUG: ESPNOW RECEIVER APP ---//
+//////////////////////////////////////
 void ConeLight_App_Debug_ESPNow_Receiver::draw()
 {
   oled()->setCursor(24, 18);

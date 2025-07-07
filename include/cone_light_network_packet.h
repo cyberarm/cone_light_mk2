@@ -14,4 +14,5 @@ typedef struct cone_light_network_packet
   uint16_t command_id;
   uint8_t command_type;
   uint32_t command_parameters;
+  uint32_t command_parameters_extra;
 } cone_light_network_packet_t;

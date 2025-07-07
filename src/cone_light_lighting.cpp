@@ -49,3 +49,13 @@ void ConeLightLighting::set_brightness(uint8_t brightness)
   m_brightness = brightness;
   m_needs_redraw = true;
 }
+
+void ConeLightLighting::handle_packet(cone_light_network_packet_t packet)
+{
+  // Ignore packets meant for another group/cluster of nodes
+  if (packet.command_type == ConeLightNetworkCommand::SET_GROUP_COLOR && packet.node_group_id != m_cone_light->node_group_id())
+    return;
+
+  set_color(CRGB(packet.command_parameters));
+  set_brightness(((packet.command_parameters >> 24) & 0xFF));
+}

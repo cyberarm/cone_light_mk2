@@ -14,6 +14,7 @@
 
 // Forward declaration...
 class ConeLight;
+typedef struct cone_light_network_packet cone_light_network_packet_t;
 
 class ConeLightLighting
 {
@@ -34,4 +35,6 @@ public:
 
   CRGB get_color() { return m_color; };
   uint8_t get_brightness() { return m_brightness; };
+
+  void handle_packet(cone_light_network_packet_t packet);
 };

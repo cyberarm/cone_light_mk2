@@ -6,6 +6,7 @@
 // Forward declaration...
 class ConeLight;
 class ConeLightSong;
+typedef struct cone_light_network_packet cone_light_network_packet_t;
 
 class ConeLightSpeaker
 {
@@ -23,4 +24,6 @@ public:
   void reset();
   void play_song(uint16_t song_id);
   void play_tone(uint16_t frequency, uint16_t duration);
+
+  void handle_packet(cone_light_network_packet_t packet);
 };

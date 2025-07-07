@@ -4,6 +4,8 @@
 // #define NODE_GROUP "BACKSTOP" // "STOPSIGN"
 // #define NODE_NAME "KETTLE" // HOBBIT FIDDLE DRAGON FLOWER LOCKET MIRROR PILLOW
 
+#define CONE_LIGHT_DEBUG false
+
 #define CONE_LIGHT_PRODUCT_NAME "Cone Light mk. II"
 // Whether buttons cause beeps and chirps
 #define CONE_LIGHT_MUTED true

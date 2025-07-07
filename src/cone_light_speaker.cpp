@@ -93,3 +93,6 @@ void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
 
   m_song->channel(SPEAKER_PIN, 0, 1, notes, durations);
 }
+
+void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
+{}

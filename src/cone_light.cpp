@@ -184,15 +184,51 @@ void ConeLight::lid_event(ConeLightEvent state)
 
 void ConeLight::espnow_event(cone_light_network_packet_t packet)
 {
-  // Serial.printf("RECV ID: %d\n", packet.packet_id);
+#if CONE_LIGHT_DEBUG
+  Serial.printf(
+      "RECV PACKET:\n"
+      "    FIRMWARE VERSION: %u\n"
+      "    PACKET ID: %u\n"
+      "    TIMESTAMP: %u\n"
+      "    NODE ID: %u\n"
+      "    NODE NAME: %s\n"
+      "    NODE GROUP ID: %u\n"
+      "    COMMAND ID: %u\n"
+      "    COMMAND TYPE: %u\n"
+      "    COMMAND PARAMETERS: %u\n"
+      "    COMMAND PARAMETERS EXTRA: %u\n",
+      packet.firmware_version,
+      packet.packet_id,
+      packet.timestamp,
+      packet.node_id,
+      packet.node_name,
+      packet.node_group_id,
+      packet.command_id,
+      packet.command_type,
+      packet.command_parameters,
+      packet.command_parameters_extra);
+#endif
 
-  switch (packet.command_id)
+  switch (packet.command_type)
   {
   case ConeLightNetworkCommand::NOT_A_COMMAND:
     if (m_current_app)
       m_current_app->espnow_recv(packet);
     break;
 
+  case ConeLightNetworkCommand::CLOCK:
+    m_network_time->packet_handler(packet);
+    break;
+
+  case ConeLightNetworkCommand::SET_COLOR:
+  case ConeLightNetworkCommand::SET_GROUP_COLOR:
+    m_lighting->handle_packet(packet);
+    break;
+
+  case ConeLightNetworkCommand::PLAY_TONE:
+  case ConeLightNetworkCommand::PLAY_SONG:
+    m_speaker->handle_packet(packet);
+    break;
   default:
     break;
   }

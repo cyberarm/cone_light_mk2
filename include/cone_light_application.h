@@ -107,17 +107,35 @@ public:
 
 class ConeLight_App_SyncedControl : public ConeLightApplication
 {
+private:
+  bool m_has_been_focused_once = false;
+  bool m_selected = false;
+  size_t m_index = 0;
+  size_t m_max_index = 4;
+  const std::string m_labels[5] = {"Main Menu", "Red", "Green", "Blue", "Lightness"};
+  uint8_t m_values[5] = {0, 0, 0, 0, 8};
+  int8_t m_held_direction = 0;
+  uint32_t m_last_held_increment_ms = 0;
+
 public:
   ConeLight_App_SyncedControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
   {
     m_cone_light = cone_light;
     m_app_name = "Synced Control";
+    m_fullscreen = true;
   };
   void draw();
-  // void update();
+  void update();
   bool button_down(ConeLightButton btn);
-  // void focus();
+  bool button_held(ConeLightButton btn);
+  bool button_up(ConeLightButton btn);
+  void focus();
   // void blur();
+  std::string hex_color(uint8_t red, uint8_t green, uint8_t blue, uint8_t lightness)
+  {
+    return std::format("#{:02X}{:02X}{:02X}{:02X}", red, green, blue, lightness);
+  };
+  void apply_color();
 };
 
 class ConeLight_App_NodeInfo : public ConeLightApplication
