@@ -27,6 +27,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_ID "node_id"
 #define CONE_LIGHT_PREFERENCES_NODE_GROUP "node_group"
 #define CONE_LIGHT_PREFERENCES_NODE_NAME "node_name"
+#define CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK "node_grandmaster_clock"
 
 // Updated whenever changes are made. YYYY.MM.DD
 #define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.07"
@@ -96,6 +97,7 @@ private:
   uint8_t m_node_id = CONE_LIGHT_NODE_ID_UNSET;
   uint8_t m_node_group = CONE_LIGHT_NODE_GROUP_ID_UNSET;
   String m_node_name = CONE_LIGHT_NODE_NAME_UNSET;
+  bool m_node_grandmaster_clock = false;
   uint32_t m_last_input_change_ms = 0;
   bool m_screensaver = false;
   bool m_muted = CONE_LIGHT_MUTED;
@@ -107,7 +109,8 @@ public:
   uint8_t node_id();
   uint8_t node_group_id();
   String node_name();
-  bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name);
+  bool node_grandmaster_clock();
+  bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock);
   void boot_complete();
   bool screensaver() { return m_screensaver; };
   void update_screensaver();

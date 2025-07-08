@@ -33,7 +33,7 @@ void ConeLightDisplay::update()
 {
   // Check wether widget bar needs to be redrawn
   m_widget_bar_needs_redraw = m_last_lid_state != m_cone_light->input_handler()->lid_open() ||
-                              m_last_sync_state != m_cone_light->networking()->clock_synced() ||
+                              m_last_sync_state != m_cone_light->network_time()->is_clock_synced() ||
                               m_last_battery_meter_width != m_battery_meter_width;
 
   m_last_battery_meter_width = m_battery_meter_width;
@@ -42,7 +42,7 @@ void ConeLightDisplay::update()
   m_battery_meter_width = (int8_t)(16 * voltage_ratio);
 
   m_last_lid_state = m_cone_light->input_handler()->lid_open();
-  m_last_sync_state = m_cone_light->networking()->clock_synced();
+  m_last_sync_state = m_cone_light->network_time()->is_clock_synced();
 }
 
 bool ConeLightDisplay::widget_bar_needs_redraw()

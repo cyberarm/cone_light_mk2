@@ -29,7 +29,7 @@ ConeLight::ConeLight()
   m_speaker = new ConeLightSpeaker(this);
   m_voltage = new ConeLightVoltage(this);
   m_networking = new ConeLightNetworking(this);
-  m_network_time = new ConeLightNetworkTime(); // Network Time only cares about time.
+  m_network_time = new ConeLightNetworkTime(this);
 
   m_applications.push_back(new ConeLight_App_BootScreen(this));
   m_applications.push_back(new ConeLight_App_MainMenu(this));
@@ -120,15 +120,22 @@ String ConeLight::node_name()
   return m_node_name;
 }
 
-bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name)
+bool ConeLight::node_grandmaster_clock()
+{
+  return m_node_grandmaster_clock;
+}
+
+bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock)
 {
   m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_ID, node_id);
   m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, node_group);
   m_preferences.putString(CONE_LIGHT_PREFERENCES_NODE_NAME, node_name);
+  m_preferences.putBool(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, node_grandmaster_clock);
 
   m_node_id = node_id;
   m_node_group = node_group;
   m_node_name = node_name;
+  m_node_grandmaster_clock = node_grandmaster_clock;
 
   return true;
 }
@@ -216,7 +223,9 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
       m_current_app->espnow_recv(packet);
     break;
 
-  case ConeLightNetworkCommand::CLOCK:
+  case ConeLightNetworkCommand::CLOCK_GRANDMASTER_SYNC:
+  case ConeLightNetworkCommand::CLOCK_NODE_DELAY_REQUEST:
+  case ConeLightNetworkCommand::CLOCK_NODE_DELAY_RESPONSE:
     m_network_time->packet_handler(packet);
     break;
 
