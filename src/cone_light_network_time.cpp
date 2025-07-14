@@ -107,7 +107,6 @@ bool ConeLightNetworkTime::packet_handler(cone_light_network_packet_t packet)
     m_last_grandmaster_time_received_ms = millis();
 
     // Eagerly request time to ping grandmaster when clock is not yet synced
-    // or when our error is significant
     if (!m_clock_synced)
       node_delay_request();
 
@@ -135,7 +134,7 @@ bool ConeLightNetworkTime::packet_handler(cone_light_network_packet_t packet)
       break;
 
     // flip sign since this is inverted from reference. We're using the local node's time to 'ping'
-    // the grand master instead of using the grand master's clock to and time reference.
+    // the grand master instead of using the grand master's clock as time reference.
     m_node_delay_offset_ms = (millis() - m_node_delay_request_time_ms) * -1;
 #if CONE_LIGHT_DEBUG
     Serial.printf("Node clock delay: %d ms\n", m_node_delay_offset_ms);

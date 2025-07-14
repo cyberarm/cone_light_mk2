@@ -12,6 +12,8 @@
 #define COLOR_TEAL CRGB(0, 255, 255)
 #define COLOR_PURPLE CRGB(255, 0, 255)
 
+#define LED_DEFAULT_BRIGHTNESS 20
+
 // Forward declaration...
 class ConeLight;
 typedef struct cone_light_network_packet cone_light_network_packet_t;

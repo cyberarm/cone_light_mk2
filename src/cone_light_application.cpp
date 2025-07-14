@@ -61,13 +61,13 @@ void ConeLight_App_BootScreen::draw()
 void ConeLight_App_BootScreen::update()
 {
   if (millis() - m_last_milliseconds < 667)
-    m_cone_light->lighting()->set_brightness(2);
+    m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS / 4);
   else if (millis() - m_last_milliseconds < (667 + 32) * 2)
-    m_cone_light->lighting()->set_brightness(4);
+    m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS / 4 * 2);
   else if (millis() - m_last_milliseconds < (667 + 32 + 32) * 3)
-    m_cone_light->lighting()->set_brightness(6);
+    m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS / 4 * 3);
   else if (millis() - m_last_milliseconds < (667 + 32 + 32 + 32) * 4)
-    m_cone_light->lighting()->set_brightness(8);
+    m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS);
   else
   {
     m_cone_light->lighting()->set_color(m_group_color);
