@@ -800,3 +800,36 @@ void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_
 
   m_needs_redraw = true;
 }
+
+void ConeLight_App_Debug_Network_Clock::draw()
+{
+  oled()->setCursor(4, 18);
+  oled()->printf("GRAND MASTER: %s", m_cone_light->network_time()->is_grandmaster_clock() ? "true" : "false");
+  oled()->setCursor(4, 26);
+  oled()->printf("TIME SYNCED: %s", m_cone_light->network_time()->is_clock_synced() ? "true" : "false");
+  oled()->setCursor(4, 34);
+  oled()->printf("GRAND TIME: %u", m_cone_light->network_time()->time());
+  oled()->setCursor(4, 42);
+  oled()->printf("LOCAL TIME: %u", m_cone_light->network_time()->timestamp());
+  oled()->setCursor(4, 50);
+  oled()->printf("OFFSET MS: %d", m_cone_light->network_time()->offset());
+
+  m_needs_redraw = false;
+}
+
+void ConeLight_App_Debug_Network_Clock::update()
+{
+  if (millis() - m_last_refresh_ms >= m_refresh_interval_ms)
+  {
+    m_last_refresh_ms = millis();
+    m_needs_redraw = true;
+  }
+}
+
+bool ConeLight_App_Debug_Network_Clock::button_down(ConeLightButton btn)
+{
+  blur();
+  m_cone_light->set_current_app_main_menu();
+
+  return true;
+}

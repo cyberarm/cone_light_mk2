@@ -209,3 +209,20 @@ public:
   bool button_down(ConeLightButton btn);
   void espnow_recv(cone_light_network_packet_t packet);
 };
+
+class ConeLight_App_Debug_Network_Clock : public ConeLightApplication
+{
+private:
+  uint32_t m_last_refresh_ms = 0;
+  const uint32_t m_refresh_interval_ms = 50;
+public:
+ConeLight_App_Debug_Network_Clock(ConeLight *cone_light) : ConeLightApplication(cone_light)
+{
+  m_cone_light = cone_light;
+  m_app_name = "D: Net Clock";
+  m_fullscreen = false;
+};
+void draw();
+void update();
+bool button_down(ConeLightButton btn);
+};

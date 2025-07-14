@@ -4,7 +4,6 @@
 ConeLight::ConeLight()
 {
   Serial.begin();
-  m_preferences.begin(CONE_LIGHT_PREFERENCES_ID);
 
   Serial.printf("Initializing %s v%s (internal v%d)\n", CONE_LIGHT_PRODUCT_NAME, CONE_LIGHT_FIRMWARE_VERSION_NAME, CONE_LIGHT_FIRMWARE_VERSION);
   Serial.println("  Configuring button inputs...");
@@ -16,9 +15,12 @@ ConeLight::ConeLight()
 
   // Load node specific data from Preferences
   Serial.println("  Loading node preferences data...");
+  m_preferences.begin(CONE_LIGHT_PREFERENCES_ID);
   m_node_id = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_ID, CONE_LIGHT_NODE_ID_UNSET);
   m_node_group = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_ID_UNSET);
   m_node_name = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_NAME, CONE_LIGHT_NODE_NAME_UNSET);
+  m_node_grandmaster_clock = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE);
+  m_preferences.end();
 
   // Initialize subsystems...
   Serial.println("  Initializing subsystems...");
@@ -39,6 +41,7 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
   m_applications.push_back(new ConeLight_App_Debug_ESPNow_Sender(this));
   m_applications.push_back(new ConeLight_App_Debug_ESPNow_Receiver(this));
+  m_applications.push_back(new ConeLight_App_Debug_Network_Clock(this));
   m_current_app = m_applications[0];
 
   m_last_input_change_ms = millis();
@@ -127,10 +130,12 @@ bool ConeLight::node_grandmaster_clock()
 
 bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock)
 {
+  m_preferences.begin(CONE_LIGHT_PREFERENCES_ID);
   m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_ID, node_id);
   m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, node_group);
   m_preferences.putString(CONE_LIGHT_PREFERENCES_NODE_NAME, node_name);
   m_preferences.putBool(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, node_grandmaster_clock);
+  m_preferences.end();
 
   m_node_id = node_id;
   m_node_group = node_group;

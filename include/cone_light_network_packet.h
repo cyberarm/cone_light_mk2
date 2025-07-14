@@ -6,7 +6,7 @@ typedef struct cone_light_network_packet
   // Automatically filled by Networking#send_packet()
   uint8_t firmware_version;
   uint16_t packet_id;
-  uint32_t timestamp;
+  uint32_t timestamp; // (unsynced) local time of node
   uint8_t node_id;
   char node_name[7];
   uint8_t node_group_id;

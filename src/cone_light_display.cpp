@@ -66,7 +66,7 @@ void ConeLightDisplay::draw_widget_bar()
   m_display->print(m_cone_light->input_handler()->lid_open() ? " LID" : "    ");
 
   // Display master clock sync status
-  m_display->print(true ? " SYNC" : "     ");
+  m_display->print((m_cone_light->network_time()->is_clock_synced() && std::abs(m_cone_light->network_time()->offset()) < 25) ? " SYNC" : "     ");
 
   // Display battery voltage meter
   m_display->drawRect(103, 3, 20, m_widget_bar_height - 6, SSD1306_WHITE);

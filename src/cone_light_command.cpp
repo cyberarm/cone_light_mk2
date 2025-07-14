@@ -79,7 +79,7 @@ void ConeLightCommand_Color::handle(ConeLight *cone_light, std::vector<String> a
 void ConeLightCommand_Config::handle(ConeLight *cone_light, std::vector<String> arguments)
 {
   Serial.printf("Firmware Info: %s v%s (internal v%d)\n", CONE_LIGHT_PRODUCT_NAME, CONE_LIGHT_FIRMWARE_VERSION_NAME, CONE_LIGHT_FIRMWARE_VERSION);
-  Serial.printf("Node Info: %s (id: %d, group: %d)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id());
+  Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %s)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), (cone_light->node_grandmaster_clock() ? "true" : "false"));
 }
 
 // CONFIGURE
@@ -94,5 +94,5 @@ void ConeLightCommand_Configure::handle(ConeLight *cone_light, std::vector<Strin
   cone_light->reconfigure_node(node_id, node_group, node_name, node_grandmaster_clock);
 
   Serial.println("Reconfigured node.");
-  Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %d)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), cone_light->node_grandmaster_clock());
+  Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %s)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), (cone_light->node_grandmaster_clock() ? "true" : "false"));
 }
