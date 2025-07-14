@@ -19,7 +19,7 @@ ConeLight::ConeLight()
   m_node_id = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_ID, CONE_LIGHT_NODE_ID_UNSET);
   m_node_group = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_ID_UNSET);
   m_node_name = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_NAME, CONE_LIGHT_NODE_NAME_UNSET);
-  m_node_grandmaster_clock = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE);
+  m_node_grandmaster_clock = m_preferences.getBool(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE);
   m_preferences.end();
 
   // Initialize subsystems...
