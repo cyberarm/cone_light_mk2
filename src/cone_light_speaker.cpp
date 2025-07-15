@@ -95,4 +95,32 @@ void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
 }
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
-{}
+{
+  uint8_t node_group_id = packet.command_parameters_extra;
+
+  // Ignore packets not mean for this node
+  // node group 255 is unset/all groups
+  if (node_group_id != 255 && m_cone_light->node_group_id() != node_group_id)
+    return;
+
+  // TODO: Introduce a time delay?
+
+  switch (packet.command_type)
+  {
+  case PLAY_SONG:
+    play_song(packet.command_parameters);
+    break;
+
+  case PLAY_TONE:
+  {
+    uint16_t frequency = (packet.command_parameters >> 16 & 0xFFFF);
+    uint16_t duration = (packet.command_parameters >> 0 & 0xFFFF);
+
+    play_tone(frequency, duration);
+    break;
+  }
+
+  default:
+    break;
+  }
+}

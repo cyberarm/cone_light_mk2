@@ -55,12 +55,46 @@ void ConeLightCommand_Song::handle(ConeLight *cone_light, std::vector<String> ar
   cone_light->speaker()->play_song(song_id);
 }
 
+// NET_SONG
+void ConeLightCommand_NetSong::handle(ConeLight *cone_light, std::vector<String> arguments)
+{
+  uint16_t song_id = arguments[0].toInt();
+  uint8_t group_id = arguments[1].toInt();
+
+  cone_light_network_packet_t packet = {};
+  packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
+  packet.command_parameters = song_id;
+  packet.command_parameters_extra = group_id;
+
+  cone_light->networking()->broadcast_packet(packet);
+  // inject packet into the commanding node to make it handle the command itself too
+  cone_light->espnow_event(packet);
+}
+
 // TONE
 void ConeLightCommand_Tone::handle(ConeLight *cone_light, std::vector<String> arguments)
 {
   int16_t frequency = arguments[0].toInt(), duration = arguments[1].toInt();
 
   cone_light->speaker()->play_tone(frequency, duration);
+}
+
+// NET_TONE
+void ConeLightCommand_NetTone::handle(ConeLight *cone_light, std::vector<String> arguments)
+{
+  uint16_t frequency = arguments[0].toInt(), duration = arguments[1].toInt();
+  uint8_t group_id = arguments[2].toInt();
+
+  uint32_t packed_freq_duration = uint32_t{frequency} << 16 | uint32_t{duration};
+
+  cone_light_network_packet_t packet = {};
+  packet.command_type = ConeLightNetworkCommand::PLAY_TONE;
+  packet.command_parameters = packed_freq_duration;
+  packet.command_parameters_extra = group_id;
+
+  cone_light->networking()->broadcast_packet(packet);
+  // inject packet into the commanding node to make it handle the command itself too
+  cone_light->espnow_event(packet);
 }
 
 // COLOR
@@ -73,6 +107,30 @@ void ConeLightCommand_Color::handle(ConeLight *cone_light, std::vector<String> a
 
   cone_light->lighting()->set_color(red, green, blue);
   cone_light->lighting()->set_brightness(brightness);
+}
+
+// NET_COLOR
+void ConeLightCommand_NetColor::handle(ConeLight *cone_light, std::vector<String> arguments)
+{
+  uint8_t red = arguments[0].toInt(),
+          green = arguments[1].toInt(),
+          blue = arguments[2].toInt(),
+          brightness = arguments[3].toInt(),
+          group_id = arguments[4].toInt();
+
+  uint32_t packed_color = uint32_t{brightness} << 24 |
+                          (uint32_t{red} << 16) |
+                          (uint32_t{green} << 8) |
+                          (uint32_t{blue});
+
+  cone_light_network_packet_t packet = {};
+  packet.command_type = (group_id == 255) ? ConeLightNetworkCommand::SET_COLOR : ConeLightNetworkCommand::SET_GROUP_COLOR;
+  packet.command_parameters = packed_color;
+  packet.command_parameters_extra = group_id;
+
+  cone_light->networking()->broadcast_packet(packet);
+  // inject packet into the commanding node to make it handle the command itself too
+  cone_light->espnow_event(packet);
 }
 
 // CONFIG

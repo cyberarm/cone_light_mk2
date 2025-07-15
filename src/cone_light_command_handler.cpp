@@ -7,8 +7,11 @@ ConeLightCommandHandler::ConeLightCommandHandler(ConeLight *cone_light)
   // Serial.setTimeout(100);
   m_commands.push_back(new ConeLightCommand_Help);
   m_commands.push_back(new ConeLightCommand_Song);
+  m_commands.push_back(new ConeLightCommand_NetSong);
   m_commands.push_back(new ConeLightCommand_Tone);
+  m_commands.push_back(new ConeLightCommand_NetTone);
   m_commands.push_back(new ConeLightCommand_Color);
+  m_commands.push_back(new ConeLightCommand_NetColor);
   m_commands.push_back(new ConeLightCommand_Config);
   m_commands.push_back(new ConeLightCommand_Configure);
 

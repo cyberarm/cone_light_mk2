@@ -48,6 +48,19 @@ public:
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
 
+class ConeLightCommand_NetSong : public ConeLightCommand
+{
+public:
+  ConeLightCommand_NetSong()
+  {
+    m_name = "net_song";
+    m_help = "net_song <song_id> <group_id> | song 0 255";
+    m_argument_count = 2;
+  };
+  void handle(ConeLight *cone_light, std::vector<String> arguments);
+};
+
+
 class ConeLightCommand_Tone : public ConeLightCommand
 {
 public:
@@ -60,6 +73,18 @@ public:
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
 
+class ConeLightCommand_NetTone : public ConeLightCommand
+{
+public:
+  ConeLightCommand_NetTone()
+  {
+    m_name = "net_tone";
+    m_help = "net_tone <frequency> <duration milliseconds> <group_id> | tone 440 100 255";
+    m_argument_count = 3;
+  };
+  void handle(ConeLight *cone_light, std::vector<String> arguments);
+};
+
 class ConeLightCommand_Color : public ConeLightCommand
 {
 public:
@@ -68,6 +93,18 @@ public:
     m_name = "color";
     m_help = "color <red> <green> <blue> <brightness> | color 210 21 2 255";
     m_argument_count = 4;
+  };
+  void handle(ConeLight *cone_light, std::vector<String> arguments);
+};
+
+class ConeLightCommand_NetColor : public ConeLightCommand
+{
+public:
+  ConeLightCommand_NetColor()
+  {
+    m_name = "net_color";
+    m_help = "net_color <red> <green> <blue> <brightness> <group_id> | color 210 21 2 255 255";
+    m_argument_count = 5;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };

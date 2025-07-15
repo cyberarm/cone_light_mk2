@@ -8,5 +8,5 @@ ESP32-C6 MCU connected to an OLED display, 6 WS2812b leds, and an active beeper.
 
 ## Arduino Libraries
 * FastLED
-* Adafruit_GFX
 * Adafruit_SSD1306
+  * Adafruit_GFX
