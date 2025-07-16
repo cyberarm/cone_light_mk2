@@ -9,9 +9,11 @@
 
 #define CONE_LIGHT_PRODUCT_NAME "Cone Light mk. II"
 // Whether buttons cause beeps and chirps
-#define CONE_LIGHT_MUTED true
+#define CONE_LIGHT_MUTED false
 // Play 4 notes on boot up
-#define CONE_LIGHT_BOOT_UP_TUNE false
+#define CONE_LIGHT_BOOT_UP_TUNE true
+// Whether node's attempt to sync with the grand master clock node
+#define CONE_LIGHT_GRAND_MASTER_CLOCK_ENABLED false
 
 #define CONE_LIGHT_NODE_ID_UNSET 255
 #define CONE_LIGHT_NODE_GROUP_ID_UNSET 255
@@ -32,7 +34,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK "node_clock"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.15"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.16"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 0
 

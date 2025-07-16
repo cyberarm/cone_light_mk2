@@ -158,7 +158,7 @@ class CyberarmSongChannel
 
   def available?(note)
     @notes.each do |n|
-      return false if note.starts_at_ms.between?(n.starts_at_ms, n.starts_at_ms + n.duration_ms - 1) # subtract 1ms so perfectly timed notes don't cause notes to be passed off to other channels
+      return false if note.starts_at_ms.between?(n.starts_at_ms, n.starts_at_ms + n.duration_ms - 14) # subtract 14ms so perfectly timed notes don't cause notes to be passed off to other channels
       return false if (note.starts_at_ms + note.duration_ms).between?(n.starts_at_ms, n.starts_at_ms + n.duration_ms)
     end
 
@@ -240,11 +240,13 @@ end
 
 notes.each do |note|
   channel = channels[note.channel] if channels[note.channel]&.available?(note)
-  warn "Failed to find optimal channel for note! (optimal channel: #{note.channel})" unless channel
+  warn "Failed to find optimal channel for note! (optimal channel: #{note.channel} [#{note.inspect}])" unless channel
 
   channel ||= channels.find { |c| c.available?(note) }
 
-  raise "Failed to find available time slot for note in any channel." unless channel
+  unless channel
+    raise "Failed to find available time slot for note in any channel. #{note.inspect}"
+  end
 
   channel.add_note(note)
 end
@@ -264,19 +266,19 @@ channels.each do |c|
   frequency_rows << "{#{c.notes.map { |n| n.frequency }.join(', ')}}"
 end
 first_line = true
-frequency_rows.join("},\n").lines.each_with_index do |line, i|
+frequency_rows.join(",\n").lines.each_with_index do |line, i|
   print first_line ? "#{line}" : "         #{line}"
 
   first_line = false
 end
 puts "},"
-print "        "
+print "        {"
 duration_rows = []
 channels.each do |c|
   duration_rows << "{#{c.notes.map { |n| n.duration_ms }.join(', ')}}"
 end
 first_line = true
-duration_rows.join("},\n").lines.each_with_index do |line, i|
+duration_rows.join(",\n").lines.each_with_index do |line, i|
   print first_line ? "#{line}" : "         #{line}"
 
   first_line = false

@@ -138,6 +138,27 @@ public:
   void apply_color();
 };
 
+class ConeLight_App_Songs : public ConeLightApplication
+{
+private:
+  uint8_t m_song_index = 0;
+  uint8_t m_max_song_index = 0;
+
+public:
+  ConeLight_App_Songs(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "Songs";
+    m_fullscreen = true;
+    
+    m_max_song_index = 0;
+  };
+  void draw();
+  void update();
+  bool button_held(ConeLightButton btn);
+  bool button_down(ConeLightButton btn);
+};
+
 class ConeLight_App_NodeInfo : public ConeLightApplication
 {
 public:

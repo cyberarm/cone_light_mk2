@@ -25,6 +25,7 @@ public:
   void reset();
   void play_song(uint16_t song_id);
   void play_tone(uint16_t frequency, uint16_t duration);
+  bool playing() { return m_song->playing(); };
 
   void handle_packet(cone_light_network_packet_t packet);
 };

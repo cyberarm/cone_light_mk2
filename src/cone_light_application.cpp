@@ -1,4 +1,5 @@
 #include "cone_light_application.h"
+#include "cone_light_songs.h"
 
 //--- ||| ---//
 ConeLightApplication::ConeLightApplication(ConeLight *cone_light)
@@ -623,6 +624,126 @@ void ConeLight_App_SyncedControl::apply_color()
   m_cone_light->lighting()->set_brightness(m_values[4]);
 
   m_cone_light->networking()->broadcast_packet(packet);
+}
+
+/////////////////////
+//--- SONGS APP ---//
+/////////////////////
+void ConeLight_App_Songs::draw()
+{
+  oled()->setTextWrap(false);
+
+  oled()->setCursor(2, 3);
+  oled()->print("Hold UP for Main Menu");
+
+  // Draw UP arrow
+  display()->draw_up_arrow(7, 2 + display()->widget_bar_height());
+  oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
+  // Draw SELECT icon
+  display()->draw_select_icon(7 + 3, 32 + (display()->widget_bar_height() / 2) - 1);
+  oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
+  // Draw DOWN arrow
+  display()->draw_down_arrow(7, 64 - (9 + 4));
+
+  // Draw vertical line to box off the arrows and select icon
+  oled()->drawFastVLine(20, display()->widget_bar_height(), 64, SSD1306_WHITE);
+
+  // Border
+  oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
+
+  // Labels
+  uint8_t previous_song_index = m_song_index - 1;
+  if (previous_song_index > m_max_song_index)
+    previous_song_index = m_max_song_index;
+
+  uint8_t next_song_index = m_song_index + 1;
+  if (next_song_index > m_max_song_index)
+    next_song_index = 0;
+
+  oled()->setCursor(42, 3 + display()->widget_bar_height());
+  oled()->print(cone_light_songs[previous_song_index].name());
+
+  oled()->setCursor(32, 32 + ((display()->widget_bar_height() / 2) - 1) - 3);
+  oled()->print(cone_light_songs[m_song_index].name());
+
+  oled()->setCursor(42, 64 - ((display()->widget_bar_height() / 2) + 4));
+  oled()->print(cone_light_songs[next_song_index].name());
+
+  oled()->setTextWrap(true);
+}
+
+void ConeLight_App_Songs::update()
+{
+  if (m_max_song_index == 0)
+  {
+    m_max_song_index = cone_light_songs.size() - 1;
+    m_needs_redraw = true;
+  }
+  else
+  {
+    m_needs_redraw = false;
+  }
+}
+
+bool ConeLight_App_Songs::button_down(ConeLightButton btn)
+{
+  switch (btn)
+  {
+  case UP_BUTTON:
+    m_song_index--;
+    if (m_song_index > m_max_song_index)
+      m_song_index = m_max_song_index;
+
+    Serial.printf("%d\n", m_song_index);
+
+    m_needs_redraw = true;
+    break;
+  case SELECT_BUTTON:
+  {
+    cone_light_network_packet_t packet = {};
+    packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
+    packet.command_parameters = m_song_index;
+    packet.command_parameters_extra = 255;
+
+    m_cone_light->networking()->broadcast_packet(packet);
+    // inject packet into the commanding node to make it handle the command itself too
+    m_cone_light->espnow_event(packet);
+    break;
+  }
+  case DOWN_BUTTON:
+    m_song_index++;
+    if (m_song_index > m_max_song_index)
+      m_song_index = 0;
+
+    Serial.printf("%d\n", m_song_index);
+
+    m_needs_redraw = true;
+    break;
+
+  default:
+    return false;
+    break;
+  }
+
+  return true;
+}
+
+bool ConeLight_App_Songs::button_held(ConeLightButton btn)
+{
+  switch (btn)
+  {
+  case UP_BUTTON:
+    m_cone_light->set_current_app_main_menu();
+
+    return true;
+    break;
+  
+  default:
+    return false;
+    break;
+  }
+
+  return false;
 }
 
 //////////////////////////////////

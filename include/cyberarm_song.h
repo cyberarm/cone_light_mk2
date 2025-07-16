@@ -58,6 +58,7 @@ public:
       if (m_current_note >= m_note_count)
       {
         ledcWriteTone(m_pin, 0);
+        m_complete = true;
         return;
       }
 
@@ -134,6 +135,19 @@ public:
         channel->update();
       }
     }
+  }
+
+  bool playing()
+  {
+    for (size_t i = 0; i < MAX_CHANNELS; i++)
+    {
+      CyberarmSongChannel *channel = m_channels[i];
+
+      if (!channel->isFinished())
+        return true;
+    }
+
+    return false;
   }
 
   void reset()

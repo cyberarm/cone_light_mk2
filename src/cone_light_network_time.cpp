@@ -64,7 +64,9 @@ void ConeLightNetworkTime::update()
     if (millis() - m_last_time_grandmaster_sync_ms < m_grandmaster_sync_interval_ms)
       return;
 
+#if CONE_LIGHT_GRAND_MASTER_CLOCK_ENABLED
     broadcast_grandmaster_sync();
+#endif
   }
   else
   {
@@ -75,7 +77,9 @@ void ConeLightNetworkTime::update()
     if (millis() - m_last_time_node_delay_request_ms < m_node_delay_request_interval_ms)
       return;
 
+#if CONE_LIGHT_GRAND_MASTER_CLOCK_ENABLED
     node_delay_request();
+#endif
   }
 }
 
