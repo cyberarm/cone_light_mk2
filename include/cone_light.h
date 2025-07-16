@@ -36,7 +36,7 @@
 // Updated whenever changes are made. YYYY.MM.DD
 #define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.16"
 // Used for backward incompatible changes
-#define CONE_LIGHT_FIRMWARE_VERSION 0
+#define CONE_LIGHT_FIRMWARE_VERSION 1
 
 #define BTN_A_PIN D10
 #define BTN_B_PIN D9
