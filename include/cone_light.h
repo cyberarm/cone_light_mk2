@@ -5,6 +5,7 @@
 // #define NODE_NAME "KETTLE" // HOBBIT FIDDLE DRAGON FLOWER LOCKET MIRROR PILLOW
 
 #define CONE_LIGHT_DEBUG true
+#define CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS false
 
 #define CONE_LIGHT_PRODUCT_NAME "Cone Light mk. II"
 // Whether buttons cause beeps and chirps

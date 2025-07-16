@@ -14,7 +14,7 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
   // Boot chime
   if (m_speaker_inited && CONE_LIGHT_BOOT_UP_TUNE)
   {
-    m_song->channel(SPEAKER_PIN, 0, note_count, notes, durations);
+    m_song->set_channel(SPEAKER_PIN, 0, note_count, notes, durations);
   }
   else
   {
@@ -34,6 +34,23 @@ ConeLightSpeaker::~ConeLightSpeaker()
 void ConeLightSpeaker::update()
 {
   m_song->update();
+
+  // HARM: Potentially rapidly changing/flashing lights
+  // TODO: Make leds 'blend' between current and next colors to prevent/mitigate flashing
+#if CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS
+  CyberarmSongChannel *channel = m_song->channel(m_cone_light->node_id());
+  if (channel && !channel->isFinished() && m_current_channel_note != channel->currentNote())
+  {
+    m_current_channel_note = channel->currentNote();
+    int16_t freq = channel->currentFrequency();
+    // HACK: prevents lights from instantly flashing off then back to a color for 'rest' notes
+    if (freq < 0)
+      return;
+
+    m_cone_light->lighting()->set_color(m_cone_light->lighting()->frequency_to_color(freq));
+    m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS);
+  }
+#endif
 }
 
 void ConeLightSpeaker::reset()
@@ -72,7 +89,7 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
 
   printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", song.name().c_str(), node_id, notes.size());
 
-  m_song->channel(SPEAKER_PIN, node_id, notes.size(), notes.data(), durations.data());
+  m_song->set_channel(SPEAKER_PIN, node_id, notes.size(), notes.data(), durations.data());
 }
 
 void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
@@ -91,7 +108,7 @@ void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
   notes[0] = frequency;
   durations[0] = duration;
 
-  m_song->channel(SPEAKER_PIN, 0, 1, notes, durations);
+  m_song->set_channel(SPEAKER_PIN, 0, 1, notes, durations);
 }
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)

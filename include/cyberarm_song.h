@@ -75,7 +75,7 @@ public:
         ledcWriteTone(m_pin, note);
       }
 
-      Serial.printf("PIN: %d, NOTEID: %d, NOTE: %d, DURATION: %ld\n", m_pin, m_current_note, note, m_last_note_duration);
+      Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, DURATION: %ld\n", m_pin, m_current_note, note, m_last_note_duration);
 
       m_current_note++;
     }
@@ -86,12 +86,20 @@ public:
     return m_complete;
   }
 
-  uint8_t currentNote()
+  uint16_t currentNote()
   {
     return m_current_note;
   }
 
-  uint8_t noteCount()
+  uint16_t currentFrequency()
+  {
+    if (m_current_note-1 >= m_note_count)
+      return 0;
+
+    return m_notes[m_current_note-1];
+  }
+
+  uint16_t noteCount()
   {
     return m_note_count;
   }
@@ -138,11 +146,19 @@ public:
     }
   }
 
-  void channel(uint8_t pin, uint8_t channelID, uint16_t noteCount, int16_t notes[], uint16_t durations[])
+  void set_channel(uint8_t pin, uint8_t channelID, uint16_t noteCount, int16_t notes[], uint16_t durations[])
   {
     CyberarmSongChannel *channel = m_channels[channelID];
 
     channel->reset();
     channel->init(pin, noteCount, notes, durations);
+  }
+
+  CyberarmSongChannel* channel(uint8_t channel_id)
+  {
+    if (channel_id >= MAX_CHANNELS)
+      return nullptr;
+
+    return m_channels[channel_id];
   }
 };

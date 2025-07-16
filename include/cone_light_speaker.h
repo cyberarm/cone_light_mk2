@@ -16,6 +16,7 @@ private:
   bool m_speaker_inited = false;
   bool m_boot_sound_played = false;
   ConeLight *m_cone_light = nullptr;
+  int16_t m_current_channel_note = -1;
 
 public:
   ConeLightSpeaker(ConeLight *cone_light);
