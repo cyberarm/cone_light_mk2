@@ -617,8 +617,10 @@ void ConeLight_App_SyncedControl::apply_color()
                           (uint32_t{color.green} << 8) |
                           (uint32_t{color.blue});
   cone_light_network_packet_t packet = {};
-  packet.command_type = ConeLightNetworkCommand::SET_COLOR; // FIXME: Support setting color for group ONLY
+  // packet.command_type = ConeLightNetworkCommand::SET_COLOR; // FIXME: Support setting color for group ONLY
+  packet.command_type = ConeLightNetworkCommand::SET_GROUP_COLOR; // TODO: Allow app to toggle between or select which groups to control (or all groups)
   packet.command_parameters = packed_color;
+  packet.command_parameters_extra = m_cone_light->node_group_id();
 
   m_cone_light->lighting()->set_color(color);
   m_cone_light->lighting()->set_brightness(m_values[4]);

@@ -8,6 +8,7 @@ ConeLightCommandHandler::ConeLightCommandHandler(ConeLight *cone_light)
   m_commands.push_back(new ConeLightCommand_Help);
   m_commands.push_back(new ConeLightCommand_Song);
   m_commands.push_back(new ConeLightCommand_NetSong);
+  m_commands.push_back(new ConeLightCommand_Songs);
   m_commands.push_back(new ConeLightCommand_Tone);
   m_commands.push_back(new ConeLightCommand_NetTone);
   m_commands.push_back(new ConeLightCommand_Color);
@@ -26,7 +27,22 @@ void ConeLightCommandHandler::update()
 {
   if (Serial.available() > 0)
   {
-    String buf = Serial.readStringUntil('\n');
+    uint8_t buffer[64] = {0};
+
+    // Unexpectedly large Serial input, drain and discard buffer of unexpected size
+    if (Serial.available() > 63)
+    {
+      while (Serial.available())
+        Serial.read();
+
+      Serial.println("Unexpectedly large input (greater than 63 characters). Discarded.");
+      return;
+    }
+
+    Serial.read(buffer, Serial.available());
+
+    auto buffer_to_char_ptr = reinterpret_cast<char*>(buffer);
+    String buf = String(buffer_to_char_ptr);
     buf.trim();
 
     Serial.printf("    CommandHandler buffer: %s\n", buf.c_str());

@@ -71,6 +71,18 @@ void ConeLightCommand_NetSong::handle(ConeLight *cone_light, std::vector<String>
   cone_light->espnow_event(packet);
 }
 
+// SONGS
+void ConeLightCommand_Songs::handle(ConeLight *cone_light, std::vector<String> arguments)
+{
+  Serial.println("Songs Catalog:");
+
+  uint16_t i = 0;
+  for (auto song : cone_light_songs)
+  {
+    Serial.printf("    %d: %s\n", i++, song.name().c_str());
+  }
+}
+
 // TONE
 void ConeLightCommand_Tone::handle(ConeLight *cone_light, std::vector<String> arguments)
 {

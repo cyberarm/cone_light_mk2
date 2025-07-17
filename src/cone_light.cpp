@@ -3,7 +3,7 @@
 
 ConeLight::ConeLight()
 {
-  Serial.begin();
+  Serial.begin(115200);
 
   Serial.printf("Initializing %s v%s (internal v%d)\n", CONE_LIGHT_PRODUCT_NAME, CONE_LIGHT_FIRMWARE_VERSION_NAME, CONE_LIGHT_FIRMWARE_VERSION);
   Serial.println("  Configuring button inputs...");

@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "cone_light.h"
+#include "cone_light_songs.h"
 
 // Forward declarations...
 class ConeLight;
@@ -56,6 +57,18 @@ public:
     m_name = "net_song";
     m_help = "net_song <song_id> <group_id> | song 0 255";
     m_argument_count = 2;
+  };
+  void handle(ConeLight *cone_light, std::vector<String> arguments);
+};
+
+class ConeLightCommand_Songs : public ConeLightCommand
+{
+public:
+  ConeLightCommand_Songs()
+  {
+    m_name = "songs";
+    m_help = "songs | songs";
+    m_argument_count = 0;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
