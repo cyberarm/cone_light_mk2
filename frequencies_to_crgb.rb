@@ -134,29 +134,23 @@ NOTE_TO_FREQUENCY = [
 ].freeze
 
 NOTE_KEY_TO_COLOR = [
- # Blues
- [153, 193, 241], # A
- [53,  132, 228], # A# / B♭
+ [0xff0000ff], # A
+ [0xff007fff], # A# / B♭
 
- # Greens
- [143, 240, 164], # C
- [51,  209, 122], # C# / D♭
+ [0xff00ffff], # C
+ [0xff00ff7f], # C# / D♭
 
-  # Yellows
- [249, 240, 107], # D
- [246, 211,  45], # D# / E♭
+ [0xff00ff00], # D
+ [0xff7fff00], # D# / E♭
 
- # Oranges
- [255, 190, 111], # E
- [255, 120,   0], # F
+ [0xffffff00], # E
+ [0xffff7f00], # F
   
- # Reds
- [246,  97,  81], # F# / G♭
- [224,  27,  36], # G
+ [0xffff0000], # F# / G♭
+ [0xffff007f], # G
 
- # Purples
- [220, 138, 221], # F# / G♭
- [145,  65, 172], # G# / A♭
+ [0xffffff00], # F# / G♭
+ [0xffff7f00], # G# / A♭
 ].freeze
 
 FREQUENCIES_TO_COLOR = {}
@@ -169,6 +163,10 @@ end
 puts "std::unordered_map<uint16_t, CRGB> frequencies_to_color ="
 puts "{"
 FREQUENCIES_TO_COLOR.each do |freq, color|
-  puts "    {#{freq}, CRGB(#{color[0]}, #{color[1]}, #{color[2]})},"
+  if color.size == 1
+    puts "    {#{freq}, CRGB(#{color[0]})},"
+  elsif color.size == 3
+    puts "    {#{freq}, CRGB(#{color[0]}, #{color[1]}, #{color[2]})},"
+  end
 end
 puts "};"
