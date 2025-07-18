@@ -34,7 +34,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK "node_clock"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.16"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.18"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 1
 
