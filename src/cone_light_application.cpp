@@ -353,6 +353,9 @@ bool ConeLight_App_ManualControl::button_down(ConeLightButton btn)
 
 bool ConeLight_App_ManualControl::button_held(ConeLightButton btn)
 {
+  if (!m_selected)
+    return false;
+
   m_needs_redraw = true;
 
   switch (btn)
@@ -558,6 +561,9 @@ bool ConeLight_App_SyncedControl::button_down(ConeLightButton btn)
 
 bool ConeLight_App_SyncedControl::button_held(ConeLightButton btn)
 {
+  if (!m_selected)
+    return false;
+
   m_needs_redraw = true;
 
   switch (btn)
