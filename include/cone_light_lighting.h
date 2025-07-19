@@ -167,7 +167,7 @@ public:
     if (frequencies_to_color.contains(frequency))
       return frequencies_to_color.at(frequency);
 
-    return CRGB();
+    return CRGB(0xffffffff);
   };
 
   void handle_packet(cone_light_network_packet_t packet);

@@ -47,7 +47,13 @@ public:
     Serial.printf("Initialized Channel on pin %d with %d notes\n", m_pin, m_note_count);
   }
 
-  void reset() {}
+  void reset()
+  {
+    m_current_note = 0;
+    m_complete = false;
+    m_last_note_duration = 0;
+    m_last_note_started_at = millis();
+  }
 
   void update()
   {
@@ -76,7 +82,9 @@ public:
         ledcWriteTone(m_pin, note);
       }
 
+#if CONE_LIGHT_DEBUG
       Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, DURATION: %ld\n", m_pin, m_current_note, note, m_last_note_duration);
+#endif
 
       m_current_note++;
     }
@@ -94,10 +102,10 @@ public:
 
   uint16_t currentFrequency()
   {
-    if (m_current_note-1 >= m_note_count)
+    if (m_current_note >= m_note_count)
       return 0;
 
-    return m_notes[m_current_note-1];
+    return m_notes[m_current_note];
   }
 
   uint16_t noteCount()
