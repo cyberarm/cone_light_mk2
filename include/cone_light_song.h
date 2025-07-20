@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-// #include "cyberarm_song.h"
+#include "cyberarm_song.h"
 
 // struct cone_light_song_t
 // {
@@ -23,9 +23,9 @@ private:
   std::vector<std::vector<uint16_t>> m_durations;
 
 public:
-  ConeLightSong(String name, std::vector<std::vector<int16_t>> notes, std::vector<std::vector<uint16_t>> durations);
+  ConeLightSong(const String name, const std::vector<std::vector<int16_t>> notes, const std::vector<std::vector<uint16_t>> durations);
   ~ConeLightSong();
-  String name();
-  std::vector<int16_t> channel_notes(uint8_t channel_id);
-  std::vector<uint16_t> channel_durations(uint8_t channel_id);
+  String name() const;
+  std::vector<int16_t> channel_notes(uint8_t channel_id) const;
+  std::vector<uint16_t> channel_durations(uint8_t channel_id) const;
 };

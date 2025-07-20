@@ -1,6 +1,6 @@
 #include "cone_light_song.h"
 
-ConeLightSong::ConeLightSong(String name, std::vector<std::vector<int16_t>> notes, std::vector<std::vector<uint16_t>> durations)
+ConeLightSong::ConeLightSong(const String name, const std::vector<std::vector<int16_t>> notes, const std::vector<std::vector<uint16_t>> durations)
 {
   m_name = name;
   m_notes = notes;
@@ -11,12 +11,12 @@ ConeLightSong::~ConeLightSong()
 {
 }
 
-String ConeLightSong::name()
+String ConeLightSong::name() const
 {
   return m_name;
 }
 
-std::vector<int16_t> ConeLightSong::channel_notes(uint8_t channel_id)
+std::vector<int16_t> ConeLightSong::channel_notes(uint8_t channel_id) const
 {
   if (channel_id < m_notes.size())
     return m_notes[channel_id];
@@ -24,7 +24,7 @@ std::vector<int16_t> ConeLightSong::channel_notes(uint8_t channel_id)
     return {};
 }
 
-std::vector<uint16_t> ConeLightSong::channel_durations(uint8_t channel_id)
+std::vector<uint16_t> ConeLightSong::channel_durations(uint8_t channel_id) const
 {
   if (channel_id < m_durations.size())
     return m_durations[channel_id];

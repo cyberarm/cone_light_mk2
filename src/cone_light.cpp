@@ -49,6 +49,9 @@ ConeLight::ConeLight()
   m_screensaver = false;
 
   Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
+
+  Serial.printf("HEAP: %u / %u\n", ESP.getFreeHeap(), ESP.getHeapSize());
+  Serial.printf("PSRAM: %u / %u\n", ESP.getFreePsram(), ESP.getPsramSize());
 }
 
 ConeLight::~ConeLight()
