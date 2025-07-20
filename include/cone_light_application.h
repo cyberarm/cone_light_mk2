@@ -72,9 +72,9 @@ public:
   uint8_t m_max_app_index = 0;
 };
 
-class ConeLight_App_ManualControl : public ConeLightApplication
+class ConeLight_App_LEDControl : public ConeLightApplication
 {
-private:
+protected:
   bool m_has_been_focused_once = false;
   bool m_selected = false;
   size_t m_index = 0;
@@ -83,12 +83,13 @@ private:
   uint8_t m_values[5] = {0, 0, 0, 0, 8};
   int8_t m_held_direction = 0;
   uint32_t m_last_held_increment_ms = 0;
+  uint8_t m_cone_light_led_control_mode = ConeLightLEDControlMode::NOT_SET;
 
 public:
-  ConeLight_App_ManualControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  ConeLight_App_LEDControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
   {
     m_cone_light = cone_light;
-    m_app_name = "Manual Control";
+    m_app_name = "--LED CTRL--";
     m_fullscreen = true;
   };
   void draw();
@@ -105,37 +106,40 @@ public:
   void apply_color();
 };
 
-class ConeLight_App_SyncedControl : public ConeLightApplication
+class ConeLight_App_NodeLEDControl : public ConeLight_App_LEDControl
 {
-private:
-  bool m_has_been_focused_once = false;
-  bool m_selected = false;
-  size_t m_index = 0;
-  size_t m_max_index = 4;
-  const std::string m_labels[5] = {"Main Menu", "Red", "Green", "Blue", "Lightness"};
-  uint8_t m_values[5] = {0, 0, 0, 0, 8};
-  int8_t m_held_direction = 0;
-  uint32_t m_last_held_increment_ms = 0;
-
 public:
-  ConeLight_App_SyncedControl(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  ConeLight_App_NodeLEDControl(ConeLight *cone_light) : ConeLight_App_LEDControl(cone_light)
   {
     m_cone_light = cone_light;
-    m_app_name = "Synced Control";
+    m_app_name = "Node LED CTRL";
     m_fullscreen = true;
+    m_cone_light_led_control_mode = ConeLightLEDControlMode::NODE;
   };
-  void draw();
-  void update();
-  bool button_down(ConeLightButton btn);
-  bool button_held(ConeLightButton btn);
-  bool button_up(ConeLightButton btn);
-  void focus();
-  // void blur();
-  std::string hex_color(uint8_t red, uint8_t green, uint8_t blue, uint8_t lightness)
+};
+
+class ConeLight_App_GroupNodeLEDControl : public ConeLight_App_LEDControl
+{
+public:
+  ConeLight_App_GroupNodeLEDControl(ConeLight *cone_light) : ConeLight_App_LEDControl(cone_light)
   {
-    return std::format("#{:02X}{:02X}{:02X}{:02X}", red, green, blue, lightness);
+    m_cone_light = cone_light;
+    m_app_name = "Group Node LED CTRL";
+    m_fullscreen = true;
+    m_cone_light_led_control_mode = ConeLightLEDControlMode::GROUP;
   };
-  void apply_color();
+};
+
+class ConeLight_App_AllNodeLEDControl : public ConeLight_App_LEDControl
+{
+public:
+  ConeLight_App_AllNodeLEDControl(ConeLight *cone_light) : ConeLight_App_LEDControl(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "All Node LED CTRL";
+    m_fullscreen = true;
+    m_cone_light_led_control_mode = ConeLightLEDControlMode::ALL;
+  };
 };
 
 class ConeLight_App_Songs : public ConeLightApplication

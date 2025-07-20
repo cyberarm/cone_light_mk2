@@ -50,3 +50,11 @@ enum ConeLightDirection
   NONE = 0,
   DOWN = -1
 };
+
+enum ConeLightLEDControlMode
+{
+  NOT_SET = 0,
+  NODE,
+  GROUP,
+  ALL
+};
