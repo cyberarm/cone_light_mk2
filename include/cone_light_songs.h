@@ -3,4 +3,4 @@
 #include "cone_light_song.h"
 
 class ConeLightSong;
-extern const std::array<ConeLightSong, 34> cone_light_songs;
+extern const std::array<ConeLightSong, 36> cone_light_songs;
