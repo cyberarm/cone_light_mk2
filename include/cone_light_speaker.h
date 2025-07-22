@@ -2,6 +2,8 @@
 
 #include "cone_light.h"
 #include "cyberarm_song.h"
+#include <FastLED.h>
+#include <Tween.h>
 
 // Forward declaration...
 class ConeLight;
@@ -14,9 +16,11 @@ private:
   CyberarmSong *m_song = new CyberarmSong();
   uint32_t m_last_milliseconds = millis();
   bool m_speaker_inited = false;
-  bool m_boot_sound_played = false;
   ConeLight *m_cone_light = nullptr;
-  int16_t m_current_channel_note = -1;
+  int16_t m_current_channel_note_id = -1;
+  bool m_song_playing = false;
+  Tween::Timeline m_led_timeline;
+  CRGB m_led_song_color = {};
 
 public:
   ConeLightSpeaker(ConeLight *cone_light);
@@ -28,4 +32,5 @@ public:
   bool playing() { return m_song->playing(); };
 
   void handle_packet(cone_light_network_packet_t packet);
+  void animate_leds_with_song();
 };

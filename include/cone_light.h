@@ -5,7 +5,7 @@
 // #define NODE_NAME "KETTLE" // HOBBIT FIDDLE DRAGON FLOWER LOCKET MIRROR PILLOW
 
 #define CONE_LIGHT_DEBUG false
-#define CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS false
+#define CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS true
 
 #define CONE_LIGHT_PRODUCT_NAME "Cone Light mk. II"
 // Whether buttons cause beeps and chirps
@@ -34,7 +34,7 @@
 #define CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK "node_clock"
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.20"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.21"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 1
 

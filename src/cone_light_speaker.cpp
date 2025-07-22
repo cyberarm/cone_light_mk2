@@ -37,20 +37,19 @@ void ConeLightSpeaker::update()
 
   // HARM: Potentially rapidly changing/flashing lights
   // TODO: Make leds 'blend' between current and next colors to prevent/mitigate flashing
-#if CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS
-  CyberarmSongChannel *channel = m_song->channel(m_cone_light->node_id());
-  if (channel && !channel->isFinished() && m_current_channel_note != channel->currentNote())
+  if (m_song_playing)
   {
-    m_current_channel_note = channel->currentNote();
-    int16_t freq = channel->currentFrequency();
-    // HACK: prevents lights from instantly flashing off then back to a color for 'rest' notes
-    if (freq < 0)
-      return;
+    m_led_timeline.update();
 
-    m_cone_light->lighting()->set_color(m_cone_light->lighting()->frequency_to_color(freq));
+    // FIXME: Continually updating the leds might prevent the wifi task from runnning, preventing sending/receiving packets.
+#if CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS
+    m_cone_light->lighting()->set_color(m_led_song_color);
     m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS);
-  }
 #endif
+
+    if (!m_song->playing() && m_led_timeline.getRemainingTime() <= 0)
+      m_song_playing = false;
+  }
 }
 
 void ConeLightSpeaker::reset()
@@ -90,6 +89,8 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
   printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", song.name().c_str(), node_id, notes.size());
 
   m_song->set_channel(SPEAKER_PIN, node_id, notes.size(), notes.data(), durations.data());
+  animate_leds_with_song();
+  m_song_playing = true;
 }
 
 void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
@@ -140,4 +141,52 @@ void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
   default:
     break;
   }
+}
+
+void ConeLightSpeaker::animate_leds_with_song()
+{
+  CyberarmSongChannel *channel = m_song->channel(m_cone_light->node_id());
+  m_led_timeline.clear();
+  m_led_song_color = CRGB::Black;
+
+  m_led_timeline.add(m_led_song_color);
+  uint16_t skipped_rest_duration_ms = 0;
+
+  if (channel && channel->note_count() > 0)
+  {
+    for (size_t i = 0; i < channel->note_count() - 1; i++)
+    {
+      auto freq = channel->notes()[i];
+      auto duration = channel->durations()[i];
+      auto color = m_cone_light->lighting()->frequency_to_color(freq);
+
+      // First note, check for leading pause
+      if (i == 0 && freq < 0)
+      {
+        m_led_timeline.append(m_led_song_color, CRGB::Black, duration);
+      }
+      else
+      {
+        // Don't animate short rests to mitigate flashing
+        if (freq < 0 && duration < 128)
+        {
+          skipped_rest_duration_ms += duration;
+          continue;
+        }
+
+        m_led_timeline.append(m_led_song_color, color, duration + skipped_rest_duration_ms);
+        skipped_rest_duration_ms = 0;
+      }
+    }
+  }
+
+  // Reset LED color back to what it was before the song began
+  // FIXME: Store value of SET_COLOR/SET_GROUP_COLOR commands to ensure we use the correct color
+  //        and don't accidentally use a color from a mid progress song that's interrupted.
+  m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_color(), 500);
+
+  Serial.printf("Timeline size: %d\n", m_led_timeline.size());
+
+  m_led_timeline.mode(Tween::Mode::ONCE);
+  m_led_timeline.start();
 }

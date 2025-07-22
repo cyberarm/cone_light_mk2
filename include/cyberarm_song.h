@@ -11,7 +11,7 @@ private:
   int16_t m_notes[MAX_NOTES] = {0};
   uint16_t m_durations[MAX_NOTES] = {0};
   uint16_t m_note_count = 0;
-  uint16_t m_current_note = 0;
+  uint16_t m_current_note_id = 0;
   bool m_complete = true;
   uint32_t m_last_note_duration = 0;
   uint32_t m_last_note_started_at = 0;
@@ -25,7 +25,7 @@ public:
     m_pin = pin;
     m_note_count = noteCount;
 
-    m_current_note = 0;
+    m_current_note_id = 0;
     m_complete = false;
     m_last_note_duration = 0;
     m_last_note_started_at = millis();
@@ -49,7 +49,7 @@ public:
 
   void reset()
   {
-    m_current_note = 0;
+    m_current_note_id = 0;
     m_complete = false;
     m_last_note_duration = 0;
     m_last_note_started_at = millis();
@@ -57,11 +57,11 @@ public:
 
   void update()
   {
-    // Serial.printf("Channel#update: note#: %d, note count: %d\n", m_current_note, m_note_count);
+    // Serial.printf("Channel#update: note#: %d, note count: %d\n", m_current_note_id, m_note_count);
 
     if (millis() - m_last_note_started_at >= m_last_note_duration)
     {
-      if (m_current_note >= m_note_count)
+      if (m_current_note_id >= m_note_count)
       {
         ledcWriteTone(m_pin, 0);
         m_complete = true;
@@ -69,8 +69,8 @@ public:
       }
 
       m_last_note_started_at = millis();
-      int16_t note = m_notes[m_current_note];
-      uint16_t duration = m_durations[m_current_note];
+      int16_t note = m_notes[m_current_note_id];
+      uint16_t duration = m_durations[m_current_note_id];
       m_last_note_duration = duration;
 
       if (note < 0)
@@ -83,34 +83,73 @@ public:
       }
 
 #if CONE_LIGHT_DEBUG
-      Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, DURATION: %ld\n", m_pin, m_current_note, note, m_last_note_duration);
+      Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, DURATION: %ld\n", m_pin, m_current_note_id, note, m_last_note_duration);
 #endif
 
-      m_current_note++;
+      m_current_note_id++;
     }
   }
 
-  bool isFinished()
+  bool finished()
   {
     return m_complete;
   }
 
-  uint16_t currentNote()
+  uint16_t current_note_id()
   {
-    return m_current_note;
+    return m_current_note_id;
   }
 
-  uint16_t currentFrequency()
+  uint16_t current_frequency()
   {
-    if (m_current_note >= m_note_count)
+    if (m_current_note_id >= m_note_count)
       return 0;
 
-    return m_notes[m_current_note];
+    return m_notes[m_current_note_id];
   }
 
-  uint16_t noteCount()
+  uint16_t current_duration()
+  {
+    if (m_current_note_id >= m_note_count)
+      return 0;
+
+    return m_durations[m_current_note_id];
+  }
+
+  uint16_t next_note_id()
+  {
+    return m_current_note_id + 1;
+  }
+
+  uint16_t next_frequency()
+  {
+    if (next_note_id() >= m_note_count)
+      return 0;
+
+    return m_notes[next_note_id()];
+  }
+
+  uint16_t next_duration()
+  {
+    if (next_note_id() >= m_note_count)
+      return 0;
+
+    return m_durations[next_note_id()];
+  }
+
+  uint16_t note_count()
   {
     return m_note_count;
+  }
+
+  int16_t* notes()
+  {
+    return m_notes;
+  }
+
+  uint16_t* durations()
+  {
+    return m_durations;
   }
 };
 
@@ -138,7 +177,7 @@ public:
     {
       CyberarmSongChannel *channel = m_channels[i];
 
-      if (!channel->isFinished())
+      if (!channel->finished())
       {
         channel->update();
       }
@@ -151,7 +190,7 @@ public:
     {
       CyberarmSongChannel *channel = m_channels[i];
 
-      if (!channel->isFinished())
+      if (!channel->finished())
         return true;
     }
 
