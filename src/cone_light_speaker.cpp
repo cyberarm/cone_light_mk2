@@ -14,7 +14,7 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
   // Boot chime
   if (m_speaker_inited && CONE_LIGHT_BOOT_UP_TUNE)
   {
-    m_song->set_channel(SPEAKER_PIN, 0, note_count, notes, durations);
+    m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), note_count, notes, durations);
   }
   else
   {
@@ -110,7 +110,7 @@ void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
   notes[0] = frequency;
   durations[0] = duration;
 
-  m_song->set_channel(SPEAKER_PIN, 0, 1, notes, durations);
+  m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), 1, notes, durations);
 }
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)

@@ -49,6 +49,7 @@ public:
 
   void reset()
   {
+    m_note_count = 0;
     m_current_note_id = 0;
     m_complete = false;
     m_last_note_duration = 0;
