@@ -62,6 +62,7 @@ void ConeLightCommand_NetSong::handle(ConeLight *cone_light, std::vector<String>
   uint8_t group_id = arguments[1].toInt();
 
   cone_light_network_packet_t packet = {};
+  packet.command_id = cone_light->networking()->next_command_id();
   packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
   packet.command_parameters = song_id;
   packet.command_parameters_extra = group_id;
@@ -100,6 +101,7 @@ void ConeLightCommand_NetTone::handle(ConeLight *cone_light, std::vector<String>
   uint32_t packed_freq_duration = uint32_t{frequency} << 16 | uint32_t{duration};
 
   cone_light_network_packet_t packet = {};
+  packet.command_id = cone_light->networking()->next_command_id();
   packet.command_type = ConeLightNetworkCommand::PLAY_TONE;
   packet.command_parameters = packed_freq_duration;
   packet.command_parameters_extra = group_id;
@@ -136,6 +138,7 @@ void ConeLightCommand_NetColor::handle(ConeLight *cone_light, std::vector<String
                           (uint32_t{blue});
 
   cone_light_network_packet_t packet = {};
+  packet.command_id = cone_light->networking()->next_command_id();
   packet.command_type = (group_id == 255) ? ConeLightNetworkCommand::SET_COLOR : ConeLightNetworkCommand::SET_GROUP_COLOR;
   packet.command_parameters = packed_color;
   packet.command_parameters_extra = group_id;

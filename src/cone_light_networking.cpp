@@ -46,6 +46,7 @@ void ConeLightNetworking::update()
 
 void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet)
 {
+  strncpy(packet.protocol_id, CONE_LIGHT_NETWORKING_PROTOCOL_ID, 5); // CONE_LIGHT_NETWORKING_PROTOCOL_ID is 4 characters + NULL
   packet.firmware_version = CONE_LIGHT_FIRMWARE_VERSION;
   packet.packet_id = m_packet_id++;
   packet.timestamp = m_cone_light->network_time()->timestamp();
@@ -86,12 +87,35 @@ void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_in
   cone_light_network_packet_t packet = {};
   memcpy(&packet, data, sizeof(cone_light_network_packet_t));
 
+  // Received packet cannot be handled, unknown protocol id
+  if (strncmp(packet.protocol_id, CONE_LIGHT_NETWORKING_PROTOCOL_ID, 5) != 0)
+  {
+    Serial.printf("Networking: Rejected packet due to protocol id mismatch. Got: %s, expected: %s\n", packet.protocol_id, CONE_LIGHT_NETWORKING_PROTOCOL_ID);
+    return;
+  }
+
   // Received packet cannot be handled, incompatible firmware (protocol) version
   if (packet.firmware_version != CONE_LIGHT_FIRMWARE_VERSION)
   {
     Serial.printf("Networking: Rejected packet due to firmware version mismatch. Got: %u, expected: %u\n", packet.firmware_version, CONE_LIGHT_FIRMWARE_VERSION);
     return;
   }
+
+  // Received packet cannot be handled, node id exceeds max number of allowed nodes
+  if (packet.node_id >= CONE_LIGHT_NETWORKING_MAX_NODES)
+  {
+    Serial.printf("Networking: Rejected packet due to node id exceeding max number of allowed nodes. Got: %u, expected: 0..%u\n", packet.node_id, CONE_LIGHT_NETWORKING_MAX_NODES);
+    return;
+  }
+
+  // Received packet cannot be handled, node identifier mismatch or repeated packet/command id
+  if (!m_known_nodes[packet.node_id].ingest_packet(packet))
+  {
+    Serial.printf("Networking: Rejected packet due to node identifier mismatch or repeated packet/command id.\n");
+    return;
+  }
+
+  m_last_espnow_receive_info = esp_now_info;
 
   m_cone_light->espnow_event(packet);
 }

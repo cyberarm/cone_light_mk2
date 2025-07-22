@@ -426,6 +426,7 @@ void ConeLight_App_LEDControl::apply_color()
                             (uint32_t{color.green} << 8) |
                             (uint32_t{color.blue});
 
+    packet.command_id = m_cone_light->networking()->next_command_id();
     packet.command_type = (m_cone_light_led_control_mode == GROUP) ? ConeLightNetworkCommand::SET_GROUP_COLOR : ConeLightNetworkCommand::SET_COLOR;
     packet.command_parameters = packed_color;
     packet.command_parameters_extra = m_cone_light->node_group_id();
@@ -509,6 +510,7 @@ bool ConeLight_App_Songs::button_down(ConeLightButton btn)
   case SELECT_BUTTON:
   {
     cone_light_network_packet_t packet = {};
+    packet.command_id = m_cone_light->networking()->next_command_id();
     packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
     packet.command_parameters = m_song_index;
     packet.command_parameters_extra = 255;
@@ -663,6 +665,7 @@ void ConeLight_App_Debug_ESPNow_Sender::update()
     return;
 
   cone_light_network_packet_t packet;
+  packet.command_id = m_cone_light->networking()->next_command_id();
   packet.command_type = ConeLightNetworkCommand::NOT_A_COMMAND;
   packet.command_parameters = m_packet_id++;
 
@@ -686,6 +689,8 @@ bool ConeLight_App_Debug_ESPNow_Sender::button_down(ConeLightButton btn)
 //////////////////////////////////////
 void ConeLight_App_Debug_ESPNow_Receiver::draw()
 {
+  oled()->setTextWrap(false);
+
   oled()->setCursor(24, 18);
   oled()->printf("RECV: %d", m_last_packet_id);
   oled()->setCursor(24, 26);
@@ -694,6 +699,13 @@ void ConeLight_App_Debug_ESPNow_Receiver::draw()
   oled()->printf("LAST: +%d", m_packets_lost);
   oled()->setCursor(24, 42);
   oled()->printf("FROM: %d:%s:%d", m_last_sender_id, m_last_sender_name, m_last_sender_group_id);
+  if (m_cone_light->networking()->last_espnow_info())
+  {
+      oled()->setCursor(24, 50);
+      oled()->printf("RSSI: %d", m_cone_light->networking()->last_espnow_info()->rx_ctrl->rssi);
+  }
+
+  oled()->setTextWrap(true);
 
   m_needs_redraw = false;
 }

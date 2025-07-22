@@ -185,8 +185,6 @@ void ConeLightSpeaker::animate_leds_with_song()
   //        and don't accidentally use a color from a mid progress song that's interrupted.
   m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_color(), 500);
 
-  Serial.printf("Timeline size: %d\n", m_led_timeline.size());
-
   m_led_timeline.mode(Tween::Mode::ONCE);
   m_led_timeline.start();
 }
