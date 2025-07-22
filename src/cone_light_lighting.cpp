@@ -62,6 +62,12 @@ void ConeLightLighting::set_brightness(uint8_t brightness)
   m_needs_redraw = true;
 }
 
+void ConeLightLighting::set_static_brightness(uint8_t brightness)
+{
+  m_static_brightness = brightness;
+  m_needs_redraw = true;
+}
+
 void ConeLightLighting::handle_packet(cone_light_network_packet_t packet)
 {
   // Ignore packets meant for another group/cluster of nodes
@@ -70,5 +76,7 @@ void ConeLightLighting::handle_packet(cone_light_network_packet_t packet)
     return;
 
   set_color(CRGB(packet.command_parameters));
-  set_brightness(((packet.command_parameters >> 24) & 0xFF));
+  set_static_color(CRGB(packet.command_parameters));
+  set_brightness((packet.command_parameters >> 24) & 0xFF);
+  set_static_brightness((packet.command_parameters >> 24) & 0xFF);
 }

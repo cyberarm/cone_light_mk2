@@ -419,6 +419,7 @@ void ConeLight_App_LEDControl::apply_color()
   m_cone_light->lighting()->set_color(color);
   m_cone_light->lighting()->set_static_color(color);
   m_cone_light->lighting()->set_brightness(m_values[4]);
+  m_cone_light->lighting()->set_static_brightness(m_values[4]);
 
   if (m_cone_light_led_control_mode == GROUP || m_cone_light_led_control_mode == ALL)
   {

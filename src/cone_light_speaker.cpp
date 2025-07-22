@@ -45,11 +45,15 @@ void ConeLightSpeaker::update()
     // FIXME: Allow enabling/disabling LED animation from node's instead of hardcoding on or off
 #if CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS
     m_cone_light->lighting()->set_color(m_led_song_color);
-    m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS);
+    m_cone_light->lighting()->set_brightness(m_cone_light->lighting()->get_static_brightness());
 #endif
 
     if (!m_song->playing() && !m_led_timeline.isRunning())
+    {
       m_song_playing = false;
+      m_cone_light->lighting()->set_color(m_cone_light->lighting()->get_static_color());
+      m_cone_light->lighting()->set_brightness(m_cone_light->lighting()->get_static_brightness());
+    }
   }
 }
 

@@ -122,6 +122,7 @@ void ConeLightCommand_Color::handle(ConeLight *cone_light, std::vector<String> a
   cone_light->lighting()->set_color(red, green, blue);
   cone_light->lighting()->set_static_color(red, green, blue);
   cone_light->lighting()->set_brightness(brightness);
+  cone_light->lighting()->set_static_brightness(brightness);
 }
 
 // NET_COLOR
