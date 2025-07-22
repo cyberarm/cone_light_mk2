@@ -71,12 +71,6 @@ void ConeLightNetworking::on_data_sent(const uint8_t *mac_addr, esp_now_send_sta
 
 void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len)
 {
-  // TODO: Drop packets from nodes that have old packet ids and old command ids to
-  //       mitigate replay attacks and prevent erroneously repeating commands from
-  //       command assurance packets (repeated command packets with the same
-  //       command id and different packet ids)
-  // NOTE: This will need to be on a per node basis.
-
   // Received packet cannot be handled, doesn't fit into mono packet size
   if (sizeof(cone_light_network_packet_t) != len)
   {
@@ -109,13 +103,11 @@ void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_in
   }
 
   // Received packet cannot be handled, node identifier mismatch or repeated packet/command id
-  if (!m_known_nodes[packet.node_id].ingest_packet(packet))
+  if (!m_known_nodes[packet.node_id].ingest_packet(esp_now_info, packet))
   {
     Serial.printf("Networking: Rejected packet due to node identifier mismatch or repeated packet/command id.\n");
     return;
   }
-
-  m_last_espnow_receive_info = esp_now_info;
 
   m_cone_light->espnow_event(packet);
 }

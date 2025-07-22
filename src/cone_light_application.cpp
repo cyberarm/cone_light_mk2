@@ -701,11 +701,8 @@ void ConeLight_App_Debug_ESPNow_Receiver::draw()
   oled()->printf("LAST: +%d", m_packets_lost);
   oled()->setCursor(24, 42);
   oled()->printf("FROM: %d:%s:%d", m_last_sender_id, m_last_sender_name, m_last_sender_group_id);
-  if (m_cone_light->networking()->last_espnow_info())
-  {
-      oled()->setCursor(24, 50);
-      oled()->printf("RSSI: %d", m_cone_light->networking()->last_espnow_info()->rx_ctrl->rssi);
-  }
+  oled()->setCursor(24, 50);
+  oled()->printf("RSSI: %d", m_cone_light->networking()->node_rssi(m_last_sender_id));
 
   oled()->setTextWrap(true);
 
