@@ -16,8 +16,8 @@ typedef struct cone_light_networking_node_tracker
   uint8_t node_id = 255;
   uint8_t node_group_id = 255;
   char node_name[7] = "";
-  int32_t packet_id = -1;
-  int32_t command_id = -1;
+  uint32_t packet_id = 0;
+  uint32_t command_id = 0;
 
   bool ingest_packet(cone_light_network_packet_t packet)
   {
@@ -28,7 +28,7 @@ typedef struct cone_light_networking_node_tracker
                         packet.command_id > command_id;
 
 #if CONE_LIGHT_DEBUG
-    Serial.printf("INGEST_PACKET: node_id: %u / %u, node_group_id: %u / %u, node_name: %s / %s [%d], packet_id: %d / %u, command_id: %d / %u\n",
+    Serial.printf("INGEST_PACKET: node_id: %u / %u, node_group_id: %u / %u, node_name: %s / %s [%u], packet_id: %u / %u, command_id: %d / %u\n",
                   node_id, packet.node_id, node_group_id, packet.node_group_id, node_name, packet.node_name, strncmp(packet.node_name, node_name, 7), packet_id, packet.packet_id, command_id, packet.command_id);
 #endif
 
@@ -62,8 +62,8 @@ private:
   ConeLight *m_cone_light = nullptr;
   uint8_t m_broadcast_address[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   bool m_espnow_initialized = false;
-  uint16_t m_packet_id = 0;
-  uint16_t m_command_id = 0;
+  uint32_t m_packet_id = 1;
+  uint32_t m_command_id = 1;
   std::array<cone_light_networking_node_tracker_t, CONE_LIGHT_NETWORKING_MAX_NODES> m_known_nodes = {};
   const esp_now_recv_info_t *m_last_espnow_receive_info = nullptr;
 
@@ -76,7 +76,7 @@ public:
   void broadcast_packet(cone_light_network_packet_t packet);
   void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status);
   void on_data_received(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len);
-  uint16_t next_command_id() { return m_command_id++; };
+  uint32_t next_command_id() { return m_command_id++; };
   const esp_now_recv_info_t *last_espnow_info() { return m_last_espnow_receive_info; };
 };
 
