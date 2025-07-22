@@ -44,6 +44,18 @@ void ConeLightLighting::set_color(CRGB color)
   m_needs_redraw = true;
 }
 
+void ConeLightLighting::set_static_color(uint8_t red, uint8_t green, uint8_t blue)
+{
+  m_static_color = CRGB(red, green, blue);
+  m_needs_redraw = true;
+}
+
+void ConeLightLighting::set_static_color(CRGB color)
+{
+  m_static_color = color;
+  m_needs_redraw = true;
+}
+
 void ConeLightLighting::set_brightness(uint8_t brightness)
 {
   m_brightness = brightness;

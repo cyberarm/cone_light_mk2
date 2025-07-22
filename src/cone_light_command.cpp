@@ -120,6 +120,7 @@ void ConeLightCommand_Color::handle(ConeLight *cone_light, std::vector<String> a
           brightness = arguments[3].toInt();
 
   cone_light->lighting()->set_color(red, green, blue);
+  cone_light->lighting()->set_static_color(red, green, blue);
   cone_light->lighting()->set_brightness(brightness);
 }
 

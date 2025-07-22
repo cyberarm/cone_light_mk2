@@ -42,12 +42,13 @@ void ConeLightSpeaker::update()
     m_led_timeline.update();
 
     // FIXME: Continually updating the leds might prevent the wifi task from runnning, preventing sending/receiving packets.
+    // FIXME: Allow enabling/disabling LED animation from node's instead of hardcoding on or off
 #if CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS
     m_cone_light->lighting()->set_color(m_led_song_color);
     m_cone_light->lighting()->set_brightness(LED_DEFAULT_BRIGHTNESS);
 #endif
 
-    if (!m_song->playing() && m_led_timeline.getRemainingTime() <= 0)
+    if (!m_song->playing() && !m_led_timeline.isRunning())
       m_song_playing = false;
   }
 }
@@ -154,7 +155,7 @@ void ConeLightSpeaker::animate_leds_with_song()
 
   if (channel && channel->note_count() > 0)
   {
-    for (size_t i = 0; i < channel->note_count() - 1; i++)
+    for (size_t i = 0; i < channel->note_count(); i++)
     {
       auto freq = channel->notes()[i];
       auto duration = channel->durations()[i];
@@ -180,10 +181,12 @@ void ConeLightSpeaker::animate_leds_with_song()
     }
   }
 
+  // Fade out LEDs at end of song
+  m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
+  // Hold on black for a moment
+  m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
   // Reset LED color back to what it was before the song began
-  // FIXME: Store value of SET_COLOR/SET_GROUP_COLOR commands to ensure we use the correct color
-  //        and don't accidentally use a color from a mid progress song that's interrupted.
-  m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_color(), 500);
+  m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_static_color(), 500);
 
   m_led_timeline.mode(Tween::Mode::ONCE);
   m_led_timeline.start();

@@ -150,6 +150,7 @@ class ConeLightLighting
 private:
   CRGB m_leds[NUM_LEDS];
   CRGB m_color = COLOR_PURPLE;
+  CRGB m_static_color = COLOR_PURPLE;
   uint8_t m_brightness = LED_DEFAULT_BRIGHTNESS;
   bool m_needs_redraw = true;
   ConeLight *m_cone_light = nullptr;
@@ -160,9 +161,13 @@ public:
   void update();
   void set_color(uint8_t red, uint8_t green, uint8_t blue);
   void set_color(CRGB color);
+  // static color is the color the light should return to after an animation or other automated led controller completes
+  void set_static_color(uint8_t red, uint8_t green, uint8_t blue);
+  void set_static_color(CRGB color);
   void set_brightness(uint8_t brightness);
 
   CRGB get_color() { return m_color; };
+  CRGB get_static_color() { return m_static_color; };
   uint8_t get_brightness() { return m_brightness; };
   CRGB frequency_to_color(uint16_t frequency)
   {

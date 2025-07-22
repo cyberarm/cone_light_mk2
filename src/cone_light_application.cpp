@@ -35,6 +35,7 @@ ConeLight_App_BootScreen::ConeLight_App_BootScreen(ConeLight *cone_light) : Cone
   }
 
   m_cone_light->lighting()->set_color(m_boot_color);
+  m_cone_light->lighting()->set_static_color(m_group_color);
 };
 
 void ConeLight_App_BootScreen::draw()
@@ -416,6 +417,7 @@ void ConeLight_App_LEDControl::apply_color()
   CRGB color = CRGB(m_values[1], m_values[2], m_values[3]);
 
   m_cone_light->lighting()->set_color(color);
+  m_cone_light->lighting()->set_static_color(color);
   m_cone_light->lighting()->set_brightness(m_values[4]);
 
   if (m_cone_light_led_control_mode == GROUP || m_cone_light_led_control_mode == ALL)
