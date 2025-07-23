@@ -42,9 +42,29 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
 
 void ConeLightNetworking::update()
 {
+  // uint32_t ms = millis();
+
+  // for (auto packet_data : m_redundant_packet_deliveries)
+  // {
+  //   if (ms - packet_data.last_delivery_ms >= packet_data.ms_between_deliveries)
+  //   {
+  //     packet_data.last_delivery_ms = ms;
+  //     packet_data.redundant_deliveries--;
+
+  //     send_packet(packet_data.receipt_address, packet_data.packet, false);
+  //   }
+  // }
+
+  // // Iterate through std::vector in reverse order for safer* deletions, probably.
+  // for (size_t i = m_redundant_packet_deliveries.size() - 1; i > 0; i--)
+  // {
+  //   auto packet_data = m_redundant_packet_deliveries[i];
+  //   if (packet_data.redundant_deliveries == 0 || packet_data.redundant_deliveries == 255)
+  //     m_redundant_packet_deliveries.erase(m_redundant_packet_deliveries.begin() + i);
+  // }
 }
 
-void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet)
+void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet, bool redundant_delivery)
 {
   strncpy(packet.protocol_id, CONE_LIGHT_NETWORKING_PROTOCOL_ID, 5); // CONE_LIGHT_NETWORKING_PROTOCOL_ID is 4 characters + NULL
   packet.firmware_version = CONE_LIGHT_FIRMWARE_VERSION;
@@ -54,15 +74,25 @@ void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_networ
   strncpy(packet.node_name, m_cone_light->node_name().c_str(), 7); // names are 6 characters + NULL
   packet.node_group_id = m_cone_light->node_group_id();
 
+  // cone_light_redundant_packet_delivery_t packet_delivery = {};
+  // if (redundant_delivery)
+  // {
+  //   memcpy(packet_delivery.receipt_address, mac_addr, 6);
+  //   memcpy(&packet_delivery.packet, &packet, sizeof(cone_light_network_packet_t)); // CHECK: This might segfault
+  //   packet_delivery.last_delivery_ms = millis();
+
+  //   m_redundant_packet_deliveries.emplace_back(redundant_delivery);
+  // }
+
   esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&packet, sizeof(packet));
 
   if (result != ESP_OK)
     Serial.printf("ESPNow failed to send packet: [%d] %s\n", result, esp_err_to_name(result));
 }
 
-void ConeLightNetworking::broadcast_packet(cone_light_network_packet_t packet)
+void ConeLightNetworking::broadcast_packet(cone_light_network_packet_t packet, bool redundant_delivery)
 {
-  send_packet(m_broadcast_address, packet);
+  send_packet(m_broadcast_address, packet, redundant_delivery);
 }
 
 void ConeLightNetworking::on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status)

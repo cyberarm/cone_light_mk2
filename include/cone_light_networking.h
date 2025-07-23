@@ -79,6 +79,16 @@ typedef struct cone_light_networking_node_tracker
 
 } cone_light_networking_node_tracker_t;
 
+typedef struct cone_light_redundant_packet_delivery
+{
+  uint8_t receipt_address[6];
+  cone_light_network_packet_t packet;
+  uint8_t redundant_deliveries = 2;
+  uint8_t ms_between_deliveries = 5;
+  uint32_t last_delivery_ms = 0;
+
+} cone_light_redundant_packet_delivery_t;
+
 class ConeLightNetworking
 {
 private:
@@ -89,14 +99,15 @@ private:
   uint32_t m_command_id = 1;
   std::array<cone_light_networking_node_tracker_t, CONE_LIGHT_NETWORKING_MAX_NODES> m_known_nodes = {};
   const int8_t m_no_node_address[6] = {0};
+  std::vector<cone_light_redundant_packet_delivery_t> m_redundant_packet_deliveries = {};
 
 public:
   ConeLightNetworking(ConeLight *cone_light);
   ~ConeLightNetworking();
   void update();
   bool espnow_initialized() { return m_espnow_initialized; };
-  void send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet);
-  void broadcast_packet(cone_light_network_packet_t packet);
+  void send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet, bool redundant_delivery = false);
+  void broadcast_packet(cone_light_network_packet_t packet, bool redundant_delivery = false);
   void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status);
   void on_data_received(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len);
   uint32_t next_command_id() { return m_command_id++; };
