@@ -16,6 +16,7 @@ typedef struct cone_light_networking_node_tracker
   int8_t m_address[6] = {0};
   int16_t m_rssi = 0;
 
+  uint32_t timestamp = 0;
   uint8_t node_id = 255;
   uint8_t node_group_id = 255;
   char node_name[7] = "";
@@ -24,11 +25,14 @@ typedef struct cone_light_networking_node_tracker
 
   bool ingest_packet(const esp_now_recv_info_t *esp_now_info, const cone_light_network_packet_t packet)
   {
-    bool valid_packet = packet.node_id == node_id &&
+    bool valid_packet_node_details = packet.node_id == node_id &&
                         packet.node_group_id == node_group_id &&
-                        strncmp(packet.node_name, node_name, 7) == 0 &&
-                        packet.packet_id > packet_id &&
-                        packet.command_id > command_id;
+                        strncmp(packet.node_name, node_name, 7) == 0;
+
+    bool valid_packet_ids = packet.packet_id > packet_id &&
+                         packet.command_id > command_id;
+
+    bool valid_packet = valid_packet_node_details && valid_packet_ids;
 
 #if CONE_LIGHT_DEBUG
     Serial.printf("INGEST_PACKET: node_id: %u / %u, node_group_id: %u / %u, node_name: %s / %s [%u], packet_id: %u / %u, command_id: %d / %u\n",
@@ -44,13 +48,22 @@ typedef struct cone_light_networking_node_tracker
       // Set fixed node data
       memcpy(m_address, esp_now_info->src_addr, 6);
 
+      timestamp = packet.timestamp;
       node_id = packet.node_id;
       node_group_id = packet.node_group_id;
       strncpy(node_name, packet.node_name, 7);
     }
 
     if (!valid_packet)
-      return false;
+    {
+      // Allow ignoring validity of packet/command id from node when node's timestamp is less than before (assume rebooted)
+      if (!(valid_packet_node_details && !valid_packet_ids && packet.timestamp < timestamp))
+        return false;
+
+#if CONE_LIGHT_DEBUG
+      Serial.printf("INGEST_PACKET: packet with valid node details, younger timestamp, and invalid packet/command IDs was accepted. Assumed that node rebooted.\n");
+#endif
+    }
 
     // Update node data
     m_rssi = esp_now_info->rx_ctrl->rssi;
