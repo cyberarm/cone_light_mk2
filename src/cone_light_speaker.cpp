@@ -7,14 +7,13 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
 
   m_speaker_inited = ledcAttach(SPEAKER_PIN, 8000, 10);
 
-  const int8_t note_count = 7;
-  int16_t notes[note_count] = {136, -1, 220, -1, 293, -1, 370};
-  uint16_t durations[note_count] = {667, 32, 667, 32, 667, 32, 667};
+  m_notes = {136, -1, 220, -1, 293, -1, 370};
+  m_durations = {667, 32, 667, 32, 667, 32, 667};
 
   // Boot chime
   if (m_speaker_inited && CONE_LIGHT_BOOT_UP_TUNE)
   {
-    m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), note_count, notes, durations);
+    m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
   }
   else
   {
@@ -36,7 +35,6 @@ void ConeLightSpeaker::update()
   m_song->update();
 
   // HARM: Potentially rapidly changing/flashing lights
-  // TODO: Make leds 'blend' between current and next colors to prevent/mitigate flashing
   if (m_song_playing)
   {
     m_led_timeline.update();
@@ -93,7 +91,7 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
 
   printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", song.name().c_str(), node_id, notes.size());
 
-  m_song->set_channel(SPEAKER_PIN, node_id, notes.size(), notes.data(), durations.data());
+  m_song->set_channel(SPEAKER_PIN, node_id, notes, durations);
   animate_leds_with_song();
   m_song_playing = true;
 }
@@ -108,13 +106,10 @@ void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
     return;
   }
 
-  int16_t notes[1] = {0};
-  uint16_t durations[1] = {0};
+  m_notes = {(int16_t)frequency};
+  m_durations = {duration};
 
-  notes[0] = frequency;
-  durations[0] = duration;
-
-  m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), 1, notes, durations);
+  m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
 }
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
@@ -157,12 +152,12 @@ void ConeLightSpeaker::animate_leds_with_song()
   m_led_timeline.add(m_led_song_color);
   uint16_t skipped_rest_duration_ms = 0;
 
-  if (channel && channel->note_count() > 0)
+  if (channel && channel->notes().size() > 0)
   {
-    for (size_t i = 0; i < channel->note_count(); i++)
+    for (size_t i = 0; i < channel->notes().size(); i++)
     {
-      auto freq = channel->notes()[i];
-      auto duration = channel->durations()[i];
+      auto freq = channel->notes().at(i);
+      auto duration = channel->durations().at(i);
       auto color = m_cone_light->lighting()->frequency_to_color(freq);
 
       // First note, check for leading pause

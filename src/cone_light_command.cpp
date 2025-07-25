@@ -171,3 +171,11 @@ void ConeLightCommand_Configure::handle(ConeLight *cone_light, std::vector<Strin
   Serial.println("Reconfigured node.");
   Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %s)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), (cone_light->node_grandmaster_clock() ? "true" : "false"));
 }
+
+// MEMORY_USAGE
+void ConeLightCommand_MemoryUsage::handle(ConeLight *cone_light, std::vector<String> arguments)
+{
+  Serial.printf("HEAP: %u / %u (%.1f%% free)\n", ESP.getHeapSize() - ESP.getFreeHeap(), ESP.getHeapSize(), ((float)ESP.getFreeHeap() / (float) ESP.getHeapSize()) * 100.0f);
+  if (ESP.getPsramSize() > 0)
+    Serial.printf("PSRAM: %u / %u (%.1f%% free)\n", ESP.getPsramSize() - ESP.getFreePsram(), ESP.getPsramSize(), ((float)ESP.getFreePsram() / (float)ESP.getPsramSize()) * 100.0f);
+}

@@ -21,6 +21,8 @@ private:
   bool m_song_playing = false;
   Tween::Timeline m_led_timeline;
   CRGB m_led_song_color = {};
+  std::vector<int16_t> m_notes = {0};
+  std::vector<uint16_t> m_durations = {0};
 
 public:
   ConeLightSpeaker(ConeLight *cone_light);

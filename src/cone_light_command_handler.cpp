@@ -15,6 +15,7 @@ ConeLightCommandHandler::ConeLightCommandHandler(ConeLight *cone_light)
   m_commands.push_back(new ConeLightCommand_NetColor);
   m_commands.push_back(new ConeLightCommand_Config);
   m_commands.push_back(new ConeLightCommand_Configure);
+  m_commands.push_back(new ConeLightCommand_MemoryUsage);
 
   Serial.println("    Command Handler initialized successfully.");
 }

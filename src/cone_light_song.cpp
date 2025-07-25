@@ -1,16 +1,5 @@
 #include "cone_light_song.h"
 
-ConeLightSong::ConeLightSong(const String name, const std::vector<std::vector<int16_t>> notes, const std::vector<std::vector<uint16_t>> durations)
-{
-  m_name = name;
-  m_notes = notes;
-  m_durations = durations;
-}
-
-ConeLightSong::~ConeLightSong()
-{
-}
-
 String ConeLightSong::name() const
 {
   return m_name;

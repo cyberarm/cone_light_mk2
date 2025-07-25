@@ -1,67 +1,6 @@
 #pragma once
 
-// #define NODE_ID 0x00
-// #define NODE_GROUP "BACKSTOP" // "STOPSIGN"
-// #define NODE_NAME "KETTLE" // HOBBIT FIDDLE DRAGON FLOWER LOCKET MIRROR PILLOW
-
-#define CONE_LIGHT_DEBUG true
-#define CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS true
-
-#define CONE_LIGHT_PRODUCT_NAME "Cone Light mk. II"
-// Whether buttons cause beeps and chirps
-#define CONE_LIGHT_MUTED false
-// Play 4 notes on boot up
-#define CONE_LIGHT_BOOT_UP_TUNE false
-// Whether node's attempt to sync with the grand master clock node
-#define CONE_LIGHT_GRAND_MASTER_CLOCK_ENABLED false
-
-#define CONE_LIGHT_NODE_ID_UNSET 255
-#define CONE_LIGHT_NODE_GROUP_ID_UNSET 255
-#define CONE_LIGHT_NODE_NAME_UNSET "NONAME"
-#define CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE false
-
-#define CONE_LIGHT_NODE_GROUP_0 0
-#define CONE_LIGHT_NODE_GROUP_0_NAME "BACKSTOP"
-#define CONE_LIGHT_NODE_GROUP_1 1
-#define CONE_LIGHT_NODE_GROUP_1_NAME "STOPSIGN"
-#define CONE_LIGHT_NODE_GROUP_255 255
-#define CONE_LIGHT_NODE_GROUP_255_NAME "!NOT SET"
-
-#define CONE_LIGHT_PREFERENCES_ID "cone_light"
-#define CONE_LIGHT_PREFERENCES_NODE_ID "node_id"
-#define CONE_LIGHT_PREFERENCES_NODE_GROUP "node_group"
-#define CONE_LIGHT_PREFERENCES_NODE_NAME "node_name"
-#define CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK "node_clock"
-
-#define CONE_LIGHT_NETWORKING_PROTOCOL_ID "CONE"
-#define CONE_LIGHT_NETWORKING_MAX_NODES 12
-
-// Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.07.22"
-// Used for backward incompatible changes
-#define CONE_LIGHT_FIRMWARE_VERSION 2
-
-#define BTN_A_PIN D10
-#define BTN_B_PIN D9
-#define BTN_C_PIN D8
-#define SPEAKER_PIN D2
-#define LID_PIN D1
-#define VOLTAGE_PIN A0 // On D0
-
-#define BTN_HELD_AFTER_MS 500
-#define BTN_DEBOUNCE_MS 50
-
-#define LID_DEBOUNCE_MS 500
-
-#define BTN_PRESSED_SPEAKER_CHIRP_FREQUENCY 440
-#define BTN_HELD_SPEAKER_CHIRP_FREQUENCY 1760
-#define BTN_RELEASED_SPEAKER_CHIRP_FREQUENCY 110
-#define BTN_SPEAKER_CHIRP_DURATION 50
-
-#define VOLTAGE_MAX 5.6f
-#define VOLTAGE_MIN 4.72f
-
-#define SCREENSAVER_TIMEOUT_MS 60'000
+#include "cone_light_constants.h"
 
 #include <Preferences.h>
 #include "cone_light_enums.h"

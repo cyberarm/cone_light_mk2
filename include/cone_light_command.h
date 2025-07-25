@@ -145,3 +145,15 @@ public:
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
+
+class ConeLightCommand_MemoryUsage : public ConeLightCommand
+{
+public:
+  ConeLightCommand_MemoryUsage()
+  {
+    m_name = "memory_usage";
+    m_help = "memory_usage | reports memory usage";
+    m_argument_count = 0;
+  };
+  void handle(ConeLight *cone_light, std::vector<String> arguments);
+};
