@@ -434,7 +434,9 @@ void ConeLight_App_LEDControl::apply_color()
     packet.command_parameters = packed_color;
     packet.command_parameters_extra = m_cone_light->node_group_id();
 
-    m_cone_light->networking()->broadcast_packet(packet);
+    // send redundant packets if the button is NOT held down
+    // FIXME: redundant packets are not sent when button is RELEASED after being HELD
+    m_cone_light->networking()->broadcast_packet(packet, m_held_direction == ConeLightDirection::NONE);
   }
 }
 
@@ -518,7 +520,7 @@ bool ConeLight_App_Songs::button_down(ConeLightButton btn)
     packet.command_parameters = m_song_index;
     packet.command_parameters_extra = 255;
 
-    m_cone_light->networking()->broadcast_packet(packet);
+    m_cone_light->networking()->broadcast_packet(packet, true);
     // inject packet into the commanding node to make it handle the command itself too
     m_cone_light->espnow_event(packet);
     break;

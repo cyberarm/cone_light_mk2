@@ -26,11 +26,11 @@ typedef struct cone_light_networking_node_tracker
   bool ingest_packet(const esp_now_recv_info_t *esp_now_info, const cone_light_network_packet_t packet)
   {
     bool valid_packet_node_details = packet.node_id == node_id &&
-                        packet.node_group_id == node_group_id &&
-                        strncmp(packet.node_name, node_name, 7) == 0;
+                                     packet.node_group_id == node_group_id &&
+                                     strncmp(packet.node_name, node_name, 7) == 0;
 
     bool valid_packet_ids = packet.packet_id > packet_id &&
-                         packet.command_id > command_id;
+                            packet.command_id > command_id;
 
     bool valid_packet = valid_packet_node_details && valid_packet_ids;
 
@@ -79,15 +79,42 @@ typedef struct cone_light_networking_node_tracker
 
 } cone_light_networking_node_tracker_t;
 
-typedef struct cone_light_redundant_packet_delivery
+class ConeLightNetworkingRedundantPacketDelivery
 {
-  uint8_t receipt_address[6];
-  cone_light_network_packet_t packet;
-  uint8_t redundant_deliveries = 2;
-  uint8_t ms_between_deliveries = 5;
-  uint32_t last_delivery_ms = 0;
+private:
+  uint8_t m_receipt_address[6];
+  cone_light_network_packet_t m_packet;
+  uint8_t m_redundant_deliveries = 2;
+  uint8_t m_ms_between_deliveries = 5;
+  uint32_t m_last_delivery_ms = 0;
 
-} cone_light_redundant_packet_delivery_t;
+public:
+  ConeLightNetworkingRedundantPacketDelivery(const uint8_t *receipt_address, const cone_light_network_packet_t packet, const uint8_t redundant_deliveries, const uint8_t ms_between_deliveries, const uint32_t last_delivery_ms)
+  {
+    memcpy(m_receipt_address, receipt_address, 6);
+    memcpy(&m_packet, &packet, sizeof(cone_light_network_packet_t));
+    m_redundant_deliveries = redundant_deliveries;
+    m_ms_between_deliveries = ms_between_deliveries;
+    m_last_delivery_ms = last_delivery_ms;
+  }
+
+  ~ConeLightNetworkingRedundantPacketDelivery() {}
+
+  const uint8_t *receipt_address() { return m_receipt_address; };
+  const cone_light_network_packet_t packet() { return m_packet; };
+  const uint8_t redundant_deliveries() { return m_redundant_deliveries; };
+  const uint8_t ms_between_deliveries() { return m_ms_between_deliveries; };
+  const uint32_t last_delivery_ms() { return m_last_delivery_ms; };
+
+  void delivery_attempted()
+  {
+    m_redundant_deliveries--;
+    if (m_redundant_deliveries >= 250)
+      m_redundant_deliveries = 0;
+
+    m_last_delivery_ms = millis();
+  };
+};
 
 class ConeLightNetworking
 {
@@ -99,7 +126,7 @@ private:
   uint32_t m_command_id = 1;
   std::array<cone_light_networking_node_tracker_t, CONE_LIGHT_NETWORKING_MAX_NODES> m_known_nodes = {};
   const int8_t m_no_node_address[6] = {0};
-  std::vector<cone_light_redundant_packet_delivery_t> m_redundant_packet_deliveries = {};
+  std::vector<std::shared_ptr<ConeLightNetworkingRedundantPacketDelivery>> m_redundant_packet_deliveries = {};
 
 public:
   ConeLightNetworking(ConeLight *cone_light);

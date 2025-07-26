@@ -42,26 +42,25 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
 
 void ConeLightNetworking::update()
 {
-  // uint32_t ms = millis();
+  uint32_t ms = millis();
 
-  // for (auto packet_data : m_redundant_packet_deliveries)
-  // {
-  //   if (ms - packet_data.last_delivery_ms >= packet_data.ms_between_deliveries)
-  //   {
-  //     packet_data.last_delivery_ms = ms;
-  //     packet_data.redundant_deliveries--;
+  for (auto &package : m_redundant_packet_deliveries)
+  {
+    if (ms - package->last_delivery_ms() >= package->ms_between_deliveries())
+    {
+#if CONE_LIGHT_DEBUG
+      Serial.printf("REDUNDANT PACKET DELIVERY: PENDING ATTEMPTS: %u, NODE ID: %u, PKT ID: %u, CMD ID: %u\n", package->redundant_deliveries(), package->packet().node_id, package->packet().packet_id, package->packet().packet_id);
+#endif
 
-  //     send_packet(packet_data.receipt_address, packet_data.packet, false);
-  //   }
-  // }
+      send_packet(package->receipt_address(), package->packet(), false);
+      package->delivery_attempted();
+    }
+  }
 
-  // // Iterate through std::vector in reverse order for safer* deletions, probably.
-  // for (size_t i = m_redundant_packet_deliveries.size() - 1; i > 0; i--)
-  // {
-  //   auto packet_data = m_redundant_packet_deliveries[i];
-  //   if (packet_data.redundant_deliveries == 0 || packet_data.redundant_deliveries == 255)
-  //     m_redundant_packet_deliveries.erase(m_redundant_packet_deliveries.begin() + i);
-  // }
+  m_redundant_packet_deliveries.erase(std::remove_if(m_redundant_packet_deliveries.begin(), m_redundant_packet_deliveries.end(),
+                                                     [](auto package)
+                                                     { return package->redundant_deliveries() == 0; }),
+                                      m_redundant_packet_deliveries.end());
 }
 
 void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet, bool redundant_delivery)
@@ -74,15 +73,11 @@ void ConeLightNetworking::send_packet(const uint8_t *mac_addr, cone_light_networ
   strncpy(packet.node_name, m_cone_light->node_name().c_str(), 7); // names are 6 characters + NULL
   packet.node_group_id = m_cone_light->node_group_id();
 
-  // cone_light_redundant_packet_delivery_t packet_delivery = {};
-  // if (redundant_delivery)
-  // {
-  //   memcpy(packet_delivery.receipt_address, mac_addr, 6);
-  //   memcpy(&packet_delivery.packet, &packet, sizeof(cone_light_network_packet_t)); // CHECK: This might segfault
-  //   packet_delivery.last_delivery_ms = millis();
-
-  //   m_redundant_packet_deliveries.emplace_back(redundant_delivery);
-  // }
+  if (redundant_delivery)
+  {
+    // FIXME: Remove pre-existing queued packets that have the same destination address and command TYPE, to prevent resending no longer needed packets
+    m_redundant_packet_deliveries.emplace_back(std::make_shared<ConeLightNetworkingRedundantPacketDelivery>(mac_addr, packet, 2, 5, millis()));
+  }
 
   esp_err_t result = esp_now_send(mac_addr, (uint8_t *)&packet, sizeof(packet));
 
