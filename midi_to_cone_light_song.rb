@@ -8,142 +8,7 @@ end
 
 require "midilib"
 
-Note = Struct.new(:channel, :frequency, :starts_at_ms, :duration_ms)
-
-NOTE_TO_FREQUENCY = [
-  8.662,
-  8.176,
-  9.723,
-  9.177,
-  10.913,
-  10.301,
-  12.250,
-  11.562,
-  13.750,
-  12.978,
-  15.434,
-  14.568,
-  17.324,
-  16.352,
-  19.445,
-  18.354,
-  21.827,
-  20.602,
-  24.500,
-  23.125,
-  27.500,
-  25.957,
-  30.868,
-  29.135,
-  34.648,
-  32.703,
-  38.891,
-  36.708,
-  43.654,
-  41.203,
-  48.999,
-  46.249,
-  55.000,
-  51.913,
-  61.735,
-  58.270,
-  69.296,
-  65.406,
-  77.782,
-  73.416,
-  87.307,
-  82.407,
-  97.999,
-  92.499,
-  110.000,
-  103.826,
-  123.471,
-  116.541,
-  138.591,
-  130.813,
-  155.563,
-  146.832,
-  174.614,
-  164.814,
-  195.998,
-  184.997,
-  220.000,
-  207.652,
-  246.942,
-  233.082,
-  277.183,
-  261.626,
-  311.127,
-  293.665,
-  349.228,
-  329.628,
-  391.995,
-  369.994,
-  440.000,
-  415.305,
-  493.883,
-  466.164,
-  554.365,
-  523.251,
-  622.254,
-  587.330,
-  698.456,
-  659.255,
-  783.991,
-  739.989,
-  880.000,
-  830.609,
-  987.767,
-  932.328,
-  1108.731,
-  1046.502,
-  1244.508,
-  1174.659,
-  1396.913,
-  1318.510,
-  1567.982,
-  1479.978,
-  1760.000,
-  1661.219,
-  1975.533,
-  1864.655,
-  2217.461,
-  2093.005,
-  2489.016,
-  2349.318,
-  2793.826,
-  2637.020,
-  3135.963,
-  2959.955,
-  3520.000,
-  3322.438,
-  3951.066,
-  3729.310,
-  4434.922,
-  4186.009,
-  4978.032,
-  4698.636,
-  5587.652,
-  5274.041,
-  6271.927,
-  5919.911,
-  7040.000,
-  6644.875,
-  7902.133,
-  7458.620,
-  8869.844,
-  8372.018,
-  9956.063,
-  9397.273,
-  11175.300,
-  10548.080,
-  12543.850,
-  11839.820
-].freeze
-
-def note_to_frequency(note)
-  NOTE_TO_FREQUENCY[note].round
-end
+Note = Struct.new(:channel, :note, :starts_at_ms, :duration_ms)
 
 class CyberarmSongChannel
   attr_reader :notes
@@ -184,7 +49,7 @@ class CyberarmSongChannel
       unless n.starts_at_ms - n1.starts_at_ms <= 0
         pause_notes << Note.new(
           channel: nil,
-          frequency: -1,
+          note: -1,
           starts_at_ms: n1.starts_at_ms + n1.duration_ms,
           duration_ms: n.starts_at_ms - (n1.starts_at_ms + n1.duration_ms)
         )
@@ -221,12 +86,12 @@ File.open(file_path, "rb") do |file|
     pp track.name
     pp track.events.size
     track.events.select { |e| e.is_a?(MIDI::NoteOn) }.each do |e|
-      frequency = note_to_frequency(e.note)
       start_time_ms = (seq.pulses_to_seconds(e.time_from_start) * 1000.0).round
       duration_ms = (seq.pulses_to_seconds(e.off.time_from_start) * 1000.0).round - start_time_ms
 
-      # pp [e.note, frequency, start_time_ms, duration_ms]
-      notes << Note.new(channel: i - 1, frequency: frequency, starts_at_ms: start_time_ms, duration_ms: duration_ms)
+      # pp [e.note, note, start_time_ms, duration_ms]
+      # +24 to push up a couple octaves
+      notes << Note.new(channel: i - 1, note: e.note + 24, starts_at_ms: start_time_ms, duration_ms: duration_ms)
     end
   end
 end
@@ -257,12 +122,12 @@ puts
 puts  "    ConeLightSong("
 puts  "        \"#{song_name}\","
 print "        {"
-frequency_rows = []
+note_rows = []
 channels.each do |c|
-  frequency_rows << "{#{c.notes.map { |n| n.frequency }.join(', ')}}"
+  note_rows << "{#{c.notes.map { |n| n.note }.join(', ')}}"
 end
 first_line = true
-frequency_rows.join(",\n").lines.each_with_index do |line, i|
+note_rows.join(",\n").lines.each_with_index do |line, i|
   print first_line ? "#{line}" : "         #{line}"
 
   first_line = false
