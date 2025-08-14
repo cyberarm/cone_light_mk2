@@ -5,7 +5,7 @@ String ConeLightSong::name() const
   return m_name;
 }
 
-std::vector<int16_t> ConeLightSong::channel_notes(uint8_t channel_id) const
+std::vector<int8_t> ConeLightSong::channel_notes(uint8_t channel_id) const
 {
   if (channel_id < m_notes.size())
     return m_notes[channel_id];

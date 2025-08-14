@@ -80,7 +80,7 @@ public:
   ConeLightCommand_Tone()
   {
     m_name = "tone";
-    m_help = "tone <frequency> <duration milliseconds> | tone 440 100";
+    m_help = "tone <midi note> <duration milliseconds> | tone 68 100";
     m_argument_count = 2;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
@@ -92,7 +92,7 @@ public:
   ConeLightCommand_NetTone()
   {
     m_name = "net_tone";
-    m_help = "net_tone <frequency> <duration milliseconds> <group_id> | tone 440 100 255";
+    m_help = "net_tone <midi note> <duration milliseconds> <group_id> | tone 68 100 255";
     m_argument_count = 3;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);

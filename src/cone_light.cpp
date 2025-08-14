@@ -169,15 +169,15 @@ void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
     if (state == BUTTON_PRESSED)
       if (m_current_app->button_down(btn))
         if (!muted() && !speaker()->playing())
-          speaker()->play_tone(BTN_PRESSED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
+          speaker()->play_tone(BTN_PRESSED_SPEAKER_CHIRP_NOTE, BTN_SPEAKER_CHIRP_DURATION);
     if (state == BUTTON_HELD)
       if (m_current_app->button_held(btn))
         if (!muted() && !speaker()->playing())
-          speaker()->play_tone(BTN_HELD_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
+          speaker()->play_tone(BTN_HELD_SPEAKER_CHIRP_NOTE, BTN_SPEAKER_CHIRP_DURATION);
     if (state == BUTTON_RELEASED)
       if (m_current_app->button_up(btn))
         if (!muted() && !speaker()->playing())
-          speaker()->play_tone(BTN_RELEASED_SPEAKER_CHIRP_FREQUENCY, BTN_SPEAKER_CHIRP_DURATION);
+          speaker()->play_tone(BTN_RELEASED_SPEAKER_CHIRP_NOTE, BTN_SPEAKER_CHIRP_DURATION);
   }
 
   m_last_input_change_ms = millis();

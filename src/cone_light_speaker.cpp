@@ -7,7 +7,7 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
 
   m_speaker_inited = ledcAttach(SPEAKER_PIN, 8000, 10);
 
-  m_notes = {136, -1, 220, -1, 293, -1, 370};
+  m_notes = {48, -1, 56, -1, 63, -1, 67};
   m_durations = {667, 32, 667, 32, 667, 32, 667};
 
   // Boot chime
@@ -86,7 +86,7 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
     return;
   }
 
-  std::vector<int16_t> notes = song.channel_notes(node_id);
+  std::vector<int8_t> notes = song.channel_notes(node_id);
   std::vector<uint16_t> durations = song.channel_durations(node_id);
 
   printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", song.name().c_str(), node_id, notes.size());
@@ -96,7 +96,7 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
   m_song_playing = true;
 }
 
-void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
+void ConeLightSpeaker::play_tone(uint8_t note, uint16_t duration)
 {
   m_song->reset();
 
@@ -106,7 +106,7 @@ void ConeLightSpeaker::play_tone(uint16_t frequency, uint16_t duration)
     return;
   }
 
-  m_notes = {(int16_t)frequency};
+  m_notes = {(int8_t)note};
   m_durations = {duration};
 
   m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
@@ -156,19 +156,19 @@ void ConeLightSpeaker::animate_leds_with_song()
   {
     for (size_t i = 0; i < channel->notes().size(); i++)
     {
-      auto freq = channel->notes().at(i);
+      auto note = channel->notes().at(i);
       auto duration = channel->durations().at(i);
-      auto color = m_cone_light->lighting()->frequency_to_color(freq);
+      auto color = m_cone_light->lighting()->note_to_color(note);
 
       // First note, check for leading pause
-      if (i == 0 && freq < 0)
+      if (i == 0 && note < 0)
       {
         m_led_timeline.append(m_led_song_color, CRGB::Black, duration);
       }
       else
       {
         // Don't animate short rests to mitigate flashing
-        if (freq < 0 && duration < 128)
+        if (note < 0 && duration < 128)
         {
           skipped_rest_duration_ms += duration;
           continue;

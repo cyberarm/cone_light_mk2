@@ -87,23 +87,25 @@ void ConeLightCommand_Songs::handle(ConeLight *cone_light, std::vector<String> a
 // TONE
 void ConeLightCommand_Tone::handle(ConeLight *cone_light, std::vector<String> arguments)
 {
-  int16_t frequency = arguments[0].toInt(), duration = arguments[1].toInt();
+  uint8_t note = arguments[0].toInt();
+  uint16_t duration = arguments[1].toInt();
 
-  cone_light->speaker()->play_tone(frequency, duration);
+  cone_light->speaker()->play_tone(note, duration);
 }
 
 // NET_TONE
 void ConeLightCommand_NetTone::handle(ConeLight *cone_light, std::vector<String> arguments)
 {
-  uint16_t frequency = arguments[0].toInt(), duration = arguments[1].toInt();
+  uint8_t note = arguments[0].toInt();
+  uint16_t duration = arguments[1].toInt();
   uint8_t group_id = arguments[2].toInt();
 
-  uint32_t packed_freq_duration = uint32_t{frequency} << 16 | uint32_t{duration};
+  uint32_t packed_note_duration = uint32_t{note} << 16 | uint32_t{duration};
 
   cone_light_network_packet_t packet = {};
   packet.command_id = cone_light->networking()->next_command_id();
   packet.command_type = ConeLightNetworkCommand::PLAY_TONE;
-  packet.command_parameters = packed_freq_duration;
+  packet.command_parameters = packed_note_duration;
   packet.command_parameters_extra = group_id;
 
   cone_light->networking()->broadcast_packet(packet);

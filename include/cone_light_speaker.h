@@ -21,7 +21,7 @@ private:
   bool m_song_playing = false;
   Tween::Timeline m_led_timeline;
   CRGB m_led_song_color = {};
-  std::vector<int16_t> m_notes = {0};
+  std::vector<int8_t> m_notes = {0};
   std::vector<uint16_t> m_durations = {0};
 
 public:
@@ -30,7 +30,7 @@ public:
   void update();
   void reset();
   void play_song(uint16_t song_id);
-  void play_tone(uint16_t frequency, uint16_t duration);
+  void play_tone(uint8_t note, uint16_t duration);
   bool playing() { return m_song->playing(); };
 
   void handle_packet(cone_light_network_packet_t packet);
