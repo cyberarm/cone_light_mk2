@@ -1,0 +1,57 @@
+require "json"
+
+
+data = File.read("./midis.jsonl")
+song_count = data.lines.count
+
+count = 0
+File.open("./src/cone_light_songs.cpp", "w") do |f|
+  f.puts "// DO NOT MANUALLY EDIT THIS FILE. ANY CHANGES WILL BE OVERWRITTEN WHEN REGENERATED."
+  f.puts "// File generated: #{Time.now.utc.strftime("%Y-%m-%d %H:%M:%S")}"
+  f.puts
+  f.puts "#include \"cone_light_songs.h\""
+  f.puts
+  f.puts "const std::array<ConeLightSong, #{song_count}> cone_light_songs = {"
+
+  data.each_line do |line|
+    hash = JSON.parse(line.strip, symbolize_names: true)
+
+    f.puts  "    ConeLightSong("
+    f.puts  "        \"#{hash[:name]}\","
+    f.print "        {"
+    note_rows = []
+    hash[:notes].each do |note_array|
+      note_rows << "{#{note_array.join(', ')}}"
+    end
+    first_line = true
+    note_rows.join(",\n").lines.each_with_index do |line, i|
+      f.print first_line ? "#{line}" : "         #{line}"
+
+      first_line = false
+    end
+    f.puts "},"
+    f.print "        {"
+    duration_rows = []
+    hash[:durations].each do |duration_array|
+      duration_rows << "{#{duration_array.join(', ')}}"
+    end
+    first_line = true
+    duration_rows.join(",\n").lines.each_with_index do |line, i|
+      f.print first_line ? "#{line}" : "         #{line}"
+
+      first_line = false
+    end
+    f.puts "})#{(count == song_count - 1) ? "};" : ","}"
+
+    count += 1
+  end
+end
+
+File.open("./include/cone_light_songs.h", "w") do |f|
+  f.puts "#pragma once"
+  f.puts
+  f.puts "#include \"cone_light_song.h\""
+  f.puts
+  f.puts "class ConeLightSong;"
+  f.puts "extern const std::array<ConeLightSong, #{song_count}> cone_light_songs;"
+end
