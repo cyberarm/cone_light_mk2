@@ -65,9 +65,30 @@ class CyberarmSongChannel
   end
 end
 
+def song_to_json(category, name, transpose, notes, durations)
+  {
+    category: category,
+    name: name,
+    transpose: transpose,
+    notes: notes,
+    durations: durations
+}.to_json
+end
+
 available_channels = 8
 transpose = 24 # +24 to push up a couple octaves and make notes more audible by using higher frequencies
 output = File.open("./midis.jsonl", "w") do |f|
+  # Write abort "song"
+  f.puts(
+    song_to_json(
+      0,
+      "ABORT PLAYBACK",
+      0,
+      available_channels.times.map { [-1] },
+      available_channels.times.map { [0] }
+    )
+  )
+
   Dir.glob("/home/cyberarm/Nextcloud/cone_light_midis/*/*_cone_light.mid").each do |file_path|
     unless File.exist?(file_path)
       puts "No such file: #{file_path}"
@@ -127,14 +148,14 @@ output = File.open("./midis.jsonl", "w") do |f|
 
     puts "    Waterfalled! Node(s) may trade off melodies and baselines. Unless played in cluster song will sound terrible." if waterfalled
 
-    hash = {
-      category: File.dirname(file_path).split("/").last.split("_").first.to_i,
-      name: File.basename(file_path, "_cone_light.mid").split("_").map(&:capitalize).join(" "),
-      transpose: 0,
-      notes: channels.map { |c| c.notes.map(&:note) },
-      durations: channels.map { |c| c.notes.map(&:duration_ms) }
-    }
-
-    f.puts(hash.to_json)
+    f.puts(
+      song_to_json(
+        File.dirname(file_path).split("/").last.split("_").first.to_i,
+        File.basename(file_path, "_cone_light.mid").split("_").map(&:capitalize).join(" "),
+        0,
+        channels.map { |c| c.notes.map(&:note) },
+        channels.map { |c| c.notes.map(&:duration_ms) }
+      )
+    )
   end
 end
