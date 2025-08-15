@@ -54,6 +54,8 @@ public:
     m_complete = false;
     m_last_note_duration = 0;
     m_last_note_started_at = millis();
+
+    ledcWriteTone(m_pin, 0);
   }
 
   void update()
