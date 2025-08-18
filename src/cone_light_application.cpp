@@ -416,9 +416,12 @@ void ConeLight_App_LEDControl::apply_color()
 {
   CRGB color = CRGB(m_values[1], m_values[2], m_values[3]);
 
-  m_cone_light->lighting()->set_color(color);
-  m_cone_light->lighting()->set_static_color(color);
+  // Only apply selected color if a song is NOT playing to PREVENT strobing between led animation color and chosen color
+  if (!m_cone_light->speaker()->playing())
+    m_cone_light->lighting()->set_color(color);
   m_cone_light->lighting()->set_brightness(m_values[4]);
+
+  m_cone_light->lighting()->set_static_color(color);
   m_cone_light->lighting()->set_static_brightness(m_values[4]);
 
   if (m_cone_light_led_control_mode == GROUP || m_cone_light_led_control_mode == ALL)

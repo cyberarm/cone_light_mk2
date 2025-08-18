@@ -75,7 +75,9 @@ void ConeLightLighting::handle_packet(cone_light_network_packet_t packet)
       packet.command_parameters_extra != m_cone_light->node_group_id())
     return;
 
-  set_color(CRGB(packet.command_parameters));
+  // Only apply selected color if a song is NOT playing to PREVENT strobing between led animation color and chosen color
+  if (!m_cone_light->speaker()->playing())
+    set_color(CRGB(packet.command_parameters));
   set_static_color(CRGB(packet.command_parameters));
   set_brightness((packet.command_parameters >> 24) & 0xFF);
   set_static_brightness((packet.command_parameters >> 24) & 0xFF);

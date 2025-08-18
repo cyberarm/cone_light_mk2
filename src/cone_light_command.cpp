@@ -121,7 +121,9 @@ void ConeLightCommand_Color::handle(ConeLight *cone_light, std::vector<String> a
           blue = arguments[2].toInt(),
           brightness = arguments[3].toInt();
 
-  cone_light->lighting()->set_color(red, green, blue);
+  // Only apply selected color if a song is NOT playing to PREVENT strobing between led animation color and chosen color
+  if (!cone_light->speaker()->playing())
+    cone_light->lighting()->set_color(red, green, blue);
   cone_light->lighting()->set_static_color(red, green, blue);
   cone_light->lighting()->set_brightness(brightness);
   cone_light->lighting()->set_static_brightness(brightness);
