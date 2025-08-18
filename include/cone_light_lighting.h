@@ -19,18 +19,18 @@ class ConeLight;
 typedef struct cone_light_network_packet cone_light_network_packet_t;
 
 constexpr CRGB notes_to_color[] = {
-    CRGB(4278255487),
-    CRGB(4278222847),
-    CRGB(4286578432),
-    CRGB(4278255360),
-    CRGB(4294934272),
-    CRGB(4294901760),
-    CRGB(4294901887),
-    CRGB(4294934272),
-    CRGB(4278190335),
-    CRGB(4278222847),
-    CRGB(4278255615),
-    CRGB(4278255487),
+    CRGB(4294917888),
+    CRGB(4294950656),
+    CRGB(4290772736),
+    CRGB(4282384128),
+    CRGB(4278255423),
+    CRGB(4278255551),
+    CRGB(4278239231),
+    CRGB(4278206463),
+    CRGB(4282319103),
+    CRGB(4290707711),
+    CRGB(4294901951),
+    CRGB(4294901823)
 };
 
 class ConeLightLighting
