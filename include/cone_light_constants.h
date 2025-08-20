@@ -39,7 +39,7 @@
 #define CONE_LIGHT_NETWORKING_MAX_NODES 12
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.08.18"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.08.20"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 2
 
