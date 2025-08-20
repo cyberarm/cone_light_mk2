@@ -62,11 +62,16 @@ void ConeLightDisplay::draw_widget_bar()
   m_display->print(m_cone_light->node_name());
   m_display->drawFastVLine(42, 0, m_widget_bar_height, SSD1306_WHITE);
 
+  // Display Node ID and Node Group ID
+  m_display->printf(" %d:%d", m_cone_light->node_id(), m_cone_light->node_group_id());
+  m_display->drawFastVLine(42 + 24, 0, m_widget_bar_height, SSD1306_WHITE);
+
   // Display LID indicator
   m_display->print(m_cone_light->input_handler()->lid_open() ? " LID" : "    ");
+  m_display->drawFastVLine(42 + 24 + 24, 0, m_widget_bar_height, SSD1306_WHITE);
 
-  // Display master clock sync status
-  m_display->print((m_cone_light->network_time()->is_clock_synced() && std::abs(m_cone_light->network_time()->offset()) < 25) ? " SYNC" : "     ");
+  // // Display master clock sync status
+  // m_display->print((m_cone_light->network_time()->is_clock_synced() && std::abs(m_cone_light->network_time()->offset()) < 25) ? " SYNC" : "     ");
 
   // Display battery voltage meter
   m_display->drawRect(103, 3, 20, m_widget_bar_height - 6, SSD1306_WHITE);
