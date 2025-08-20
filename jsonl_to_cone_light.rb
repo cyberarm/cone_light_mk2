@@ -63,7 +63,7 @@ File.open("./src/cone_light_songs.cpp", "w") do |f|
     note_rows = []
     hash[:durations].each do |note_array|
       # We rely on walking notes to know when the song is over, so we don't need to explicitly set duration to a MAGIC value to know when the song is complete
-      note_rows << "{#{note_array.map { |n| n.positive? ? n + hash[:transpose] : n }.join(', ')}}"
+      note_rows << "{#{note_array.join(', ')}}"
     end
     f.puts "    /* SONG: #{hash[:name]} */"
     note_rows.join(",\n").lines.each_with_index do |line, i|
