@@ -1,8 +1,7 @@
 #pragma once
 
 #include "cone_light_constants.h"
-
-#define MAX_CHANNELS 8
+#include "cone_light_songs.h"
 
 constexpr uint16_t note_to_freq[] = {
     8, 9, 9, 10, 10, 11, 12, 12, 13, 14, 15, 15,
@@ -22,18 +21,18 @@ class CyberarmSongChannel
 {
 private:
   uint8_t m_pin = 0;
-  std::vector<int8_t> m_notes = {};
-  std::vector<uint16_t> m_durations = {};
+  uint32_t m_song_data_index = 0;
   uint16_t m_current_note_id = 0;
   bool m_complete = true;
   uint32_t m_last_note_duration = 0;
   uint32_t m_last_note_started_at = 0;
+  uint32_t m_song_real_note_count = 0;
 
 public:
   CyberarmSongChannel() {}
   ~CyberarmSongChannel() {}
 
-  void init(uint8_t pin, const std::vector<int8_t> notes, const std::vector<uint16_t> durations)
+  void init(uint8_t pin, uint32_t song_data_index)
   {
     m_pin = pin;
 
@@ -42,10 +41,19 @@ public:
     m_last_note_duration = 0;
     m_last_note_started_at = millis();
 
-    m_notes = notes;
-    m_durations = durations;
+    m_song_data_index = song_data_index;
 
-    Serial.printf("Initialized Channel on pin %d with %d notes\n", m_pin, m_notes.size());
+    for (size_t i = 0; i < cone_light_song_notes[song_data_index].size(); i++)
+    {
+      auto note = cone_light_song_notes[song_data_index].at(i);
+
+      if (note == CONE_LIGHT_SONG_END_NOTE)
+        break;
+
+      m_song_real_note_count = i + 1; // array INDEX to COUNT
+    }
+
+    Serial.printf("Initialized Channel on pin %d with %d notes\n", m_pin, m_song_real_note_count);
   }
 
   void reset()
@@ -54,6 +62,7 @@ public:
     m_complete = false;
     m_last_note_duration = 0;
     m_last_note_started_at = millis();
+    m_song_real_note_count = 0;
 
     ledcWriteTone(m_pin, 0);
   }
@@ -64,7 +73,7 @@ public:
 
     if (millis() - m_last_note_started_at >= m_last_note_duration)
     {
-      if (m_current_note_id >= m_notes.size())
+      if (m_current_note_id >= m_song_real_note_count)
       {
         ledcWriteTone(m_pin, 0);
         m_complete = true;
@@ -72,8 +81,8 @@ public:
       }
 
       m_last_note_started_at = millis();
-      int8_t note = m_notes.at(m_current_note_id);
-      uint16_t duration = m_durations.at(m_current_note_id);
+      int8_t note = cone_light_song_notes[m_song_data_index].at(m_current_note_id);
+      uint16_t duration = cone_light_song_durations[m_song_data_index].at(m_current_note_id);
       m_last_note_duration = duration;
 
       if (note < 0)
@@ -106,70 +115,18 @@ public:
   {
     return m_current_note_id;
   }
-
-  uint16_t current_frequency()
-  {
-    if (m_current_note_id >= m_notes.size())
-      return 0;
-
-    return note_to_freq[m_notes.at(m_current_note_id)];
-  }
-
-  uint16_t current_duration()
-  {
-    if (m_current_note_id >= m_notes.size())
-      return 0;
-
-    return m_durations.at(m_current_note_id);
-  }
-
-  uint16_t next_note_id()
-  {
-    return m_current_note_id + 1;
-  }
-
-  uint16_t next_frequency()
-  {
-    if (next_note_id() >= m_notes.size())
-      return 0;
-
-    return note_to_freq[m_notes.at(next_note_id())];
-  }
-
-  uint16_t next_duration()
-  {
-    if (next_note_id() >= m_notes.size())
-      return 0;
-
-    return m_durations.at(next_note_id());
-  }
-
-  uint16_t note_count()
-  {
-    return m_notes.size();
-  }
-
-  const std::vector<int8_t> &notes()
-  {
-    return m_notes;
-  }
-
-  const std::vector<uint16_t> &durations()
-  {
-    return m_durations;
-  }
 };
 
 //--- Cyberarm Song
 class CyberarmSong
 {
 private:
-  CyberarmSongChannel *m_channels[MAX_CHANNELS] = {};
+  CyberarmSongChannel *m_channels[CONE_LIGHT_SONG_CHANNELS] = {};
 
 public:
   CyberarmSong()
   {
-    for (size_t i = 0; i < MAX_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
     {
       m_channels[i] = new CyberarmSongChannel();
     }
@@ -180,7 +137,7 @@ public:
   {
     // Serial.printf("Song#update: channel 0 has %d left of %d notes\n", m_channels[0]->currentNote(), m_channels[0]->noteCount());
 
-    for (size_t i = 0; i < MAX_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
     {
       CyberarmSongChannel *channel = m_channels[i];
 
@@ -193,7 +150,7 @@ public:
 
   bool playing()
   {
-    for (size_t i = 0; i < MAX_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
     {
       CyberarmSongChannel *channel = m_channels[i];
 
@@ -206,7 +163,7 @@ public:
 
   void reset()
   {
-    for (size_t i = 0; i < MAX_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
     {
       CyberarmSongChannel *channel = m_channels[i];
 
@@ -214,17 +171,17 @@ public:
     }
   }
 
-  void set_channel(uint8_t pin, uint8_t channelID, const std::vector<int8_t> &notes, const std::vector<uint16_t> &durations)
+  void set_channel(uint8_t pin, uint8_t channelID, uint32_t song_data_index)
   {
     CyberarmSongChannel *channel = m_channels[channelID];
 
     channel->reset();
-    channel->init(pin, notes, durations);
+    channel->init(pin, song_data_index);
   }
 
   CyberarmSongChannel *channel(uint8_t channel_id)
   {
-    if (channel_id >= MAX_CHANNELS)
+    if (channel_id >= CONE_LIGHT_SONG_CHANNELS)
       return nullptr;
 
     return m_channels[channel_id];

@@ -78,9 +78,9 @@ void ConeLightCommand_Songs::handle(ConeLight *cone_light, std::vector<String> a
   Serial.println("Songs Catalog:");
 
   uint16_t i = 0;
-  for (auto song : cone_light_songs)
+  for (auto song : cone_light_song_titles)
   {
-    Serial.printf("    %d: %s\n", i++, song.name().c_str());
+    Serial.printf("    %d: %s\n", i++, song.c_str());
   }
 }
 

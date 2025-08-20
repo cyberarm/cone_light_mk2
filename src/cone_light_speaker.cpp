@@ -11,14 +11,14 @@ ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
   m_durations = {667, 32, 667, 32, 667, 32, 667};
 
   // Boot chime
-  if (m_speaker_inited && CONE_LIGHT_BOOT_UP_TUNE)
-  {
-    m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
-  }
-  else
-  {
+  // if (m_speaker_inited && CONE_LIGHT_BOOT_UP_TUNE)
+  // {
+  //   m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
+  // }
+  // else
+  // {
     reset();
-  }
+  // }
 
   if (m_speaker_inited)
     Serial.println("    Speaker initialized successfully.");
@@ -71,45 +71,40 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
   }
 
   // song_id is an array index
-  if (song_id >= cone_light_songs.size())
+  if (song_id >= cone_light_song_titles.size())
   {
     printf("    Speaker Song: Unknown song id: %d\n", song_id);
     return;
   }
 
-  ConeLightSong song = cone_light_songs[song_id];
-
   uint8_t node_id = m_cone_light->node_id();
-  if (node_id >= MAX_CHANNELS)
+  if (node_id >= CONE_LIGHT_SONG_CHANNELS)
   {
-    printf("    Speaker Song: Node ID [%d] greater than available song channels [%d - 1]\n    Misconfigured?", node_id, MAX_CHANNELS);
+    printf("    Speaker Song: Node ID [%d] greater than available song channels [%d - 1]\n    Misconfigured?", node_id, CONE_LIGHT_SONG_CHANNELS);
     return;
   }
 
-  std::vector<int8_t> notes = song.channel_notes(node_id);
-  std::vector<uint16_t> durations = song.channel_durations(node_id);
+  printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", cone_light_song_titles[song_id].c_str(), node_id, cone_light_song_notes[(song_id * CONE_LIGHT_SONG_CHANNELS) + m_cone_light->node_id()].size());
 
-  printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", song.name().c_str(), node_id, notes.size());
-
-  m_song->set_channel(SPEAKER_PIN, node_id, notes, durations);
+  m_song->set_channel(SPEAKER_PIN, node_id, (song_id * CONE_LIGHT_SONG_CHANNELS) + m_cone_light->node_id());
   animate_leds_with_song();
   m_song_playing = true;
 }
 
 void ConeLightSpeaker::play_tone(uint8_t note, uint16_t duration)
 {
-  m_song->reset();
+  // m_song->reset();
 
-  if (!m_speaker_inited)
-  {
-    Serial.println("    Speaker failed to initialize, not attempting to play tone.");
-    return;
-  }
+  // if (!m_speaker_inited)
+  // {
+  //   Serial.println("    Speaker failed to initialize, not attempting to play tone.");
+  //   return;
+  // }
 
-  m_notes = {(int8_t)note};
-  m_durations = {duration};
+  // m_notes = {(int8_t)note, CONE_LIGHT_SONG_END_NOTE};
+  // m_durations = {duration, 0};
 
-  m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
+  // m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
 }
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
@@ -145,48 +140,48 @@ void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
 
 void ConeLightSpeaker::animate_leds_with_song()
 {
-  CyberarmSongChannel *channel = m_song->channel(m_cone_light->node_id());
-  m_led_timeline.clear();
-  m_led_song_color = CRGB::Black;
+  // CyberarmSongChannel *channel = m_song->channel(m_cone_light->node_id());
+  // m_led_timeline.clear();
+  // m_led_song_color = CRGB::Black;
 
-  m_led_timeline.add(m_led_song_color);
-  uint16_t skipped_rest_duration_ms = 0;
+  // m_led_timeline.add(m_led_song_color);
+  // uint16_t skipped_rest_duration_ms = 0;
 
-  if (channel && channel->notes().size() > 0)
-  {
-    for (size_t i = 0; i < channel->notes().size(); i++)
-    {
-      auto note = channel->notes().at(i);
-      auto duration = channel->durations().at(i);
-      auto color = m_cone_light->lighting()->note_to_color(note);
+  // if (channel && channel->notes().size() > 0)
+  // {
+  //   for (size_t i = 0; i < channel->notes().size(); i++)
+  //   {
+  //     auto note = channel->notes().at(i);
+  //     auto duration = channel->durations().at(i);
+  //     auto color = m_cone_light->lighting()->note_to_color(note);
 
-      // First note, check for leading pause
-      if (i == 0 && note < 0)
-      {
-        m_led_timeline.append(m_led_song_color, CRGB::Black, duration);
-      }
-      else
-      {
-        // Don't animate short rests to mitigate flashing
-        if (note < 0 && duration < 128)
-        {
-          skipped_rest_duration_ms += duration;
-          continue;
-        }
+  //     // First note, check for leading pause
+  //     if (i == 0 && note < 0)
+  //     {
+  //       m_led_timeline.append(m_led_song_color, CRGB::Black, duration);
+  //     }
+  //     else
+  //     {
+  //       // Don't animate short rests to mitigate flashing
+  //       if (note < 0 && duration < 128)
+  //       {
+  //         skipped_rest_duration_ms += duration;
+  //         continue;
+  //       }
 
-        m_led_timeline.append(m_led_song_color, color, duration + skipped_rest_duration_ms);
-        skipped_rest_duration_ms = 0;
-      }
-    }
-  }
+  //       m_led_timeline.append(m_led_song_color, color, duration + skipped_rest_duration_ms);
+  //       skipped_rest_duration_ms = 0;
+  //     }
+  //   }
+  // }
 
-  // Fade out LEDs at end of song
-  m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
-  // Hold on black for a moment
-  m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
-  // Reset LED color back to what it was before the song began
-  m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_static_color(), 500);
+  // // Fade out LEDs at end of song
+  // m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
+  // // Hold on black for a moment
+  // m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
+  // // Reset LED color back to what it was before the song began
+  // m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_static_color(), 500);
 
-  m_led_timeline.mode(Tween::Mode::ONCE);
-  m_led_timeline.start();
+  // m_led_timeline.mode(Tween::Mode::ONCE);
+  // m_led_timeline.start();
 }

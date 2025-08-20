@@ -1,6 +1,10 @@
 #pragma once
 
-#include "cone_light_song.h"
+#include <array>
+#include <cstdint>
+#include <WString.h>
 
-class ConeLightSong;
-extern const std::array<ConeLightSong, 49> cone_light_songs;
+extern const std::array<const String, 49> cone_light_song_titles;
+extern const std::array<const std::array<int8_t, 336>, 392> cone_light_song_notes;
+extern const std::array<const std::array<uint16_t, 336>, 392> cone_light_song_durations;
+

@@ -478,13 +478,13 @@ void ConeLight_App_Songs::draw()
     next_song_index = 0;
 
   oled()->setCursor(42, 3 + display()->widget_bar_height());
-  oled()->print(cone_light_songs[previous_song_index].name());
+  oled()->print(cone_light_song_titles[previous_song_index]);
 
   oled()->setCursor(32, 32 + ((display()->widget_bar_height() / 2) - 1) - 3);
-  oled()->print(cone_light_songs[m_song_index].name());
+  oled()->print(cone_light_song_titles[m_song_index]);
 
   oled()->setCursor(42, 64 - ((display()->widget_bar_height() / 2) + 4));
-  oled()->print(cone_light_songs[next_song_index].name());
+  oled()->print(cone_light_song_titles[next_song_index]);
 
   oled()->setTextWrap(true);
 }
@@ -493,7 +493,7 @@ void ConeLight_App_Songs::update()
 {
   if (m_max_song_index == 0)
   {
-    m_max_song_index = cone_light_songs.size() - 1;
+    m_max_song_index = cone_light_song_titles.size() - 1;
     m_needs_redraw = true;
   }
   else
