@@ -115,6 +115,16 @@ public:
   {
     return m_current_note_id;
   }
+
+  uint32_t song_data_index()
+  {
+    return m_song_data_index;
+  }
+
+  uint32_t song_real_note_count()
+  {
+    return m_song_real_note_count;
+  }
 };
 
 //--- Cyberarm Song

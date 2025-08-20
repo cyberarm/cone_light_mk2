@@ -140,48 +140,48 @@ void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
 
 void ConeLightSpeaker::animate_leds_with_song()
 {
-  // CyberarmSongChannel *channel = m_song->channel(m_cone_light->node_id());
-  // m_led_timeline.clear();
-  // m_led_song_color = CRGB::Black;
+  CyberarmSongChannel *channel = m_song->channel(m_cone_light->node_id());
+  m_led_timeline.clear();
+  m_led_song_color = CRGB::Black;
 
-  // m_led_timeline.add(m_led_song_color);
-  // uint16_t skipped_rest_duration_ms = 0;
+  m_led_timeline.add(m_led_song_color);
+  uint16_t skipped_rest_duration_ms = 0;
 
-  // if (channel && channel->notes().size() > 0)
-  // {
-  //   for (size_t i = 0; i < channel->notes().size(); i++)
-  //   {
-  //     auto note = channel->notes().at(i);
-  //     auto duration = channel->durations().at(i);
-  //     auto color = m_cone_light->lighting()->note_to_color(note);
+  if (channel && channel->song_real_note_count() > 0)
+  {
+    for (size_t i = 0; i < channel->song_real_note_count(); i++)
+    {
+      auto note = cone_light_song_notes[channel->song_data_index()].at(i);
+      auto duration = cone_light_song_durations[channel->song_data_index()].at(i);
+      auto color = m_cone_light->lighting()->note_to_color(note);
 
-  //     // First note, check for leading pause
-  //     if (i == 0 && note < 0)
-  //     {
-  //       m_led_timeline.append(m_led_song_color, CRGB::Black, duration);
-  //     }
-  //     else
-  //     {
-  //       // Don't animate short rests to mitigate flashing
-  //       if (note < 0 && duration < 128)
-  //       {
-  //         skipped_rest_duration_ms += duration;
-  //         continue;
-  //       }
+      // First note, check for leading pause
+      if (i == 0 && note < 0)
+      {
+        m_led_timeline.append(m_led_song_color, CRGB::Black, duration);
+      }
+      else
+      {
+        // Don't animate short rests to mitigate flashing
+        if (note < 0 && duration < 128)
+        {
+          skipped_rest_duration_ms += duration;
+          continue;
+        }
 
-  //       m_led_timeline.append(m_led_song_color, color, duration + skipped_rest_duration_ms);
-  //       skipped_rest_duration_ms = 0;
-  //     }
-  //   }
-  // }
+        m_led_timeline.append(m_led_song_color, color, duration + skipped_rest_duration_ms);
+        skipped_rest_duration_ms = 0;
+      }
+    }
+  }
 
-  // // Fade out LEDs at end of song
-  // m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
-  // // Hold on black for a moment
-  // m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
-  // // Reset LED color back to what it was before the song began
-  // m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_static_color(), 500);
+  // Fade out LEDs at end of song
+  m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
+  // Hold on black for a moment
+  m_led_timeline.append(m_led_song_color, CRGB::Black, 500);
+  // Reset LED color back to what it was before the song began
+  m_led_timeline.append(m_led_song_color, m_cone_light->lighting()->get_static_color(), 500);
 
-  // m_led_timeline.mode(Tween::Mode::ONCE);
-  // m_led_timeline.start();
+  m_led_timeline.mode(Tween::Mode::ONCE);
+  m_led_timeline.start();
 }
