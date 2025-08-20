@@ -93,18 +93,15 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
 
 void ConeLightSpeaker::play_tone(uint8_t note, uint16_t duration)
 {
-  // m_song->reset();
+  m_song->reset();
 
-  // if (!m_speaker_inited)
-  // {
-  //   Serial.println("    Speaker failed to initialize, not attempting to play tone.");
-  //   return;
-  // }
+  if (!m_speaker_inited)
+  {
+    Serial.println("    Speaker failed to initialize, not attempting to play tone.");
+    return;
+  }
 
-  // m_notes = {(int8_t)note, CONE_LIGHT_SONG_END_NOTE};
-  // m_durations = {duration, 0};
-
-  // m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), m_notes, m_durations);
+  m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), 0, note, duration);
 }
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)

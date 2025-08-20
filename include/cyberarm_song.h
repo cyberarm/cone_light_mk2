@@ -28,11 +28,14 @@ private:
   uint32_t m_last_note_started_at = 0;
   uint32_t m_song_real_note_count = 0;
 
+  int8_t m_note = -1;
+  uint16_t m_duration = 0;
+
 public:
   CyberarmSongChannel() {}
   ~CyberarmSongChannel() {}
 
-  void init(uint8_t pin, uint32_t song_data_index)
+  void init(uint8_t pin, uint32_t song_data_index, int8_t note = -1, uint16_t duration = 0)
   {
     m_pin = pin;
 
@@ -42,15 +45,24 @@ public:
     m_last_note_started_at = millis();
 
     m_song_data_index = song_data_index;
+    m_note = note;
+    m_duration = duration;
 
-    for (size_t i = 0; i < cone_light_song_notes[song_data_index].size(); i++)
+    if (note >= 0)
     {
-      auto note = cone_light_song_notes[song_data_index].at(i);
+      m_song_real_note_count = 1;
+    }
+    else
+    {
+      for (size_t i = 0; i < cone_light_song_notes[song_data_index].size(); i++)
+      {
+        auto note = cone_light_song_notes[song_data_index].at(i);
 
-      if (note == CONE_LIGHT_SONG_END_NOTE)
-        break;
+        if (note == CONE_LIGHT_SONG_END_NOTE)
+          break;
 
-      m_song_real_note_count = i + 1; // array INDEX to COUNT
+        m_song_real_note_count = i + 1; // array INDEX to COUNT
+      }
     }
 
     Serial.printf("Initialized Channel on pin %d with %d notes\n", m_pin, m_song_real_note_count);
@@ -63,6 +75,9 @@ public:
     m_last_note_duration = 0;
     m_last_note_started_at = millis();
     m_song_real_note_count = 0;
+
+    m_note = -1;
+    m_duration = 0;
 
     ledcWriteTone(m_pin, 0);
   }
@@ -81,8 +96,18 @@ public:
       }
 
       m_last_note_started_at = millis();
-      int8_t note = cone_light_song_notes[m_song_data_index].at(m_current_note_id);
-      uint16_t duration = cone_light_song_durations[m_song_data_index].at(m_current_note_id);
+      int8_t note;
+      uint16_t duration;
+      if (m_note >= 0)
+      {
+        note = m_note;
+        duration = m_duration;
+      }
+      else
+      {
+        note = cone_light_song_notes[m_song_data_index].at(m_current_note_id);
+        duration = cone_light_song_durations[m_song_data_index].at(m_current_note_id);
+      }
       m_last_note_duration = duration;
 
       if (note < 0)
@@ -181,12 +206,12 @@ public:
     }
   }
 
-  void set_channel(uint8_t pin, uint8_t channelID, uint32_t song_data_index)
+  void set_channel(uint8_t pin, uint8_t channelID, uint32_t song_data_index, int8_t note = -1, uint16_t duration = 0)
   {
     CyberarmSongChannel *channel = m_channels[channelID];
 
     channel->reset();
-    channel->init(pin, song_data_index);
+    channel->init(pin, song_data_index, note, duration);
   }
 
   CyberarmSongChannel *channel(uint8_t channel_id)
