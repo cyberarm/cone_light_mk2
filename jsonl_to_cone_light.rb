@@ -40,6 +40,7 @@ File.open("./src/cone_light_songs.cpp", "w") do |f|
       max_notes.times do |i|
         if i >= note_array.size
           notes << end_note
+          break
         else
           notes << note_array[i]
         end
