@@ -161,9 +161,9 @@ output = File.open("./midis.jsonl", "w") do |f|
     # Standardize starting pause so every song will have a fixed delay before starting
     standard_delay_ms = 1_000 # 1 second
     trimmed_time_ms = 0
-    time_to_first_note_ms = -1
+    time_to_first_note_ms = 10_000_000 # ten million milliseconds should be a safe bet :D
     channels.each do |c|
-      time_to_first_note_ms = c.notes.first.starts_at_ms if c.notes.first.starts_at_ms > time_to_first_note_ms && time_to_first_note_ms < 0
+      time_to_first_note_ms = c.notes.first.starts_at_ms if c.notes.first.starts_at_ms < time_to_first_note_ms
     end
     # Shift note start times
     if time_to_first_note_ms != standard_delay_ms

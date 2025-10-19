@@ -39,7 +39,7 @@
 #define CONE_LIGHT_NETWORKING_MAX_NODES 12
 
 // Updated whenever changes are made. YYYY.MM.DD
-#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.08.27"
+#define CONE_LIGHT_FIRMWARE_VERSION_NAME "2025.10.17"
 // Used for backward incompatible changes
 #define CONE_LIGHT_FIRMWARE_VERSION 3
 
@@ -64,7 +64,9 @@
 #define CONE_LIGHT_SONG_NOTES_PER_CHANNEL 256
 #define CONE_LIGHT_SONG_END_NOTE -64
 
+// 1.4v * 4
 #define VOLTAGE_MAX 5.6f
-#define VOLTAGE_MIN 4.72f
+// 1.15v * 4
+#define VOLTAGE_MIN 4.6f
 
 #define SCREENSAVER_TIMEOUT_MS 60'000
