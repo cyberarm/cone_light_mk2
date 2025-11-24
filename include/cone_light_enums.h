@@ -25,7 +25,13 @@ enum ConeLightButton
 
 enum ConeLightNetworkCommand
 {
-  NOT_A_COMMAND = 0, // This message is not a "command" and should be forwarded to the active app for processing.
+  // This message is not a "command" and should only be forwarded to the active app for processing.
+  NOT_A_COMMAND = 0,
+
+  // Request all receiving nodes to pong back with their current state (i.e. battery percentage)
+  PING = 1,
+  // Reply to ping
+  PONG,
 
   // NETWORK TIME
   CLOCK_GRANDMASTER_SYNC = 10,

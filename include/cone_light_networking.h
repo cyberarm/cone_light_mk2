@@ -13,8 +13,10 @@ class ConeLight;
 typedef struct cone_light_networking_node_tracker
 {
   bool m_first_packet = true;
-  int8_t m_address[6] = {0};
+  uint8_t m_address[6] = {0};
   int16_t m_rssi = 0;
+  float m_voltage = 0.0f;
+  bool m_playing_song = false;
 
   uint32_t timestamp = 0;
   uint8_t node_id = 255;
@@ -72,7 +74,7 @@ typedef struct cone_light_networking_node_tracker
     return true;
   }
 
-  const int8_t *address() { return m_address; }
+  const uint8_t *address() { return m_address; }
   const int16_t rssi() { return m_rssi; }
 
 } cone_light_networking_node_tracker_t;
@@ -123,8 +125,11 @@ private:
   uint32_t m_packet_id = 1;
   uint32_t m_command_id = 1;
   std::array<cone_light_networking_node_tracker_t, CONE_LIGHT_NETWORKING_MAX_NODES> m_known_nodes = {};
-  const int8_t m_no_node_address[6] = {0};
+  const uint8_t m_no_node_address[6] = {0};
   std::vector<std::shared_ptr<ConeLightNetworkingRedundantPacketDelivery>> m_redundant_packet_deliveries = {};
+
+  void handle_ping(const cone_light_network_packet_t &packet);
+  void handle_pong(const cone_light_network_packet_t &packet);
 
 public:
   ConeLightNetworking(ConeLight *cone_light);
@@ -143,7 +148,7 @@ public:
 
     return m_known_nodes[node_id].rssi();
   };
-  const int8_t *node_address(uint8_t node_id)
+  const uint8_t *node_address(uint8_t node_id)
   {
     if (node_id >= CONE_LIGHT_NETWORKING_MAX_NODES)
     {

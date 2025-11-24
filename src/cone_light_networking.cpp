@@ -133,7 +133,52 @@ void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_in
     return;
   }
 
+  // Handle PING / PONG commands
+  switch (packet.command_type)
+  {
+  case ConeLightNetworkCommand::PING:
+    handle_ping(packet);
+    break;
+  case ConeLightNetworkCommand::PONG:
+    handle_pong(packet);
+    break;
+
+  default:
+    break;
+  }
+
   m_cone_light->espnow_event(packet);
+}
+
+// We've received a PING from some node, reply!
+void ConeLightNetworking::handle_ping(const cone_light_network_packet_t &packet)
+{
+  // Ignore our own pings
+  if (packet.node_id == m_cone_light->node_id())
+    return;
+
+  uint32_t packed_voltage;
+  const float voltage = m_cone_light->voltage()->voltage();
+  memcpy(&packed_voltage, &voltage, sizeof(float));
+
+  cone_light_network_packet_t pong_pkt{
+      .command_id = next_command_id(),
+      .command_type = ConeLightNetworkCommand::PONG,
+      .command_parameters = packed_voltage,
+      .command_parameters_extra = m_cone_light->speaker()->playing()};
+
+  send_packet(node_address(packet.node_id), pong_pkt, true);
+}
+
+// We've received a reply to OUR PING, store data!
+void ConeLightNetworking::handle_pong(const cone_light_network_packet_t &packet)
+{
+  auto &node = m_known_nodes[packet.node_id];
+  float voltage;
+  memcpy(&voltage, &packet.command_parameters, sizeof(float));
+
+  node.m_voltage = voltage;
+  node.m_playing_song = packet.command_parameters_extra;
 }
 
 //--- non-member functions ---//
