@@ -197,32 +197,33 @@ void ConeLight::lid_event(ConeLightEvent state)
 
 void ConeLight::espnow_event(cone_light_network_packet_t packet)
 {
-#if CONE_LIGHT_DEBUG
-  Serial.printf(
-      "RECV PACKET:\n"
-      "    PROTOCOL ID: %s\n"
-      "    FIRMWARE VERSION: %u\n"
-      "    PACKET ID: %u\n"
-      "    TIMESTAMP: %u\n"
-      "    NODE ID: %u\n"
-      "    NODE NAME: %s\n"
-      "    NODE GROUP ID: %u\n"
-      "    COMMAND ID: %u\n"
-      "    COMMAND TYPE: %u\n"
-      "    COMMAND PARAMETERS: %u\n"
-      "    COMMAND PARAMETERS EXTRA: %u\n",
-      packet.protocol_id,
-      packet.firmware_version,
-      packet.packet_id,
-      packet.timestamp,
-      packet.node_id,
-      packet.node_name,
-      packet.node_group_id,
-      packet.command_id,
-      packet.command_type,
-      packet.command_parameters,
-      packet.command_parameters_extra);
-#endif
+  if (CONE_LIGHT_DEBUG)
+  {
+    Serial.printf(
+        "RECV PACKET:\n"
+        "    PROTOCOL ID: %s\n"
+        "    FIRMWARE VERSION: %u\n"
+        "    PACKET ID: %u\n"
+        "    TIMESTAMP: %u\n"
+        "    NODE ID: %u\n"
+        "    NODE NAME: %s\n"
+        "    NODE GROUP ID: %u\n"
+        "    COMMAND ID: %u\n"
+        "    COMMAND TYPE: %u\n"
+        "    COMMAND PARAMETERS: %u\n"
+        "    COMMAND PARAMETERS EXTRA: %u\n",
+        packet.protocol_id,
+        packet.firmware_version,
+        packet.packet_id,
+        packet.timestamp,
+        packet.node_id,
+        packet.node_name,
+        packet.node_group_id,
+        packet.command_id,
+        packet.command_type,
+        packet.command_parameters,
+        packet.command_parameters_extra);
+  }
 
   switch (packet.command_type)
   {

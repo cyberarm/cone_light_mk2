@@ -65,9 +65,8 @@ void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, Co
 
     m_cone_light->button_event(btn, current_state);
 
-#if CONE_LIGHT_DEBUG
-    Serial.printf("BTN CHANGED: %s -> %s | %d\n", btn_name.c_str(), btn_state.c_str(), millis());
-#endif
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("BTN CHANGED: %s -> %s | %d\n", btn_name.c_str(), btn_state.c_str(), millis());
   }
 }
 

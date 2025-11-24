@@ -65,7 +65,8 @@ public:
       }
     }
 
-    Serial.printf("Initialized Channel on pin %d with %d notes\n", m_pin, m_song_real_note_count);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("Initialized Channel on pin %d with %d notes\n", m_pin, m_song_real_note_count);
   }
 
   void reset()
@@ -116,16 +117,14 @@ public:
       }
       else
       {
-#if CONE_LIGHT_DEBUG_WITH_SILENT_SPEAKER
-        ledcWriteTone(m_pin, 0);
-#else
-        ledcWriteTone(m_pin, note_to_freq[note]);
-#endif
+        if (CONE_LIGHT_DEBUG_WITH_SILENT_SPEAKER)
+          ledcWriteTone(m_pin, 0);
+        else
+          ledcWriteTone(m_pin, note_to_freq[note]);
       }
 
-#if CONE_LIGHT_DEBUG
-      Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, NOTE: %d, DURATION: %ld\n", m_pin, m_current_note_id, note_to_freq[note], note, m_last_note_duration);
-#endif
+      if (CONE_LIGHT_DEBUG)
+        Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, NOTE: %d, DURATION: %ld\n", m_pin, m_current_note_id, note_to_freq[note], note, m_last_note_duration);
 
       m_current_note_id++;
     }

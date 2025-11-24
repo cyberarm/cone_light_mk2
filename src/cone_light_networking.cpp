@@ -48,9 +48,8 @@ void ConeLightNetworking::update()
   {
     if (ms - package->last_delivery_ms() >= package->ms_between_deliveries())
     {
-#if CONE_LIGHT_DEBUG
-      Serial.printf("REDUNDANT PACKET DELIVERY: PENDING ATTEMPTS: %u, NODE ID: %u, PKT ID: %u, CMD ID: %u\n", package->redundant_deliveries(), package->packet().node_id, package->packet().packet_id, package->packet().packet_id);
-#endif
+      if (CONE_LIGHT_DEBUG)
+        Serial.printf("REDUNDANT PACKET DELIVERY: PENDING ATTEMPTS: %u, NODE ID: %u, PKT ID: %u, CMD ID: %u\n", package->redundant_deliveries(), package->packet().node_id, package->packet().packet_id, package->packet().packet_id);
 
       send_packet(package->receipt_address(), package->packet(), false);
       package->delivery_attempted();

@@ -34,10 +34,9 @@ typedef struct cone_light_networking_node_tracker
 
     bool valid_packet = valid_packet_node_details && valid_packet_ids;
 
-#if CONE_LIGHT_DEBUG
-    Serial.printf("INGEST_PACKET: node_id: %u / %u, node_group_id: %u / %u, node_name: %s / %s [%u], packet_id: %u / %u, command_id: %d / %u\n",
-                  node_id, packet.node_id, node_group_id, packet.node_group_id, node_name, packet.node_name, strncmp(packet.node_name, node_name, 7), packet_id, packet.packet_id, command_id, packet.command_id);
-#endif
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("INGEST_PACKET: node_id: %u / %u, node_group_id: %u / %u, node_name: %s / %s [%u], packet_id: %u / %u, command_id: %d / %u\n",
+                    node_id, packet.node_id, node_group_id, packet.node_group_id, node_name, packet.node_name, strncmp(packet.node_name, node_name, 7), packet_id, packet.packet_id, command_id, packet.command_id);
 
     // Short circuit since we have no data to disprove the packet's validity
     if (m_first_packet)
@@ -60,9 +59,8 @@ typedef struct cone_light_networking_node_tracker
       if (!(valid_packet_node_details && !valid_packet_ids && packet.timestamp < timestamp))
         return false;
 
-#if CONE_LIGHT_DEBUG
-      Serial.printf("INGEST_PACKET: packet with valid node details, younger timestamp, and invalid packet/command IDs was accepted. Assumed that node rebooted.\n");
-#endif
+      if (CONE_LIGHT_DEBUG)
+        Serial.printf("INGEST_PACKET: packet with valid node details, younger timestamp, and invalid packet/command IDs was accepted. Assumed that node rebooted.\n");
     }
 
     // Update node data

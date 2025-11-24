@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-static constexpr bool CONE_LIGHT_DEBUG = true;
+static constexpr bool CONE_LIGHT_DEBUG = false;
 static constexpr bool CONE_LIGHT_DEBUG_WITH_SILENT_SPEAKER = false;
 
 static constexpr bool CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS = true;

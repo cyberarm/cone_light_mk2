@@ -41,10 +41,11 @@ void ConeLightSpeaker::update()
 
     // FIXME: Continually updating the leds might prevent the wifi task from runnning, preventing sending/receiving packets.
     // FIXME: Allow enabling/disabling LED animation from node's instead of hardcoding on or off
-#if CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS
-    m_cone_light->lighting()->set_color(m_led_song_color);
-    m_cone_light->lighting()->set_brightness(m_cone_light->lighting()->get_static_brightness());
-#endif
+    if (CONE_LIGHT_ALLOW_PHOTOSENSITIVE_HAZARDS)
+    {
+      m_cone_light->lighting()->set_color(m_led_song_color);
+      m_cone_light->lighting()->set_brightness(m_cone_light->lighting()->get_static_brightness());
+    }
 
     if (!m_song->playing() && !m_led_timeline.isRunning())
     {
