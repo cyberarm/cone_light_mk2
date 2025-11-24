@@ -154,7 +154,7 @@ public:
     m_cone_light = cone_light;
     m_app_name = "Songs";
     m_fullscreen = true;
-    
+
     m_max_song_index = 0;
   };
   void draw();
@@ -219,7 +219,7 @@ private:
   uint32_t m_packets_lost = 0;
   uint32_t m_total_packets_lost = 0;
   uint8_t m_last_sender_id = CONE_LIGHT_NODE_ID_UNSET;
-  char m_last_sender_name[7] = {CONE_LIGHT_NODE_NAME_UNSET};
+  char m_last_sender_name[7] = {0};
   uint8_t m_last_sender_group_id = CONE_LIGHT_NODE_GROUP_ID_UNSET;
 
 public:
@@ -228,6 +228,8 @@ public:
     m_cone_light = cone_light;
     m_app_name = "D: ESPNOW RECV";
     m_fullscreen = false;
+
+    strncpy(m_last_sender_name, CONE_LIGHT_NODE_NAME_UNSET, 7);
   };
   void draw();
   void update();

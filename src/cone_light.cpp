@@ -1,4 +1,3 @@
-#include <Preferences.h>
 #include "cone_light.h"
 
 ConeLight::ConeLight()
