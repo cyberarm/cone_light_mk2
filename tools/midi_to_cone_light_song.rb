@@ -2,9 +2,7 @@ file_path = ARGV.shift
 song_name = ARGV.shift || File.basename(file_path, ".midi")
 available_channels = 8
 
-unless File.exist?(file_path)
-  puts "No such file: #{file_path}"
-end
+puts "No such file: #{file_path}" unless File.exist?(file_path)
 
 require "midilib"
 
@@ -116,7 +114,7 @@ puts notes.size
 
 channels.each(&:insert_dead_times)
 
-puts 
+puts
 puts "Output:"
 puts
 puts  "    ConeLightSong("
@@ -176,4 +174,4 @@ puts
 #   duration_seconds = c.notes.sum(&:duration_ms) / 1000.0
 #   puts "channel #{snames[i]} duration: #{(duration_seconds / 60.0).round(2)} minutes (#{duration_seconds} seconds)"
 # end
-# 
+#
