@@ -194,6 +194,27 @@ public:
   float m_voltage_ratio = 0.0f;
 };
 
+class ConeLight_App_Debug_Cluster_Info : public ConeLightApplication
+{
+private:
+  uint32_t m_last_refresh_ms = 0;
+  const uint32_t m_refresh_interval_ms = 1000;
+public:
+ConeLight_App_Debug_Cluster_Info(ConeLight *cone_light) : ConeLightApplication(cone_light)
+{
+  m_cone_light = cone_light;
+  m_app_name = "Cluster Info";
+  m_fullscreen = true;
+};
+void draw();
+void update();
+bool button_down(ConeLightButton btn);
+};
+
+///////////////////////
+//--- DEBUG TOOLS ---//
+///////////////////////
+
 class ConeLight_App_Debug_ESPNow_Sender : public ConeLightApplication
 {
 private:

@@ -656,6 +656,65 @@ bool ConeLight_App_BatteryInfo::button_down(ConeLightButton btn)
   return true;
 }
 
+////////////////////////
+//--- Cluster Info ---//
+////////////////////////
+void ConeLight_App_Debug_Cluster_Info::draw()
+{
+  bool data_available = false;
+  uint8_t line_height = 0;
+  const uint8_t line_height_step = 8;
+
+  oled()->setCursor(0, line_height);
+  for (size_t i = 0; i < CONE_LIGHT_NETWORKING_MAX_NODES; i++)
+  {
+    cone_light_networking_node_tracker node = m_cone_light->networking()->node(i);
+    if (node.timestamp == 0)
+      continue;
+
+    data_available = true;
+    oled()->printf("%s %u:%u %6.2f%% %2d",
+                    node.node_name,
+                    node.node_group_id,
+                    node.node_id,
+                    m_cone_light->voltage()->voltage_percentage(node.m_voltage),
+                    node.m_playing_song);
+    line_height += line_height_step;
+    oled()->setCursor(0, line_height);
+  }
+
+  if (!data_available)
+    oled()->printf("Pinging nodes,\n  please wait...");
+
+  m_needs_redraw = false;
+}
+
+void ConeLight_App_Debug_Cluster_Info::update()
+{
+  if (millis() - m_last_refresh_ms >= m_refresh_interval_ms)
+  {
+    m_last_refresh_ms = millis();
+    m_needs_redraw = true;
+
+    cone_light_network_packet_t packet = {};
+
+    packet.command_id = m_cone_light->networking()->next_command_id();
+    packet.command_type = ConeLightNetworkCommand::PING;
+    packet.command_parameters = 0;
+    packet.command_parameters_extra = 0;
+
+    m_cone_light->networking()->broadcast_packet(packet, true);
+  }
+}
+
+bool ConeLight_App_Debug_Cluster_Info::button_down(ConeLightButton btn)
+{
+  blur();
+  m_cone_light->set_current_app_main_menu();
+
+  return true;
+}
+
 ////////////////////////////////////
 //--- DEBUG: ESPNOW SENDER APP ---//
 ////////////////////////////////////
@@ -747,6 +806,9 @@ void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_
   m_needs_redraw = true;
 }
 
+////////////////////////////////
+//--- DEBUG: Network Clock ---//
+////////////////////////////////
 void ConeLight_App_Debug_Network_Clock::draw()
 {
   oled()->setCursor(4, 18);

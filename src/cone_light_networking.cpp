@@ -89,7 +89,7 @@ void ConeLightNetworking::broadcast_packet(cone_light_network_packet_t packet, b
   send_packet(m_broadcast_address, packet, redundant_delivery);
 }
 
-void ConeLightNetworking::on_data_sent(const esp_now_send_info_t *tx_info, esp_now_send_status_t status)
+void ConeLightNetworking::on_data_sent(const esp_now_send_info_t *esp_now_info, esp_now_send_status_t status)
 {
 }
 
@@ -167,7 +167,8 @@ void ConeLightNetworking::handle_ping(const cone_light_network_packet_t &packet)
       .command_parameters = packed_voltage,
       .command_parameters_extra = m_cone_light->speaker()->playing()};
 
-  send_packet(node_address(packet.node_id), pong_pkt, true);
+  broadcast_packet(pong_pkt, true);
+  // send_packet(node_address(packet.node_id), pong_pkt, true);
 }
 
 // We've received a reply to OUR PING, store data!
@@ -183,9 +184,9 @@ void ConeLightNetworking::handle_pong(const cone_light_network_packet_t &packet)
 
 //--- non-member functions ---//
 extern ConeLight *g_cone_light;
-void cone_light_networking_send_callback(const esp_now_send_info_t *tx_info, esp_now_send_status_t status)
+void cone_light_networking_send_callback(const esp_now_send_info_t *esp_now_info, esp_now_send_status_t status)
 {
-  g_cone_light->networking()->on_data_sent(tx_info, status);
+  g_cone_light->networking()->on_data_sent(esp_now_info, status);
 }
 
 void cone_light_networking_recv_callback(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len)

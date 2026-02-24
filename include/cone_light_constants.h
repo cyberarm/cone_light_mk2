@@ -37,7 +37,7 @@ static const char *CONE_LIGHT_NETWORKING_PROTOCOL_ID = "CONE";
 static constexpr uint8_t CONE_LIGHT_NETWORKING_MAX_NODES = 12;
 
 // Updated whenever changes are made. YYYY.MM.DD
-static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2025.11.23";
+static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.02.23";
 // Used for backward incompatible changes
 static constexpr uint8_t CONE_LIGHT_FIRMWARE_VERSION = 3;
 
@@ -45,7 +45,7 @@ static constexpr uint8_t BTN_A_PIN = D10;
 static constexpr uint8_t BTN_B_PIN = D9;
 static constexpr uint8_t BTN_C_PIN = D8;
 static constexpr uint8_t SPEAKER_PIN = D2;
-static constexpr uint8_t LID_PIN = D1;
+static constexpr uint8_t LID_PIN = D1, LDR_PIN = A1; // On D1
 static constexpr uint8_t VOLTAGE_PIN = A0; // On D0
 
 static constexpr uint32_t BTN_HELD_AFTER_MS = 500;

@@ -157,7 +157,14 @@ public:
 
     return m_known_nodes[node_id].address();
   };
+  const cone_light_networking_node_tracker node(uint8_t node_id)
+  {
+    if (node_id >= CONE_LIGHT_NETWORKING_MAX_NODES)
+      return {};
+
+    return m_known_nodes[node_id];
+  };
 };
 
-void cone_light_networking_send_callback(const esp_now_send_info_t *tx_info, esp_now_send_status_t status);
+void cone_light_networking_send_callback(const esp_now_send_info_t *esp_now_info, esp_now_send_status_t status);
 void cone_light_networking_recv_callback(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len);

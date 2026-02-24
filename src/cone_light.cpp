@@ -40,6 +40,8 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_Songs(this));
   m_applications.push_back(new ConeLight_App_NodeInfo(this));
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
+  m_applications.push_back(new ConeLight_App_Debug_Cluster_Info(this));
+  // DEBUG tools/apps
   m_applications.push_back(new ConeLight_App_Debug_ESPNow_Sender(this));
   m_applications.push_back(new ConeLight_App_Debug_ESPNow_Receiver(this));
   m_applications.push_back(new ConeLight_App_Debug_Network_Clock(this));
