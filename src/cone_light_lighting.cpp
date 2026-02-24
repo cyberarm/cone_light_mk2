@@ -1,4 +1,4 @@
-#include "cone_light_lighting.h"
+#include "include/cone_light_lighting.h"
 
 ConeLightLighting::ConeLightLighting(ConeLight *cone_light)
 {

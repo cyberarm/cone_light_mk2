@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include "cone_light.h"
-#include "cyberarm_song.h"
+#include "include/cone_light.h"
+#include "include/cyberarm_song.h"
 
 ConeLight *g_cone_light = nullptr;
 void setup()

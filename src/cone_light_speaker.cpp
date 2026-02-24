@@ -1,5 +1,5 @@
-#include "cone_light_songs.h"
-#include "cone_light_speaker.h"
+#include "include/cone_light_songs.h"
+#include "include/cone_light_speaker.h"
 
 ConeLightSpeaker::ConeLightSpeaker(ConeLight *cone_light)
 {

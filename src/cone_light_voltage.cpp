@@ -1,5 +1,5 @@
-#include "cone_light.h"
-#include "cone_light_voltage.h"
+#include "include/cone_light.h"
+#include "include/cone_light_voltage.h"
 
 ConeLightVoltage::ConeLightVoltage(ConeLight *cone_light)
 {

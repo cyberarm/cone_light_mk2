@@ -1,4 +1,4 @@
-#include "cone_light_command.h"
+#include "include/cone_light_command.h"
 
 ConeLightCommand::ConeLightCommand()
 {

@@ -1,4 +1,4 @@
-#include "cone_light_command_handler.h"
+#include "include/cone_light_command_handler.h"
 
 ConeLightInputHandler::ConeLightInputHandler(ConeLight *cone_light)
 {

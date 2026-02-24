@@ -1,5 +1,5 @@
-#include "cone_light_application.h"
-#include "cone_light_songs.h"
+#include "include/cone_light_application.h"
+#include "include/cone_light_songs.h"
 
 //--- ||| ---//
 ConeLightApplication::ConeLightApplication(ConeLight *cone_light)
@@ -255,17 +255,17 @@ void ConeLight_App_LEDControl::draw()
     oled()->print(m_labels[i].c_str()[0]);
     // box
     if (m_selected && m_index == i)
-      oled()->drawRect(x, y, width, height, WHITE);
+      oled()->drawRect(x, y, width, height, SSD1306_WHITE);
     // bar
-    oled()->fillRect(x + 2, y + 2, (width - 4) * ratio, height - 4, WHITE);
+    oled()->fillRect(x + 2, y + 2, (width - 4) * ratio, height - 4, SSD1306_WHITE);
     // percentage
     oled()->setCursor(x + width + 2, y + 1);
     oled()->print(std::format("{:3}%", uint8_t(ratio * 100.0f)).c_str());
 
     if (!m_selected && m_index == i)
     {
-      display()->draw_right_arrow(30, y + 4, BLACK, false);
-      display()->draw_right_arrow(28, y + 4, WHITE, false);
+      display()->draw_right_arrow(30, y + 4, SSD1306_BLACK, false);
+      display()->draw_right_arrow(28, y + 4, SSD1306_WHITE, false);
     }
   }
 }

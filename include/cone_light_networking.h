@@ -138,7 +138,7 @@ public:
   bool espnow_initialized() { return m_espnow_initialized; };
   void send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet, bool redundant_delivery = false);
   void broadcast_packet(cone_light_network_packet_t packet, bool redundant_delivery = false);
-  void on_data_sent(const uint8_t *mac_addr, esp_now_send_status_t status);
+  void on_data_sent(const esp_now_send_info_t *tx_info, esp_now_send_status_t status);
   void on_data_received(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len);
   uint32_t next_command_id() { return m_command_id++; };
   const int16_t node_rssi(uint8_t node_id)
@@ -159,5 +159,5 @@ public:
   };
 };
 
-void cone_light_networking_send_callback(const uint8_t *mac_addr, esp_now_send_status_t status);
+void cone_light_networking_send_callback(const esp_now_send_info_t *tx_info, esp_now_send_status_t status);
 void cone_light_networking_recv_callback(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len);
