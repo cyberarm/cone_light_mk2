@@ -76,6 +76,16 @@ typedef struct cone_light_networking_node_tracker
 
   const uint8_t *address() { return m_address; }
   const int16_t rssi() { return m_rssi; }
+  // return _ESTIMATED_ distance to sending node, in meters.
+  // "path loss model"
+  const double distance_meters()
+  {
+    const double tx_power = -21.0f;
+    const double path_loss = 3.25f;
+    const double exp = (tx_power - m_rssi) / (10 * path_loss);
+
+    return pow(10, exp);
+  }
 
 } cone_light_networking_node_tracker_t;
 
@@ -138,6 +148,7 @@ public:
   bool espnow_initialized() { return m_espnow_initialized; };
   void send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet, bool redundant_delivery = false);
   void broadcast_packet(cone_light_network_packet_t packet, bool redundant_delivery = false);
+  bool add_peer(const esp_now_recv_info_t *esp_now_info);
   void on_data_sent(const esp_now_send_info_t *tx_info, esp_now_send_status_t status);
   void on_data_received(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int len);
   uint32_t next_command_id() { return m_command_id++; };
@@ -156,6 +167,13 @@ public:
     }
 
     return m_known_nodes[node_id].address();
+  };
+  const double node_distance(uint8_t node_id)
+  {
+    if (node_id >= CONE_LIGHT_NETWORKING_MAX_NODES)
+      return 0;
+
+    return m_known_nodes[node_id].distance_meters();
   };
   const cone_light_networking_node_tracker node(uint8_t node_id)
   {

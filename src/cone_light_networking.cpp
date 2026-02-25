@@ -25,12 +25,12 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
   esp_now_register_send_cb(cone_light_networking_send_callback);
   esp_now_register_recv_cb(cone_light_networking_recv_callback);
 
-  esp_now_peer_info_t peerInfo = {};
-  memcpy(peerInfo.peer_addr, m_broadcast_address, 6);
-  peerInfo.channel = 0;
-  peerInfo.encrypt = false;
+  esp_now_peer_info_t peer_info = {};
+  memcpy(peer_info.peer_addr, m_broadcast_address, 6);
+  peer_info.channel = 0;
+  peer_info.encrypt = false;
 
-  if (esp_now_add_peer(&peerInfo) != ESP_OK)
+  if (esp_now_add_peer(&peer_info) != ESP_OK)
   {
     Serial.println("Failed to add broadcast peer!");
 
@@ -89,6 +89,18 @@ void ConeLightNetworking::broadcast_packet(cone_light_network_packet_t packet, b
   send_packet(m_broadcast_address, packet, redundant_delivery);
 }
 
+bool ConeLightNetworking::add_peer(const esp_now_recv_info_t *esp_now_info)
+{
+  esp_now_peer_info_t peer_info = {};
+  memcpy(peer_info.peer_addr, esp_now_info->src_addr, 6);
+  peer_info.channel = 0;
+  peer_info.encrypt = false;
+
+  esp_err_t result = esp_now_add_peer(&peer_info);
+
+  return (result == ESP_OK || result == ESP_ERR_ESPNOW_EXIST);
+}
+
 void ConeLightNetworking::on_data_sent(const esp_now_send_info_t *esp_now_info, esp_now_send_status_t status)
 {
 }
@@ -133,6 +145,9 @@ void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_in
     return;
   }
 
+  // packet accepted!
+  add_peer(esp_now_info);
+
   // Handle PING / PONG commands
   switch (packet.command_type)
   {
@@ -167,8 +182,8 @@ void ConeLightNetworking::handle_ping(const cone_light_network_packet_t &packet)
       .command_parameters = packed_voltage,
       .command_parameters_extra = m_cone_light->speaker()->playing()};
 
-  broadcast_packet(pong_pkt, true);
-  // send_packet(node_address(packet.node_id), pong_pkt, true);
+  // reply to sending node, unreliably.
+  send_packet(node_address(packet.node_id), pong_pkt, false);
 }
 
 // We've received a reply to OUR PING, store data!

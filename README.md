@@ -29,4 +29,4 @@ arduino-cli compile --fqbn esp32:esp32:XIAO_ESP32C6 .
 
 ### PlatformIO IDE
 
-Have fun. 🥹
+Have fun. :face_holding_back_tears:

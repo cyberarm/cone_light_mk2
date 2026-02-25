@@ -63,7 +63,7 @@ void ConeLightDisplay::draw_widget_bar()
   m_display->drawFastVLine(42, 0, m_widget_bar_height, SSD1306_WHITE);
 
   // Display Node ID and Node Group ID
-  m_display->printf(" %d:%d", m_cone_light->node_id(), m_cone_light->node_group_id());
+  m_display->printf(" %u:%u", m_cone_light->node_id(), m_cone_light->node_group_id());
   m_display->drawFastVLine(42 + 24, 0, m_widget_bar_height, SSD1306_WHITE);
 
   // Display LID indicator

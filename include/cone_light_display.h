@@ -5,6 +5,9 @@
 //      cannot display the initial error...
 #define NO_ADAFRUIT_SSD1306_COLOR_COMPATIBILITY
 
+// Disable Adafruit splash screen
+#define SSD1306_NO_SPLASH
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>

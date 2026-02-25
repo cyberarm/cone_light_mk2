@@ -590,7 +590,7 @@ void ConeLight_App_NodeInfo::draw()
   oled()->setCursor(68, 14);
   oled()->print("mk. II");
   oled()->setCursor(78, 30);
-  oled()->printf("%d:%d", m_cone_light->node_id(), m_cone_light->node_group_id());
+  oled()->printf("%u:%u", m_cone_light->node_id(), m_cone_light->node_group_id());
   oled()->setCursor(64, 41);
   oled()->printf("%s", (m_cone_light->node_group_id() == 0) ? CONE_LIGHT_NODE_GROUP_0_NAME : (m_cone_light->node_group_id() == 1) ? CONE_LIGHT_NODE_GROUP_1_NAME
                                                                                                                                   : CONE_LIGHT_NODE_GROUP_255_NAME);
@@ -656,10 +656,10 @@ bool ConeLight_App_BatteryInfo::button_down(ConeLightButton btn)
   return true;
 }
 
-////////////////////////
-//--- Cluster Info ---//
-////////////////////////
-void ConeLight_App_Debug_Cluster_Info::draw()
+////////////////////////////
+//--- Cluster Info App ---//
+////////////////////////////
+void ConeLight_App_ClusterInfo::draw()
 {
   bool data_available = false;
   uint8_t line_height = 0;
@@ -673,12 +673,12 @@ void ConeLight_App_Debug_Cluster_Info::draw()
       continue;
 
     data_available = true;
-    oled()->printf("%s %u:%u %6.2f%% %2d",
+    oled()->printf("%s %u:%u %2.0f%% %5.1fm",
                     node.node_name,
-                    node.node_group_id,
                     node.node_id,
+                    node.node_group_id,
                     m_cone_light->voltage()->voltage_percentage(node.m_voltage),
-                    node.m_playing_song);
+                    node.distance_meters());
     line_height += line_height_step;
     oled()->setCursor(0, line_height);
   }
@@ -689,7 +689,7 @@ void ConeLight_App_Debug_Cluster_Info::draw()
   m_needs_redraw = false;
 }
 
-void ConeLight_App_Debug_Cluster_Info::update()
+void ConeLight_App_ClusterInfo::update()
 {
   if (millis() - m_last_refresh_ms >= m_refresh_interval_ms)
   {
@@ -707,7 +707,7 @@ void ConeLight_App_Debug_Cluster_Info::update()
   }
 }
 
-bool ConeLight_App_Debug_Cluster_Info::button_down(ConeLightButton btn)
+bool ConeLight_App_ClusterInfo::button_down(ConeLightButton btn)
 {
   blur();
   m_cone_light->set_current_app_main_menu();
@@ -765,9 +765,9 @@ void ConeLight_App_Debug_ESPNow_Receiver::draw()
   oled()->setCursor(24, 34);
   oled()->printf("LAST: +%d", m_packets_lost);
   oled()->setCursor(24, 42);
-  oled()->printf("FROM: %d:%s:%d", m_last_sender_id, m_last_sender_name, m_last_sender_group_id);
+  oled()->printf("FROM: %s:%u:%u", m_last_sender_name, m_last_sender_id, m_last_sender_group_id);
   oled()->setCursor(24, 50);
-  oled()->printf("RSSI: %d", m_cone_light->networking()->node_rssi(m_last_sender_id));
+  oled()->printf("RSSI: %d %5.1fm", m_cone_light->networking()->node_rssi(m_last_sender_id), m_cone_light->networking()->node_distance(m_last_sender_id));
 
   oled()->setTextWrap(true);
 
@@ -806,9 +806,9 @@ void ConeLight_App_Debug_ESPNow_Receiver::espnow_recv(cone_light_network_packet_
   m_needs_redraw = true;
 }
 
-////////////////////////////////
-//--- DEBUG: Network Clock ---//
-////////////////////////////////
+////////////////////////////////////
+//--- DEBUG: Network Clock App ---//
+////////////////////////////////////
 void ConeLight_App_Debug_Network_Clock::draw()
 {
   oled()->setCursor(4, 18);

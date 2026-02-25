@@ -32,15 +32,18 @@ ConeLight::ConeLight()
   m_networking = new ConeLightNetworking(this);
   m_network_time = new ConeLightNetworkTime(this);
 
+  // Boot/Splash screen
   m_applications.push_back(new ConeLight_App_BootScreen(this));
+  // Main menu
   m_applications.push_back(new ConeLight_App_MainMenu(this));
+  // APPS!
   m_applications.push_back(new ConeLight_App_NodeLEDControl(this));
   m_applications.push_back(new ConeLight_App_GroupNodeLEDControl(this));
   m_applications.push_back(new ConeLight_App_AllNodeLEDControl(this));
   m_applications.push_back(new ConeLight_App_Songs(this));
   m_applications.push_back(new ConeLight_App_NodeInfo(this));
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
-  m_applications.push_back(new ConeLight_App_Debug_Cluster_Info(this));
+  m_applications.push_back(new ConeLight_App_ClusterInfo(this));
   // DEBUG tools/apps
   m_applications.push_back(new ConeLight_App_Debug_ESPNow_Sender(this));
   m_applications.push_back(new ConeLight_App_Debug_ESPNow_Receiver(this));
@@ -165,8 +168,6 @@ void ConeLight::button_event(ConeLightButton btn, ConeLightEvent state)
 {
   if (m_current_app && !m_screensaver) // 'Ignore' button press if screen is off (triggers wake up)
   {
-    // TODO: Don't play button chirp if a song is playing.
-
     if (state == BUTTON_PRESSED)
       if (m_current_app->button_down(btn))
         if (!muted() && !speaker()->playing())
@@ -261,8 +262,7 @@ void ConeLight::update_screensaver()
   {
     if (!m_screensaver)
     {
-      m_display->oled()->clearDisplay();
-      m_display->oled()->display();
+      m_display->oled()->ssd1306_command(SSD1306_DISPLAYOFF);
 
       m_screensaver = true;
     }
@@ -277,6 +277,7 @@ void ConeLight::update_screensaver()
 
   if (m_screensaver)
   {
+    m_display->oled()->ssd1306_command(SSD1306_DISPLAYON);
     m_screensaver = false;
 
     // NOTE: May produce unexpected behavior. May be better to allow apps to be forced to be redrawn instead.
