@@ -19,6 +19,8 @@ ConeLight::ConeLight()
   m_node_group = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_ID_UNSET);
   m_node_name = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_NAME, CONE_LIGHT_NODE_NAME_UNSET);
   m_node_grandmaster_clock = m_preferences.getBool(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE);
+  m_node_remote = m_preferences.getBool(CONE_LIGHT_PREFERENCES_NODE_REMOTE, CONE_LIGHT_NODE_REMOTE_UNSET_OR_FALSE);
+  m_node_access_point_password = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_ACCESS_POINT_PASSWORD, CONE_LIGHT_NODE_ACCESS_POINT_PASSWORD_UNSET);
   m_preferences.end();
 
   // Initialize subsystems...
@@ -132,6 +134,16 @@ String ConeLight::node_name()
 bool ConeLight::node_grandmaster_clock()
 {
   return m_node_grandmaster_clock;
+}
+
+bool ConeLight::node_remote()
+{
+  return m_node_remote;
+}
+
+String ConeLight::node_access_point_password()
+{
+  return m_node_access_point_password;
 }
 
 bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock)

@@ -5,6 +5,8 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 #include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include <functional>
 
 // Forward declaration...
@@ -137,6 +139,7 @@ private:
   std::array<cone_light_networking_node_tracker_t, CONE_LIGHT_NETWORKING_MAX_NODES> m_known_nodes = {};
   const uint8_t m_no_node_address[6] = {0};
   std::vector<std::shared_ptr<ConeLightNetworkingRedundantPacketDelivery>> m_redundant_packet_deliveries = {};
+  AsyncWebServer *m_web_server = nullptr;
 
   void handle_ping(const cone_light_network_packet_t &packet);
   void handle_pong(const cone_light_network_packet_t &packet);
@@ -144,6 +147,7 @@ private:
 public:
   ConeLightNetworking(ConeLight *cone_light);
   ~ConeLightNetworking();
+  void configure_web_server();
   void update();
   bool espnow_initialized() { return m_espnow_initialized; };
   void send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet, bool redundant_delivery = false);

@@ -19,6 +19,8 @@ static constexpr uint8_t CONE_LIGHT_NODE_ID_UNSET = 255;
 static constexpr uint8_t CONE_LIGHT_NODE_GROUP_ID_UNSET = 255;
 static const char *CONE_LIGHT_NODE_NAME_UNSET = "NONAME";
 static constexpr bool CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE = false;
+static constexpr bool CONE_LIGHT_NODE_REMOTE_UNSET_OR_FALSE = false;
+static const char *CONE_LIGHT_NODE_ACCESS_POINT_PASSWORD_UNSET = "luminous";
 
 static constexpr uint8_t CONE_LIGHT_NODE_GROUP_0 = 0;
 static const char *CONE_LIGHT_NODE_GROUP_0_NAME = "BACKSTOP";
@@ -32,12 +34,15 @@ static const char *CONE_LIGHT_PREFERENCES_NODE_ID = "node_id";
 static const char *CONE_LIGHT_PREFERENCES_NODE_GROUP = "node_group";
 static const char *CONE_LIGHT_PREFERENCES_NODE_NAME = "node_name";
 static const char *CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK = "node_clock";
+static const char *CONE_LIGHT_PREFERENCES_NODE_REMOTE = "node_remote";
+static const char *CONE_LIGHT_PREFERENCES_NODE_ACCESS_POINT_PASSWORD = "node_access_point_password";
 
 static const char *CONE_LIGHT_NETWORKING_PROTOCOL_ID = "CONE";
+static const char *CONE_LIGHT_NETWORKING_ACCESS_POINT_NAME = "Cone Light MK.II System";
 static constexpr uint8_t CONE_LIGHT_NETWORKING_MAX_NODES = 12;
 
 // Updated whenever changes are made. YYYY.MM.DD
-static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.02.23";
+static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.02.26";
 // Used for backward incompatible changes
 static constexpr uint8_t CONE_LIGHT_FIRMWARE_VERSION = 3;
 

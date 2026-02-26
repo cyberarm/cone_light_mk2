@@ -1,4 +1,5 @@
 #include "include/cone_light_networking.h"
+#include "include/cone_light_web_spa.h"
 
 ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
 {
@@ -11,7 +12,7 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
   pinMode(WIFI_ANT_CONFIG, OUTPUT);    // pinMode(14, OUTPUT);
   digitalWrite(WIFI_ANT_CONFIG, HIGH); // digitalWrite(14, HIGH); // Use external antenna
 
-  WiFi.mode(WIFI_MODE_STA);
+  WiFi.mode(cone_light->node_remote() ? WIFI_MODE_APSTA : WIFI_MODE_STA);
 
   if (esp_now_init() != ESP_OK)
   {
@@ -37,7 +38,30 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
     return;
   }
 
+  if (cone_light->node_remote())
+  {
+    if (!WiFi.softAP(CONE_LIGHT_NETWORKING_ACCESS_POINT_NAME, cone_light->node_access_point_password()))
+    {
+      Serial.println("Failed to create AP!");
+
+      return;
+    }
+
+    configure_web_server();
+  }
+
   Serial.printf("    Networking initialized successfully. (MAC ADDR: %s)\n", WiFi.macAddress().c_str());
+}
+
+void ConeLightNetworking::configure_web_server()
+{
+  m_web_server = new AsyncWebServer(80);
+
+  m_web_server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", data_cone_light_html);
+  });
+
+  m_web_server->begin();
 }
 
 void ConeLightNetworking::update()

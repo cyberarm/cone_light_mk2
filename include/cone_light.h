@@ -44,6 +44,8 @@ private:
   uint8_t m_node_group = CONE_LIGHT_NODE_GROUP_ID_UNSET;
   String m_node_name = CONE_LIGHT_NODE_NAME_UNSET;
   bool m_node_grandmaster_clock = false;
+  bool m_node_remote = false;
+  String m_node_access_point_password = CONE_LIGHT_NODE_ACCESS_POINT_PASSWORD_UNSET;
   uint32_t m_last_input_change_ms = 0;
   bool m_screensaver = false;
   bool m_muted = CONE_LIGHT_MUTED;
@@ -56,6 +58,8 @@ public:
   uint8_t node_group_id();
   String node_name();
   bool node_grandmaster_clock();
+  bool node_remote();
+  String node_access_point_password();
   bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock);
   void boot_complete();
   bool screensaver() { return m_screensaver; };
