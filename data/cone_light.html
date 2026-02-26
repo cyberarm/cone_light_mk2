@@ -1,7 +1,9 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html data-theme="dark" lang="en">
   <head>
-    <title>Cone Light mk. II</title>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Cone Light MK.II System</title>
 
     <style>
       * {
@@ -16,21 +18,115 @@
       body {
         width: 100%;
         min-height: 100%;
-        background: #222;
-        font-family: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif;
+        background: #63452c;
+        font-family:
+          system-ui, NotoSans, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+          Helvetica, Arial, "Helvetica Neue", sans-serif;
         color: white;
         display: flex;
         flex-direction: row;
       }
       .container {
-        width: 800pt;
+        width: 100%;
+        max-width: 800pt;
         margin: 1rem;
+      }
+      .card {
+        display: flex;
+        flex-direction: column;
+        background: #986a44;
+        border-radius: 10pt;
+        padding: 1rem;
+        margin-top: 1rem;
+      }
+      .card .row {
+        display: flex;
+        flex-direction: row;
+      }
+      .card .column {
+        display: flex;
+        flex-direction: column;
+      }
+      .card .item {
+        display: flex;
+        flex-direction: column;
+        background: #cdab8f;
+        flex-grow: 1;
+        border-radius: 10pt;
+        padding: 1rem;
+        margin: 0.5rem;
+      }
+      .card details {
+      }
+      .card details summary {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      .card ::marker {
+        color: #cdab8f;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>Cone Light mk. II</h1>
+      <h1 style="text-align: center">Cone Light MK.II System</h1>
+      <!-- REMOTE HEADER -->
+      <div class="card">
+        <div class="row">
+          <h2>REMOTE</h2>
+          <meter></meter>
+        </div>
+      </div>
+
+      <!-- NODE GROUPS -->
+      <div class="card">
+        <h2>STOPSIGN Group</h2>
+        <div class="row">
+          <div class="item">
+            <h4>ITEM</h4>
+          </div>
+          <div class="item">
+            <h4>ITEM</h4>
+          </div>
+          <div class="item">
+            <h4>ITEM</h4>
+          </div>
+          <div class="item">
+            <h4>ITEM</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- LED CONTROL -->
+      <div class="card">
+        <details>
+          <summary>LED Control</summary>
+          <div class="row">
+            <div class="item">
+              <h4>ITEM</h4>
+            </div>
+          </div>
+          <select>
+            <option>ALL</option>
+            <optgroup label="Node Group">
+              <option>STOPSIGN:0 Group</option>
+              <option>BACKSTOP:1 Group</option>
+            </optgroup>
+            <optgroup label="Individual Node">
+              <option>HOBBIT:0 Node</option>
+              <option>HOBBIT:1 Node</option>
+              <option>HOBBIT:2 Node</option>
+              <option>HOBBIT:3 Node</option>
+              <option>HOBBIT:4 Node</option>
+              <option>HOBBIT:5 Node</option>
+              <option>HOBBIT:6 Node</option>
+              <option>HOBBIT:7 Node</option>
+            </optgroup>
+          </select>
+        </details>
+      </div>
+      <!-- TONE CONTROL -->
+      <!-- SONG CONTROL -->
       <h2>Nodes</h2>
       <h3>NODE:0</h3>
       <h3>NODE:1</h3>
@@ -40,15 +136,6 @@
       <h3>NODE:5</h3>
       <h3>NODE:6</h3>
       <h3>NODE:7</h3>
-      <details>
-        <summary>LED Control</summary>
-        <select>
-          <option>Selected Node</option>
-          <option>Group ZERO</option>
-          <option>Group ONE</option>
-          <option>ALL</option>
-        </select>
-      </details>
       <details>
         <summary>Song Control</summary>
         <select>
