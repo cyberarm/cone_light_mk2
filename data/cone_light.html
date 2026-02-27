@@ -22,13 +22,22 @@
         font-family:
           system-ui, NotoSans, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
           Helvetica, Arial, "Helvetica Neue", sans-serif;
-        color: white;
+        color: #eee;
+        /*text-shadow: 1pt 1pt 2pt #000a;*/
         display: flex;
         flex-direction: row;
+        justify-content: center;
+      }
+      hr {
+        margin-top: 1rem;
+        border: none;
+        height: 1rem;
+        background: #0001;
+        border-radius: 10pt;
       }
       .container {
         width: 100%;
-        max-width: 800pt;
+        max-width: 540pt;
         margin: 1rem;
       }
       .card {
@@ -36,27 +45,50 @@
         flex-direction: column;
         background: #986a44;
         border-radius: 10pt;
-        padding: 1rem;
+        padding: 0.5rem;
         margin-top: 1rem;
       }
       .card .row {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
       }
       .card .column {
         display: flex;
         flex-direction: column;
       }
       .card .item {
+        color: #210;
         display: flex;
         flex-direction: column;
         background: #cdab8f;
         flex-grow: 1;
         border-radius: 10pt;
-        padding: 1rem;
+        padding: 0.5rem;
         margin: 0.5rem;
       }
-      .card details {
+      .card .node {
+        color: #210;
+        display: flex;
+        flex-direction: column;
+        aspect-ratio: 1/1;
+        text-align: center;
+        background: #cdab8f;
+        border-radius: 10pt;
+        padding: 0.5rem;
+        margin: 0.5rem;
+      }
+      @media screen and (width < 900px) {
+        .card .node {
+          /* CSS doesn't support calculating width as a simple percentage when we have a margin... */
+          min-width: calc(50% - 1rem);
+        }
+      }
+      @media screen and (width >= 900px) {
+        .card .node {
+          /* CSS doesn't support calculating width as a simple percentage when we have a margin... */
+          max-width: calc(50% - 1rem);
+        }
       }
       .card details summary {
         font-size: 1.5rem;
@@ -64,38 +96,88 @@
       }
       .card ::marker {
         color: #cdab8f;
+        text-shadow: none;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1 style="text-align: center">Cone Light MK.II System</h1>
+      <h2 style="text-align: center">Cone Light MK.II System</h2>
       <!-- REMOTE HEADER -->
       <div class="card">
-        <div class="row">
-          <h2>REMOTE</h2>
-          <meter></meter>
+        <div
+          class="row"
+          style="justify-content: space-between; vertical-align: center"
+        >
+          <b>8:REMOTE</b>
+          <p style="margin: auto 0; font-family: monospace">v2026.02.26 p4</p>
+          <meter min="4.200" max="5.600" value="5.241" title="5.241v">
+            5.241v
+          </meter>
         </div>
       </div>
 
       <!-- NODE GROUPS -->
       <div class="card">
-        <h2>STOPSIGN Group</h2>
+        <h2>0:STOPSIGN Group</h2>
         <div class="row">
-          <div class="item">
+          <div class="node">
+            <b>0:HOBBIT</b>
+            <p>6.17m</p>
+            <img
+              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
+              style="width: 100%; flex-grow: 1"
+            />
+            <meter value="0.75"></meter>
+          </div>
+          <div class="node">
+            <b>1:KETTLE</b>
+            <p>35.32m</p>
+            <img
+              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
+              style="width: 100%; flex-grow: 1"
+            />
+            <meter value="0.5"></meter>
+          </div>
+          <div class="node">
+            <b>2:DRAGON</b>
+            <p>28.42m</p>
+            <img
+              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
+              style="width: 100%; flex-grow: 1"
+            />
+            <meter value="0.35"></meter>
+          </div>
+          <div class="node">
+            <b>3:MIRROR</b>
+            <p>5.32m</p>
+            <img
+              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
+              style="width: 100%; flex-grow: 1"
+            />
+            <meter value="0.86"></meter>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>1:BACKSTOP Group</h2>
+        <div class="row">
+          <div class="node">
             <h4>ITEM</h4>
           </div>
-          <div class="item">
+          <div class="node">
             <h4>ITEM</h4>
           </div>
-          <div class="item">
+          <div class="node">
             <h4>ITEM</h4>
           </div>
-          <div class="item">
+          <div class="node">
             <h4>ITEM</h4>
           </div>
         </div>
       </div>
+
+      <hr />
 
       <!-- LED CONTROL -->
       <div class="card">
@@ -103,57 +185,207 @@
           <summary>LED Control</summary>
           <div class="row">
             <div class="item">
-              <h4>ITEM</h4>
+              <label>Choose color</label>
+              <input type="color" value="#ffffff" />
+            </div>
+            <div class="item">
+              <label for="led_control_select_node">Choose node or group</label>
+              <select
+                id="led_control_select_node"
+                name="led_control_select_node"
+              >
+                <option>ALL</option>
+                <optgroup label="Node Group">
+                  <option>0:STOPSIGN Group</option>
+                  <option>1:BACKSTOP Group</option>
+                </optgroup>
+                <optgroup label="Individual Node">
+                  <option>0:KETTLE Node</option>
+                  <option>1:HOBBIT Node</option>
+                  <option>2:TEAPOT Node</option>
+                  <option>3:DRAGON Node</option>
+                  <option>4:FLOWER Node</option>
+                  <option>5:WIZARD Node</option>
+                  <option>6:PILLOW Node</option>
+                  <option>7:MIRROR Node</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="item">
+              <label for="led_control_auto_update">
+                <input
+                  id="led_control_auto_update"
+                  name="led_control_auto_update"
+                  type="checkbox"
+                  checked
+                />
+                Auto update?
+              </label>
+              <input type="button" value="UPDATE" />
             </div>
           </div>
-          <select>
-            <option>ALL</option>
-            <optgroup label="Node Group">
-              <option>STOPSIGN:0 Group</option>
-              <option>BACKSTOP:1 Group</option>
-            </optgroup>
-            <optgroup label="Individual Node">
-              <option>HOBBIT:0 Node</option>
-              <option>HOBBIT:1 Node</option>
-              <option>HOBBIT:2 Node</option>
-              <option>HOBBIT:3 Node</option>
-              <option>HOBBIT:4 Node</option>
-              <option>HOBBIT:5 Node</option>
-              <option>HOBBIT:6 Node</option>
-              <option>HOBBIT:7 Node</option>
-            </optgroup>
-          </select>
         </details>
       </div>
+
       <!-- TONE CONTROL -->
+      <div class="card">
+        <details>
+          <summary>Tone Control</summary>
+          <div class="row">
+            <div class="item">
+              <label for="tone_control_select_tone">Choose tone</label>
+              <select
+                id="tone_control_select_tone"
+                name="tone_control_select_tone"
+              >
+                <option>0 C0 123mhz</option>
+                <option>0:KETTLE Node</option>
+                <option>1:HOBBIT Node</option>
+                <option>2:TEAPOT Node</option>
+                <option>3:DRAGON Node</option>
+                <option>4:FLOWER Node</option>
+                <option>5:WIZARD Node</option>
+                <option>6:PILLOW Node</option>
+                <option>7:MIRROR Node</option>
+              </select>
+            </div>
+            <div class="item">
+              <label for="tone_control_select_duration">Choose duration</label>
+              <input
+                id="tone_control_select_duration"
+                name="tone_control_select_duration"
+                type="range"
+                min="1"
+                max="10000"
+                value="1000"
+              />
+              <p>10 000ms</p>
+            </div>
+            <div class="item">
+              <label for="tone_control_select_node">Choose node or group</label>
+              <select
+                id="tone_control_select_node"
+                name="tone_control_select_node"
+              >
+                <option>ALL</option>
+                <optgroup label="Node Group">
+                  <option>0:STOPSIGN Group</option>
+                  <option>1:BACKSTOP Group</option>
+                </optgroup>
+                <optgroup label="Individual Node">
+                  <option>0:KETTLE Node</option>
+                  <option>1:HOBBIT Node</option>
+                  <option>2:TEAPOT Node</option>
+                  <option>3:DRAGON Node</option>
+                  <option>4:FLOWER Node</option>
+                  <option>5:WIZARD Node</option>
+                  <option>6:PILLOW Node</option>
+                  <option>7:MIRROR Node</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="item">
+              <input type="button" value="PLAY" />
+            </div>
+          </div>
+        </details>
+      </div>
+
       <!-- SONG CONTROL -->
-      <h2>Nodes</h2>
-      <h3>NODE:0</h3>
-      <h3>NODE:1</h3>
-      <h3>NODE:2</h3>
-      <h3>NODE:3</h3>
-      <h3>NODE:4</h3>
-      <h3>NODE:5</h3>
-      <h3>NODE:6</h3>
-      <h3>NODE:7</h3>
-      <details>
-        <summary>Song Control</summary>
-        <select>
-          <option>Selected Node</option>
-          <option>Group ZERO</option>
-          <option>Group ONE</option>
-          <option>ALL</option>
-        </select>
-      </details>
-      <details>
-        <summary>Tone Control</summary>
-        <select>
-          <option>Selected Node</option>
-          <option>Group ZERO</option>
-          <option>Group ONE</option>
-          <option>ALL</option>
-        </select>
-      </details>
+      <div class="card">
+        <details>
+          <summary>Song Control</summary>
+          <div class="row">
+            <div class="item">
+              <label>Choose song</label>
+              <select>
+                <option>0. ABORT PLAYBACK</option>
+                <optgroup label="Miscellaneous">
+                  <option>1. Fur Elise</option>
+                  <option>2. Happy Birthday</option>
+                  <option>3. Pomp And Circumstance</option>
+                  <option>4. Taps</option>
+                </optgroup>
+                <optgroup label="Christmas Carols">
+                  <option>5. Away In A Manger</option>
+                  <option>6. Carol Of The Bells</option>
+                  <option>7. God Rest Ye Merry Gentlemen</option>
+                  <option>8. Good Christian Men Rejoice</option>
+                  <option>9. Hark The Harold Angels Sing</option>
+                  <option>10. Joy To The World</option>
+                  <option>11. O Come All Ye Faithful</option>
+                  <option>12. O Little Town Of Bethlehem</option>
+                  <option>13. Ode To Joy</option>
+                  <option>14. Once In Royal Davids City</option>
+                  <option>15. Silent Night</option>
+                  <option>16. The First Noel</option>
+                  <option>17. What Child Is This</option>
+                </optgroup>
+                <optgroup label="Hymns">
+                  <option>18. A Mighty Fortress Is Our God</option>
+                  <option>19. Abide With Me</option>
+                  <option>20. All To Jesus I Surrender</option>
+                  <option>21. Amazing Grace</option>
+                  <option>22. At The Cross</option>
+                  <option>23. Be Still My Soul</option>
+                  <option>24. Be Thou My Vision</option>
+                  <option>25. Blessed Assurance</option>
+                  <option>26. Come Thou Fount Of Every Blessing</option>
+                  <option>27. Day By Day</option>
+                  <option>28. Doxology</option>
+                  <option>29. Fairest Lord Jesus</option>
+                  <option>30. Great Is Thy Faithfulness</option>
+                  <option>31. His Eye Is On The Sparrow</option>
+                  <option>32. Holy Holy Holy</option>
+                  <option>33. How Great Thou Art</option>
+                  <option>34. I Have Decided To Follow Jesus</option>
+                  <option>35. I Need Thee Every Hour</option>
+                  <option>36. I Sing The Mighty Power Of God</option>
+                  <option>37. It Is Well With My Soul</option>
+                  <option>38. Jesus Christ Is Risen Today</option>
+                  <option>39. Jesus Loves Me This I Know</option>
+                  <option>40. Joyful Joyful We Adore You</option>
+                  <option>41. Just A Closer Walk With Thee</option>
+                  <option>42. My Hope Is Built On Nothing Less</option>
+                  <option>43. Nearer My God To Thee</option>
+                  <option>44. Nothing But The Blood Of Jesus</option>
+                  <option>45. O God Our Help In Ages Past</option>
+                  <option>46. Pass Me Not Oh Gentle Savior</option>
+                  <option>47. The Churchs One Foundation</option>
+                  <option>48. What A Friend We Have In Jesus</option>
+                  <option>49. What Wondrous Love Is This</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="item">
+              <label for="song_control_select_node">Choose node or group</label>
+              <select
+                id="song_control_select_node"
+                name="song_control_select_node"
+              >
+                <option>ALL</option>
+                <optgroup label="Node Group">
+                  <option>0:STOPSIGN Group</option>
+                  <option>1:BACKSTOP Group</option>
+                </optgroup>
+                <optgroup label="Individual Node">
+                  <option>0:KETTLE Node</option>
+                  <option>1:HOBBIT Node</option>
+                  <option>2:TEAPOT Node</option>
+                  <option>3:DRAGON Node</option>
+                  <option>4:FLOWER Node</option>
+                  <option>5:WIZARD Node</option>
+                  <option>6:PILLOW Node</option>
+                  <option>7:MIRROR Node</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="item">
+              <input type="button" value="PLAY" />
+            </div>
+          </div>
+        </details>
+      </div>
     </div>
   </body>
 </html>
