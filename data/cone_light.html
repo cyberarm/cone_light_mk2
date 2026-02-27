@@ -28,6 +28,33 @@
         flex-direction: row;
         justify-content: center;
       }
+      dialog:modal {
+        min-width: 100%;
+        min-height: 100%;
+        background-color: #000d;
+        border: none;
+        padding: 1rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+      dialog .card {
+        background-color: #63452c;
+        color: #eee;
+        max-width: 540px;
+      }
+      dialog .card .column {
+        justify-content: center;
+        max-width: 540px;
+        align-items: center;
+      }
+      dialog img {
+        max-width: 128px;
+      }
+      dialog progress {
+        width: 100%;
+      }
       hr {
         margin-top: 1rem;
         border: none;
@@ -110,22 +137,156 @@
       class ConeLightRemote {
         constructor() {
           this.VERSION = "0.1.0";
-          this.CONE_LIGHT_MIN_VOLTAGE = 4.2;
+
+          this.TX_POWER = -21.0;
+          this.PATH_LOSS = 3.25;
+          this.CONE_LIGHT_MIN_VOLTAGE = 4.6;
           this.CONE_LIGHT_MAX_VOLTAGE = 5.6;
+          this.CONE_LIGHT_VOLTAGE_LOW = 4.8;
+          this.CONE_LIGHT_VOLTAGE_MED = 5.1;
+          this.CONE_LIGHT_VOLTAGE_HIGH = 5.3;
+
+          this.CONE_LIGHT_EMBED_LOGO = document.querySelector(
+            "#embed_cone_light_logo",
+          ).dataset.blob;
+          this.CONE_LIGHT_EMBED_ICON = document.querySelector(
+            "#embed_cone_light_icon",
+          ).dataset.blob;
+
+          this.DIALOG = document.querySelector("#dialog");
+
+          this.websocket = null;
 
           this.initialize();
         }
 
         initialize() {
-          window.addEventListener("load", (event) => {
-            console.log("Cone Light Remote v%s starting up...", this.VERSION);
-            console.log(event);
+          document.querySelectorAll(".cone_light_logo").forEach((item) => {
+            item.src = this.CONE_LIGHT_EMBED_LOGO;
           });
+          document.querySelectorAll(".cone_light_icon").forEach((item) => {
+            item.src = this.CONE_LIGHT_EMBED_ICON;
+          });
+
+          this.DIALOG.showModal();
+
+          this.websocket = new WebSocket(
+            `ws://${window.location.host || "192.168.4.1"}/ws`,
+          );
+          this.websocket.addEventListener("open", (event) => {
+            console.log("WS: OPEN");
+            this.DIALOG.close();
+            // nuke existing node data
+            document.querySelector("#node_groups").innerHTML = "";
+            // request/load new data
+          });
+          this.websocket.addEventListener("close", (event) => {
+            console.log("WS: CLOSE");
+            console.log(event);
+            this.DIALOG.showModal();
+            // reconnect!
+          });
+          this.websocket.addEventListener("message", (event) => {
+            console.log("WS: MESSAGE");
+            this.DIALOG.close();
+            let payload = JSON.parse(event.data);
+            console.log(payload);
+
+            document.querySelector("#remote_node_name").innerHTML =
+              `${payload.data.remote.name}:${payload.data.remote.id}:${payload.data.remote.group_id}`;
+            document.querySelector("#remote_node_version").innerHTML =
+              `v${payload.data.metadata.firmware_version} p${payload.data.metadata.protocol_version}`;
+            document.querySelector("#remote_node_voltage").value =
+              payload.data.remote.voltage;
+            document.querySelector("#remote_node_voltage").title =
+              `${payload.data.remote.voltage.toFixed(3)}v`;
+            this.configure_battery_meter(
+              document.querySelector("#remote_node_voltage"),
+            );
+
+            let index = 0;
+            for (const group of payload.data.metadata.groups) {
+              console.log(group);
+
+              this.add_node_group(index, group);
+              index++;
+            }
+
+            for (const node of payload.data.nodes) {
+              if (node.id == 255) continue;
+
+              console.log(node);
+
+              this.add_node(node);
+            }
+          });
+
+          console.log(
+            "Cone Light Remote v%s initialization completed.",
+            this.VERSION,
+          );
 
           return;
         }
 
+        add_node_group(group_id, group_name) {
+          console.log(group_id, group_name);
+          const node_groups_div = document.querySelector("#node_groups");
+
+          // .card <div>
+          const card_div = document.createElement("div");
+          card_div.className = "card";
+          card_div.dataset.group_id = group_id;
+          // title <b>
+          const title_b = document.createElement("b");
+          title_b.innerHTML = `${group_id}:${group_name} Group`;
+          // .row <div>
+          const row_div = document.createElement("div");
+          row_div.className = "row";
+
+          card_div.appendChild(title_b);
+          card_div.appendChild(row_div);
+
+          node_groups_div.appendChild(card_div);
+          return;
+        }
+
+        remove_node_group(group_id) {
+          return;
+        }
+
         add_node(node) {
+          console.log(node);
+          const node_group_div = document.querySelector(
+            `[data-group_id="${node.group_id}"] .row`,
+          );
+          console.log(node_group_div);
+
+          // .node <div>
+          const node_div = document.createElement("div");
+          node_div.className = "node";
+          node_div.dataset.node_id = node.id;
+          // name <b>
+          const name_b = document.createElement("b");
+          name_b.innerHTML = `${node.name}:${node.id}:${node.group_id}`;
+          // distance <p>
+          const distance_p = document.createElement("p");
+          distance_p.innerHTML = `${this.distance_meters(node.rssi).toFixed(2)}m`;
+          // icon <img>
+          const icon_img = document.createElement("img");
+          icon_img.src = this.CONE_LIGHT_EMBED_ICON;
+          // voltage <meter>
+          const voltage_meter = document.createElement("meter");
+          this.configure_battery_meter(voltage_meter);
+          voltage_meter.value = node.voltage;
+          voltage_meter.title = `${node.voltage}v`;
+
+          node_div.appendChild(name_b);
+          node_div.appendChild(distance_p);
+          node_div.appendChild(icon_img);
+          node_div.appendChild(voltage_meter);
+
+          node_group_div.appendChild(node_div);
           return;
         }
 
@@ -138,22 +299,49 @@
         }
 
         configure_battery_meter(element) {
+          element.min = this.CONE_LIGHT_MIN_VOLTAGE;
+          element.max = this.CONE_LIGHT_MAX_VOLTAGE;
+
+          element.low = this.CONE_LIGHT_VOLTAGE_LOW;
+          element.high = this.CONE_LIGHT_VOLTAGE_MED;
+          element.optimum = this.CONE_LIGHT_VOLTAGE_HIGH;
+
           return;
+        }
+
+        distance_meters(rssi) {
+          let exp = (this.TX_POWER - rssi) / (10 * this.PATH_LOSS);
+
+          return 10 ** exp;
         }
       }
 
-      new ConeLightRemote();
+      window.addEventListener("load", (event) => {
+        console.log("Cone Light Remote starting up...");
+        const remote = new ConeLightRemote();
+        console.log(event);
+      });
     </script>
   </head>
   <body>
     <div
       id="embed_cone_light_icon"
-      data-blob="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB3aWR0aD0iMTI3Ljk5OTk5IgogICBoZWlnaHQ9IjUzLjk5OTk5NiIKICAgdmlld0JveD0iMCAwIDMzLjg2NjY2NCAxNC4yODc0OTkiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNC4zICgwZDE1Zjc1MDQyLCAyMDI1LTEyLTI1KSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iY29uZV9saWdodF9tazJfaWNvbi5zdmciCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIGlua3NjYXBlOmRvY3VtZW50LXVuaXRzPSJweCIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgaW5rc2NhcGU6em9vbT0iOCIKICAgICBpbmtzY2FwZTpjeD0iNDkiCiAgICAgaW5rc2NhcGU6Y3k9IjkuODc1IgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMjU2MCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMzcxIgogICAgIGlua3NjYXBlOndpbmRvdy14PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy15PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ibGF5ZXIxIj4KICAgIDxpbmtzY2FwZTpncmlkCiAgICAgICBpZD0iZ3JpZDEiCiAgICAgICB1bml0cz0icHgiCiAgICAgICBvcmlnaW54PSIwIgogICAgICAgb3JpZ2lueT0iLTkuNTI0OTk5OCIKICAgICAgIHNwYWNpbmd4PSIwLjI2NDU4MzMzIgogICAgICAgc3BhY2luZ3k9IjAuMjY0NTgzMzMiCiAgICAgICBlbXBjb2xvcj0iIzAwOTllNSIKICAgICAgIGVtcG9wYWNpdHk9IjAuMzAxOTYwNzgiCiAgICAgICBjb2xvcj0iIzAwOTllNSIKICAgICAgIG9wYWNpdHk9IjAuMTQ5MDE5NjEiCiAgICAgICBlbXBzcGFjaW5nPSI2IgogICAgICAgZW5hYmxlZD0idHJ1ZSIKICAgICAgIHZpc2libGU9ImZhbHNlIiAvPgogIDwvc29kaXBvZGk6bmFtZWR2aWV3PgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIj4KICAgIDxsaW5lYXJHcmFkaWVudAogICAgICAgaWQ9ImxpbmVhckdyYWRpZW50MSIKICAgICAgIGlua3NjYXBlOmNvbGxlY3Q9ImFsd2F5cyI+CiAgICAgIDxzdG9wCiAgICAgICAgIHN0eWxlPSJzdG9wLWNvbG9yOiNmZmZmZmY7c3RvcC1vcGFjaXR5OjEiCiAgICAgICAgIG9mZnNldD0iMCIKICAgICAgICAgaWQ9InN0b3AxIiAvPgogICAgICA8c3RvcAogICAgICAgICBzdHlsZT0ic3RvcC1jb2xvcjojOWE5OTk2O3N0b3Atb3BhY2l0eToxIgogICAgICAgICBvZmZzZXQ9IjEiCiAgICAgICAgIGlkPSJzdG9wMiIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQKICAgICAgIGlua3NjYXBlOmNvbGxlY3Q9ImFsd2F5cyIKICAgICAgIHhsaW5rOmhyZWY9IiNsaW5lYXJHcmFkaWVudDEiCiAgICAgICBpZD0ibGluZWFyR3JhZGllbnQyIgogICAgICAgeDE9IjE5LjA0OTk5OSIKICAgICAgIHkxPSIxMC4xMzMwMzgiCiAgICAgICB4Mj0iMTkuMDQ5OTk5IgogICAgICAgeTI9IjIzLjgxMjQ5OCIKICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiAvPgogIDwvZGVmcz4KICA8ZwogICAgIGlua3NjYXBlOmxhYmVsPSJMYXllciAxIgogICAgIGlua3NjYXBlOmdyb3VwbW9kZT0ibGF5ZXIiCiAgICAgaWQ9ImxheWVyMSIKICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLC05LjUyNDk5OTYpIj4KICAgIDxwYXRoCiAgICAgICBzdHlsZT0iZmlsbDojZmZiZTZmO3N0cm9rZS13aWR0aDowLjUyOTE2NztzdHJva2UtbGluZWNhcDpzcXVhcmUiCiAgICAgICBkPSJtIDAuNTY0NDQ1MDIsMTkuOTMxOTQ0IHYgMi44MjIyMjMgSCAzMy4zMDIyMjEgdiAtMi44MjIyMjMgeiIKICAgICAgIGlkPSJwYXRoOS04IgogICAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NjYyIgLz4KICAgIDxwYXRoCiAgICAgICBzdHlsZT0iZmlsbDojZGVkZGRhO3N0cm9rZS13aWR0aDowLjUyOTE2NztzdHJva2UtbGluZWNhcDpzcXVhcmUiCiAgICAgICBkPSJNIDUuNjQ0NDQ0OCwxMC4wNTQxNjcgSCAyOC4yMjIyMjIgbCA1LjY0NDQ0NCw1LjY0NDQ0NCB2IDUuNjQ0NDQ1IEggNmUtNyB2IC01LjY0NDQ0NSB6IgogICAgICAgaWQ9InBhdGg4LTgiCiAgICAgICBzb2RpcG9kaTpub2RldHlwZXM9ImNjY2NjY2MiIC8+CiAgICA8cGF0aAogICAgICAgc3R5bGU9ImZpbGw6dXJsKCNsaW5lYXJHcmFkaWVudDIpO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowO3N0cm9rZS1saW5lY2FwOnNxdWFyZTtzdHJva2UtZGFzaGFycmF5Om5vbmU7ZmlsbC1vcGFjaXR5OjEiCiAgICAgICBkPSJNIDZlLTcsMTUuNjk4NjExIDUuNjQ0NDQ0OCwxMC4wNTQxNjcgSCAyOC4yMjIyMjIgbCA1LjY0NDQ0NCw1LjY0NDQ0NCB6IgogICAgICAgaWQ9InBhdGgxMS00IiAvPgogIDwvZz4KPC9zdmc+Cg=="
+      data-blob="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB3aWR0aD0iMTI3Ljk5OTk5IgogICBoZWlnaHQ9IjUzLjk5OTk5NiIKICAgdmlld0JveD0iMCAwIDMzLjg2NjY2NCAxNC4yODc0OTkiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNC4zICgwZDE1Zjc1MDQyLCAyMDI1LTEyLTI1KSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iY29uZV9saWdodF9tazJfaWNvbi5zdmciCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIGlua3NjYXBlOmRvY3VtZW50LXVuaXRzPSJweCIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgaW5rc2NhcGU6em9vbT0iOCIKICAgICBpbmtzY2FwZTpjeD0iNDkiCiAgICAgaW5rc2NhcGU6Y3k9IjkuODc1IgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMjU2MCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMzcxIgogICAgIGlua3NjYXBlOndpbmRvdy14PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy15PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ibGF5ZXIxIj4KICAgIDxpbmtzY2FwZTpncmlkCiAgICAgICBpZD0iZ3JpZDEiCiAgICAgICB1bml0cz0icHgiCiAgICAgICBvcmlnaW54PSIwIgogICAgICAgb3JpZ2lueT0iLTkuNTI0OTk5OCIKICAgICAgIHNwYWNpbmd4PSIwLjI2NDU4MzMzIgogICAgICAgc3BhY2luZ3k9IjAuMjY0NTgzMzMiCiAgICAgICBlbXBjb2xvcj0iIzAwOTllNSIKICAgICAgIGVtcG9wYWNpdHk9IjAuMzAxOTYwNzgiCiAgICAgICBjb2xvcj0iIzAwOTllNSIKICAgICAgIG9wYWNpdHk9IjAuMTQ5MDE5NjEiCiAgICAgICBlbXBzcGFjaW5nPSI2IgogICAgICAgZW5hYmxlZD0idHJ1ZSIKICAgICAgIHZpc2libGU9ImZhbHNlIiAvPgogIDwvc29kaXBvZGk6bmFtZWR2aWV3PgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIj4KICAgIDxsaW5lYXJHcmFkaWVudAogICAgICAgaWQ9ImxpbmVhckdyYWRpZW50MSIKICAgICAgIGlua3NjYXBlOmNvbGxlY3Q9ImFsd2F5cyI+CiAgICAgIDxzdG9wCiAgICAgICAgIHN0eWxlPSJzdG9wLWNvbG9yOiNmZmZmZmY7c3RvcC1vcGFjaXR5OjEiCiAgICAgICAgIG9mZnNldD0iMCIKICAgICAgICAgaWQ9InN0b3AxIiAvPgogICAgICA8c3RvcAogICAgICAgICBzdHlsZT0ic3RvcC1jb2xvcjojOWE5OTk2O3N0b3Atb3BhY2l0eToxIgogICAgICAgICBvZmZzZXQ9IjEiCiAgICAgICAgIGlkPSJzdG9wMiIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQKICAgICAgIGlua3NjYXBlOmNvbGxlY3Q9ImFsd2F5cyIKICAgICAgIHhsaW5rOmhyZWY9IiNsaW5lYXJHcmFkaWVudDEiCiAgICAgICBpZD0ibGluZWFyR3JhZGllbnQyIgogICAgICAgeDE9IjE5LjA0OTk5OSIKICAgICAgIHkxPSIxMC4xMzMwMzgiCiAgICAgICB4Mj0iMTkuMDQ5OTk5IgogICAgICAgeTI9IjIzLjgxMjQ5OCIKICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiAvPgogIDwvZGVmcz4KICA8ZwogICAgIGlua3NjYXBlOmxhYmVsPSJMYXllciAxIgogICAgIGlua3NjYXBlOmdyb3VwbW9kZT0ibGF5ZXIiCiAgICAgaWQ9ImxheWVyMSIKICAgICB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLC05LjUyNDk5OTYpIj4KICAgIDxwYXRoCiAgICAgICBzdHlsZT0iZmlsbDojZmZiZTZmO3N0cm9rZS13aWR0aDowLjUyOTE2NztzdHJva2UtbGluZWNhcDpzcXVhcmUiCiAgICAgICBkPSJtIDAuNTY0NDQ1MDIsMTkuOTMxOTQ0IHYgMi44MjIyMjMgSCAzMy4zMDIyMjEgdiAtMi44MjIyMjMgeiIKICAgICAgIGlkPSJwYXRoOS04IgogICAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NjYyIgLz4KICAgIDxwYXRoCiAgICAgICBzdHlsZT0iZmlsbDojZGVkZGRhO3N0cm9rZS13aWR0aDowLjUyOTE2NztzdHJva2UtbGluZWNhcDpzcXVhcmUiCiAgICAgICBkPSJNIDUuNjQ0NDQ0OCwxMC4wNTQxNjcgSCAyOC4yMjIyMjIgbCA1LjY0NDQ0NCw1LjY0NDQ0NCB2IDUuNjQ0NDQ1IEggNmUtNyB2IC01LjY0NDQ0NSB6IgogICAgICAgaWQ9InBhdGg4LTgiCiAgICAgICBzb2RpcG9kaTpub2RldHlwZXM9ImNjY2NjY2MiIC8+CiAgICA8cGF0aAogICAgICAgc3R5bGU9ImZpbGw6dXJsKCNsaW5lYXJHcmFkaWVudDIpO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowO3N0cm9rZS1saW5lY2FwOnNxdWFyZTtzdHJva2UtZGFzaGFycmF5Om5vbmU7ZmlsbC1vcGFjaXR5OjEiCiAgICAgICBkPSJNIDZlLTcsMTUuNjk4NjExIDUuNjQ0NDQ0OCwxMC4wNTQxNjcgSCAyOC4yMjIyMjIgbCA1LjY0NDQ0NCw1LjY0NDQ0NCB6IgogICAgICAgaWQ9InBhdGgxMS00IiAvPgogIDwvZz4KPC9zdmc+Cg=="
     ></div>
     <div
       id="embed_cone_light_logo"
-      data-blob="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB3aWR0aD0iNTEwIgogICBoZWlnaHQ9IjUxMCIKICAgdmlld0JveD0iMCAwIDUxMCA1MTAiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNC4zICgwZDE1Zjc1MDQyLCAyMDI1LTEyLTI1KSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iY29uZV9saWdodF9tazJfbG9nby5zdmciCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6ZG9jdW1lbnQtdW5pdHM9InB4IgogICAgIHNob3dncmlkPSJ0cnVlIgogICAgIHNob3dndWlkZXM9ImZhbHNlIgogICAgIGlua3NjYXBlOnpvb209IjEuMTMwODU5NCIKICAgICBpbmtzY2FwZTpjeD0iMTI3LjMzNjc5IgogICAgIGlua3NjYXBlOmN5PSIyNjYuMTY5MjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIyNTYwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjEzNzEiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjAiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjAiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJsYXllcjEiPgogICAgPGlua3NjYXBlOmdyaWQKICAgICAgIGlkPSJncmlkMSIKICAgICAgIHVuaXRzPSJweCIKICAgICAgIG9yaWdpbng9IjAiCiAgICAgICBvcmlnaW55PSIwIgogICAgICAgc3BhY2luZ3g9IjEiCiAgICAgICBzcGFjaW5neT0iMSIKICAgICAgIGVtcGNvbG9yPSIjMDA5OWU1IgogICAgICAgZW1wb3BhY2l0eT0iMC4zMDE5NjA3OCIKICAgICAgIGNvbG9yPSIjMDA5OWU1IgogICAgICAgb3BhY2l0eT0iMC4xNDkwMTk2MSIKICAgICAgIGVtcHNwYWNpbmc9IjYiCiAgICAgICBlbmFibGVkPSJ0cnVlIgogICAgICAgdmlzaWJsZT0idHJ1ZSIgLz4KICAgIDxzb2RpcG9kaTpndWlkZQogICAgICAgcG9zaXRpb249IjEyLDQwMiIKICAgICAgIG9yaWVudGF0aW9uPSIxLDAiCiAgICAgICBpZD0iZ3VpZGUyIgogICAgICAgaW5rc2NhcGU6bG9ja2VkPSJmYWxzZSIgLz4KICAgIDxzb2RpcG9kaTpndWlkZQogICAgICAgcG9zaXRpb249IjEyLDQ5OCIKICAgICAgIG9yaWVudGF0aW9uPSIwLC0xIgogICAgICAgaWQ9Imd1aWRlMyIKICAgICAgIGlua3NjYXBlOmxvY2tlZD0iZmFsc2UiIC8+CiAgICA8c29kaXBvZGk6Z3VpZGUKICAgICAgIHBvc2l0aW9uPSI0OTgsNDk4IgogICAgICAgb3JpZW50YXRpb249IjEsMCIKICAgICAgIGlkPSJndWlkZTQiCiAgICAgICBpbmtzY2FwZTpsb2NrZWQ9ImZhbHNlIiAvPgogICAgPHNvZGlwb2RpOmd1aWRlCiAgICAgICBwb3NpdGlvbj0iMTIsMTIiCiAgICAgICBvcmllbnRhdGlvbj0iMCwtMSIKICAgICAgIGlkPSJndWlkZTUiCiAgICAgICBpbmtzY2FwZTpsb2NrZWQ9ImZhbHNlIiAvPgogIDwvc29kaXBvZGk6bmFtZWR2aWV3PgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIiAvPgogIDxnCiAgICAgaW5rc2NhcGU6bGFiZWw9IkxheWVyIDEiCiAgICAgaW5rc2NhcGU6Z3JvdXBtb2RlPSJsYXllciIKICAgICBpZD0ibGF5ZXIxIj4KICAgIDxyZWN0CiAgICAgICBzdHlsZT0iZmlsbDojYjU4MzVhO3N0cm9rZTpub25lO3N0cm9rZS1saW5lY2FwOnNxdWFyZSIKICAgICAgIGlkPSJyZWN0NSIKICAgICAgIHdpZHRoPSI1MTAiCiAgICAgICBoZWlnaHQ9IjUxMCIKICAgICAgIHg9IjAiCiAgICAgICB5PSIwIgogICAgICAgcnk9IjI0IiAvPgogICAgPHBhdGgKICAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuOTk5OTk0O3N0cm9rZS1saW5lY2FwOnNxdWFyZSIKICAgICAgIGQ9Ik0gNzgsNDMyIDE5Ni42OCw1MC44OCBIIDMxMy4zMiBMIDQzMiw0MzIgWiIKICAgICAgIGlkPSJwYXRoMSIKICAgICAgIHNvZGlwb2RpOm5vZGV0eXBlcz0iY2NjY2MiIC8+CiAgICA8cGF0aAogICAgICAgc3R5bGU9ImZpbGw6I2NkYWI4ZjtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC45OTk5OTQ7c3Ryb2tlLWxpbmVjYXA6c3F1YXJlIgogICAgICAgZD0ibSAyNDYsMTI2IGggMTggdiA1MSBoIDYwIHYgMjAgSCAyNjQgViAzNzIgSCAyNDYgViAxOTcgaCAtNjAgdiAtMjAgaCA2MCB6IgogICAgICAgaWQ9InBhdGgyIgogICAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NjY2NjY2NjY2NjIiAvPgogICAgPHJlY3QKICAgICAgIHN0eWxlPSJmaWxsOiNmNmY1ZjQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuOTk5OTk0O3N0cm9rZS1saW5lY2FwOnNxdWFyZSIKICAgICAgIGlkPSJyZWN0MSIKICAgICAgIHdpZHRoPSI0ODYiCiAgICAgICBoZWlnaHQ9IjM4Ljg4MDAwMSIKICAgICAgIHg9IjEyIgogICAgICAgeT0iNDIwLjIzOTk5IgogICAgICAgcnk9IjAiIC8+CiAgPC9nPgo8L3N2Zz4K"
+      data-blob="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB3aWR0aD0iNTEwIgogICBoZWlnaHQ9IjUxMCIKICAgdmlld0JveD0iMCAwIDUxMCA1MTAiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNC4zICgwZDE1Zjc1MDQyLCAyMDI1LTEyLTI1KSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iY29uZV9saWdodF9tazJfbG9nby5zdmciCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6ZG9jdW1lbnQtdW5pdHM9InB4IgogICAgIHNob3dncmlkPSJ0cnVlIgogICAgIHNob3dndWlkZXM9ImZhbHNlIgogICAgIGlua3NjYXBlOnpvb209IjEuMTMwODU5NCIKICAgICBpbmtzY2FwZTpjeD0iMTI3LjMzNjc5IgogICAgIGlua3NjYXBlOmN5PSIyNjYuMTY5MjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIyNTYwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjEzNzEiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjAiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjAiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJsYXllcjEiPgogICAgPGlua3NjYXBlOmdyaWQKICAgICAgIGlkPSJncmlkMSIKICAgICAgIHVuaXRzPSJweCIKICAgICAgIG9yaWdpbng9IjAiCiAgICAgICBvcmlnaW55PSIwIgogICAgICAgc3BhY2luZ3g9IjEiCiAgICAgICBzcGFjaW5neT0iMSIKICAgICAgIGVtcGNvbG9yPSIjMDA5OWU1IgogICAgICAgZW1wb3BhY2l0eT0iMC4zMDE5NjA3OCIKICAgICAgIGNvbG9yPSIjMDA5OWU1IgogICAgICAgb3BhY2l0eT0iMC4xNDkwMTk2MSIKICAgICAgIGVtcHNwYWNpbmc9IjYiCiAgICAgICBlbmFibGVkPSJ0cnVlIgogICAgICAgdmlzaWJsZT0idHJ1ZSIgLz4KICAgIDxzb2RpcG9kaTpndWlkZQogICAgICAgcG9zaXRpb249IjEyLDQwMiIKICAgICAgIG9yaWVudGF0aW9uPSIxLDAiCiAgICAgICBpZD0iZ3VpZGUyIgogICAgICAgaW5rc2NhcGU6bG9ja2VkPSJmYWxzZSIgLz4KICAgIDxzb2RpcG9kaTpndWlkZQogICAgICAgcG9zaXRpb249IjEyLDQ5OCIKICAgICAgIG9yaWVudGF0aW9uPSIwLC0xIgogICAgICAgaWQ9Imd1aWRlMyIKICAgICAgIGlua3NjYXBlOmxvY2tlZD0iZmFsc2UiIC8+CiAgICA8c29kaXBvZGk6Z3VpZGUKICAgICAgIHBvc2l0aW9uPSI0OTgsNDk4IgogICAgICAgb3JpZW50YXRpb249IjEsMCIKICAgICAgIGlkPSJndWlkZTQiCiAgICAgICBpbmtzY2FwZTpsb2NrZWQ9ImZhbHNlIiAvPgogICAgPHNvZGlwb2RpOmd1aWRlCiAgICAgICBwb3NpdGlvbj0iMTIsMTIiCiAgICAgICBvcmllbnRhdGlvbj0iMCwtMSIKICAgICAgIGlkPSJndWlkZTUiCiAgICAgICBpbmtzY2FwZTpsb2NrZWQ9ImZhbHNlIiAvPgogIDwvc29kaXBvZGk6bmFtZWR2aWV3PgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIiAvPgogIDxnCiAgICAgaW5rc2NhcGU6bGFiZWw9IkxheWVyIDEiCiAgICAgaW5rc2NhcGU6Z3JvdXBtb2RlPSJsYXllciIKICAgICBpZD0ibGF5ZXIxIj4KICAgIDxyZWN0CiAgICAgICBzdHlsZT0iZmlsbDojYjU4MzVhO3N0cm9rZTpub25lO3N0cm9rZS1saW5lY2FwOnNxdWFyZSIKICAgICAgIGlkPSJyZWN0NSIKICAgICAgIHdpZHRoPSI1MTAiCiAgICAgICBoZWlnaHQ9IjUxMCIKICAgICAgIHg9IjAiCiAgICAgICB5PSIwIgogICAgICAgcnk9IjI0IiAvPgogICAgPHBhdGgKICAgICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuOTk5OTk0O3N0cm9rZS1saW5lY2FwOnNxdWFyZSIKICAgICAgIGQ9Ik0gNzgsNDMyIDE5Ni42OCw1MC44OCBIIDMxMy4zMiBMIDQzMiw0MzIgWiIKICAgICAgIGlkPSJwYXRoMSIKICAgICAgIHNvZGlwb2RpOm5vZGV0eXBlcz0iY2NjY2MiIC8+CiAgICA8cGF0aAogICAgICAgc3R5bGU9ImZpbGw6I2NkYWI4ZjtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC45OTk5OTQ7c3Ryb2tlLWxpbmVjYXA6c3F1YXJlIgogICAgICAgZD0ibSAyNDYsMTI2IGggMTggdiA1MSBoIDYwIHYgMjAgSCAyNjQgViAzNzIgSCAyNDYgViAxOTcgaCAtNjAgdiAtMjAgaCA2MCB6IgogICAgICAgaWQ9InBhdGgyIgogICAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NjY2NjY2NjY2NjIiAvPgogICAgPHJlY3QKICAgICAgIHN0eWxlPSJmaWxsOiNmNmY1ZjQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuOTk5OTk0O3N0cm9rZS1saW5lY2FwOnNxdWFyZSIKICAgICAgIGlkPSJyZWN0MSIKICAgICAgIHdpZHRoPSI0ODYiCiAgICAgICBoZWlnaHQ9IjM4Ljg4MDAwMSIKICAgICAgIHg9IjEyIgogICAgICAgeT0iNDIwLjIzOTk5IgogICAgICAgcnk9IjAiIC8+CiAgPC9nPgo8L3N2Zz4K"
     ></div>
+    <dialog id="dialog">
+      <div class="card">
+        <div class="column">
+          <img class="cone_light_logo" />
+          <h2>Cone Light MK.II System</h2>
+          <p>Connecting...</p>
+          <progress />
+        </div>
+      </div>
+    </dialog>
     <div class="container">
       <h2 style="text-align: center">Cone Light MK.II System</h2>
       <!-- REMOTE HEADER -->
@@ -169,64 +357,64 @@
           >
             v2026.02.26 p4
           </p>
-          <meter min="4.200" max="5.600" value="5.241" title="5.241v">
+          <meter
+            id="remote_node_voltage"
+            min="4.200"
+            max="5.600"
+            value="5.241"
+            title="5.241v"
+          >
             5.241v
           </meter>
         </div>
       </div>
 
       <!-- NODE GROUPS -->
-      <div class="card">
-        <b>0:STOPSIGN Group</b>
-        <div class="row">
-          <div class="node">
-            <b>0:HOBBIT</b>
-            <p>6.17m</p>
-            <img
-              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
-            />
-            <meter value="0.75"></meter>
-          </div>
-          <div class="node">
-            <b>1:KETTLE</b>
-            <p>35.32m</p>
-            <img
-              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
-            />
-            <meter value="0.5"></meter>
-          </div>
-          <div class="node">
-            <b>2:DRAGON</b>
-            <p>28.42m</p>
-            <img
-              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
-            />
-            <meter value="0.35"></meter>
-          </div>
-          <div class="node">
-            <b>3:MIRROR</b>
-            <p>5.32m</p>
-            <img
-              src="/home/cyberarm/Nextcloud/Documents/Inkscape/cone_light_mk2_icon.svg"
-            />
-            <meter value="0.86"></meter>
+      <div id="node_groups">
+        <div class="card" data-group_id="0">
+          <b>0:STOPSIGN Group</b>
+          <div class="row">
+            <div class="node">
+              <b>0:HOBBIT</b>
+              <p>6.17m</p>
+              <img class="cone_light_icon" />
+              <meter value="0.75"></meter>
+            </div>
+            <div class="node">
+              <b>1:KETTLE</b>
+              <p>35.32m</p>
+              <img class="cone_light_icon" />
+              <meter value="0.5"></meter>
+            </div>
+            <div class="node">
+              <b>2:DRAGON</b>
+              <p>28.42m</p>
+              <img class="cone_light_icon" />
+              <meter value="0.35"></meter>
+            </div>
+            <div class="node">
+              <b>3:MIRROR</b>
+              <p>5.32m</p>
+              <img class="cone_light_icon" />
+              <meter value="0.86"></meter>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card">
-        <b>1:BACKSTOP Group</b>
-        <div class="row">
-          <div class="node">
-            <h4>ITEM</h4>
-          </div>
-          <div class="node">
-            <h4>ITEM</h4>
-          </div>
-          <div class="node">
-            <h4>ITEM</h4>
-          </div>
-          <div class="node">
-            <h4>ITEM</h4>
+        <div class="card" data-group_id="1">
+          <b>1:BACKSTOP Group</b>
+          <div class="row">
+            <div class="node">
+              <h4>ITEM</h4>
+            </div>
+            <div class="node">
+              <h4>ITEM</h4>
+            </div>
+            <div class="node">
+              <h4>ITEM</h4>
+            </div>
+            <div class="node">
+              <h4>ITEM</h4>
+            </div>
           </div>
         </div>
       </div>
@@ -241,6 +429,20 @@
             <div class="item">
               <label>Choose color</label>
               <input type="color" value="#ffffff" />
+            </div>
+            <div class="item">
+              <label for="led_control_select_brightness"
+                >Choose brightness</label
+              >
+              <input
+                id="led_control_select_brightness"
+                name="led_control_select_brightness"
+                type="range"
+                min="0"
+                max="255"
+                value="25"
+              />
+              <p>255</p>
             </div>
             <div class="item">
               <label for="led_control_select_node">Choose node or group</label>

@@ -19,7 +19,7 @@ static constexpr uint8_t CONE_LIGHT_NODE_ID_UNSET = 255;
 static constexpr uint8_t CONE_LIGHT_NODE_GROUP_ID_UNSET = 255;
 static const char *CONE_LIGHT_NODE_NAME_UNSET = "NONAME";
 static constexpr bool CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE = false;
-static constexpr bool CONE_LIGHT_NODE_REMOTE_UNSET_OR_FALSE = false;
+static constexpr bool CONE_LIGHT_NODE_REMOTE_UNSET_OR_FALSE = true;//false;
 static const char *CONE_LIGHT_NODE_ACCESS_POINT_PASSWORD_UNSET = "luminous";
 
 static constexpr uint8_t CONE_LIGHT_NODE_GROUP_0 = 0;

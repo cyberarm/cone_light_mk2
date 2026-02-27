@@ -7,6 +7,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <ArduinoJson.h>
 #include <functional>
 
 // Forward declaration...
@@ -140,6 +141,8 @@ private:
   const uint8_t m_no_node_address[6] = {0};
   std::vector<std::shared_ptr<ConeLightNetworkingRedundantPacketDelivery>> m_redundant_packet_deliveries = {};
   AsyncWebServer *m_web_server = nullptr;
+  AsyncWebSocketMessageHandler *m_websocket_handler = nullptr;
+  AsyncWebSocket *m_websocket = nullptr;
 
   void handle_ping(const cone_light_network_packet_t &packet);
   void handle_pong(const cone_light_network_packet_t &packet);
@@ -148,6 +151,8 @@ public:
   ConeLightNetworking(ConeLight *cone_light);
   ~ConeLightNetworking();
   void configure_web_server();
+  void handle_websocket();
+  String websocket_payload();
   void update();
   bool espnow_initialized() { return m_espnow_initialized; };
   void send_packet(const uint8_t *mac_addr, cone_light_network_packet_t packet, bool redundant_delivery = false);

@@ -1,0 +1,79 @@
+// inbound: node data
+{
+  "data": {
+    "remote": {
+      "id": 8,
+      "group_id": 0,
+      "name": "REMOTE",
+      "voltage": 4.321,
+      "rssi": 0.0
+    },
+    "nodes": [
+      {
+        "id": 0,
+        "group_id": 0,
+        "name": "HOBBIT",
+        "voltage": 4.321,
+        "rssi": -21.0
+      }
+    ]
+  }
+}
+
+// inbound: metadata
+{
+  "data": {
+    "metadata": {
+      "firmware_version": "2026.02.26",
+      "protocol_version": 4,
+      "min_voltage": 4.2,
+      "max_voltage": 5.6,
+      "groups": ["STOPSIGN", "BACKSTOP"],
+      "tones": [
+        880.000
+      ],
+      "songs": [
+        "Amazing Grace"
+      ]
+    }
+  }
+}
+
+// outbound: command
+{
+  "data": {
+    "command": "song",
+    "target_group": 255,
+    "parameters": [
+      45
+    ]
+  }
+}
+{
+  "data": {
+    "command": "tone",
+    "target_node": 5,
+    "parameters": [
+      45,
+      10000
+    ]
+  }
+}
+{
+  "data": {
+    "command": "color",
+    "target_group": 2,
+    "parameters": [
+      0xfefefeff
+    ]
+  }
+}
+{
+  "data": {
+    "command": "brightness",
+    "target_node": 0,
+    "parameters": [
+      255
+    ]
+  }
+}

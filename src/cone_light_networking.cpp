@@ -56,12 +56,79 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
 void ConeLightNetworking::configure_web_server()
 {
   m_web_server = new AsyncWebServer(80);
+  m_websocket_handler = new AsyncWebSocketMessageHandler();
+  m_websocket = new AsyncWebSocket("/ws", m_websocket_handler->eventHandler());
 
   m_web_server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/html", data_cone_light_html);
   });
 
+  m_websocket_handler->onConnect([this](AsyncWebSocket *server, AsyncWebSocketClient *client) {
+    Serial.printf("WS Client %u connected\n", client->id());
+    server->text(client->id(), websocket_payload());
+  });
+  m_websocket_handler->onDisconnect([](AsyncWebSocket *server, uint32_t client_id) {
+    Serial.printf("WS Client %u disconnected\n", client_id);
+  });
+
+  m_websocket_handler->onError([](AsyncWebSocket *server, AsyncWebSocketClient *client, uint16_t error_code, const char *reason, size_t length) {
+    Serial.printf("WS Client %u error: %u: %s\n", client->id(), error_code, reason);
+  });
+
+  m_websocket_handler->onMessage([](AsyncWebSocket *server, AsyncWebSocketClient *client, const uint8_t *data, size_t length) {
+    Serial.printf("WS Client %u data: %s\n", client->id(), (const char *)data);
+    // server->textAll(data, len);
+  });
+
+  m_web_server->addHandler(m_websocket);
   m_web_server->begin();
+}
+
+void ConeLightNetworking::handle_websocket()
+{
+}
+
+String ConeLightNetworking::websocket_payload()
+{
+  JsonDocument doc;
+  String json;
+
+  doc["data"]["metadata"]["firmware_version"] = CONE_LIGHT_FIRMWARE_VERSION_NAME;
+  doc["data"]["metadata"]["protocol_version"] = CONE_LIGHT_FIRMWARE_VERSION;
+  doc["data"]["metadata"]["min_voltage"] = VOLTAGE_MIN;
+  doc["data"]["metadata"]["max_voltage"] = VOLTAGE_MAX;
+  doc["data"]["metadata"]["groups"][0] = CONE_LIGHT_NODE_GROUP_0_NAME;
+  doc["data"]["metadata"]["groups"][1] = CONE_LIGHT_NODE_GROUP_1_NAME;
+
+  doc["data"]["remote"]["id"] = m_cone_light->node_id();
+  doc["data"]["remote"]["group_id"] = m_cone_light->node_group_id();
+  doc["data"]["remote"]["name"] = m_cone_light->node_name();
+  doc["data"]["remote"]["voltage"] = m_cone_light->voltage()->voltage();
+  doc["data"]["remote"]["rssi"] = 0.0;
+
+  size_t i = 0;
+  for (auto &node : m_known_nodes)
+  {
+    if (node.node_id == CONE_LIGHT_NODE_ID_UNSET ||
+        node.node_group_id == CONE_LIGHT_NODE_GROUP_ID_UNSET)
+      continue;
+
+    /*  */
+    // if (node.timestamp >= 3000)
+    //   continue;
+
+    doc["data"]["nodes"][i]["id"] = node.node_id;
+    doc["data"]["nodes"][i]["group_id"] = node.node_group_id;
+    doc["data"]["nodes"][i]["name"] = node.node_name;
+    doc["data"]["nodes"][i]["voltage"] = node.m_voltage;
+    doc["data"]["nodes"][i]["rssi"] = node.m_rssi;
+
+    i++;
+  }
+
+  serializeJson(doc, json);
+
+  return json;
 }
 
 void ConeLightNetworking::update()
