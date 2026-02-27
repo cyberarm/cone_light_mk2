@@ -78,13 +78,16 @@
         padding: 0.5rem;
         margin: 0.5rem;
       }
-      @media screen and (width < 900px) {
+      .card .node meter {
+        width: 100%;
+      }
+      @media screen and (width < 540px) {
         .card .node {
           /* CSS doesn't support calculating width as a simple percentage when we have a margin... */
           min-width: calc(50% - 1rem);
         }
       }
-      @media screen and (width >= 900px) {
+      @media screen and (width >= 540px) {
         .card .node {
           /* CSS doesn't support calculating width as a simple percentage when we have a margin... */
           max-width: calc(50% - 1rem);
