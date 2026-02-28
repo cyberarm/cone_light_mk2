@@ -192,32 +192,15 @@
             let payload = JSON.parse(event.data);
             console.log(payload);
 
-            document.querySelector("#remote_node_name").innerHTML =
-              `${payload.data.remote.name}:${payload.data.remote.id}:${payload.data.remote.group_id}`;
-            document.querySelector("#remote_node_version").innerHTML =
-              `v${payload.data.metadata.firmware_version} p${payload.data.metadata.protocol_version}`;
-            document.querySelector("#remote_node_voltage").value =
-              payload.data.remote.voltage;
-            document.querySelector("#remote_node_voltage").title =
-              `${payload.data.remote.voltage.toFixed(3)}v`;
-            this.configure_battery_meter(
-              document.querySelector("#remote_node_voltage"),
-            );
-
-            let index = 0;
-            for (const group of payload.data.metadata.groups) {
-              console.log(group);
-
-              this.add_node_group(index, group);
-              index++;
-            }
-
-            for (const node of payload.data.nodes) {
-              if (node.id == 255) continue;
-
-              console.log(node);
-
-              this.add_node(node);
+            switch (payload.data.type) {
+              case "metadata":
+                console.log("METADATA");
+                this.handle_metadata(payload);
+                break;
+              case "payload":
+                console.log("PAYLOAD");
+                this.handle_payload(payload);
+                break;
             }
           });
 
@@ -225,8 +208,46 @@
             "Cone Light Remote v%s initialization completed.",
             this.VERSION,
           );
+        }
+
+        handle_metadata(payload) {
+          document.querySelector("#remote_node_version").innerHTML =
+            `v${payload.data.metadata.firmware_version} p${payload.data.metadata.protocol_version}`;
+
+          let index = 0;
+          for (const group of payload.data.metadata.groups) {
+            console.log(group);
+
+            this.add_node_group(index, group);
+            index++;
+          }
+
+          this.NODES ||= [];
+          this.GROUPS = payload.data.metadata.groups;
+          this.TONES = payload.data.metadata.tones;
+          this.SONGS = payload.data.metadata.songs;
 
           return;
+        }
+
+        handle_payload(payload) {
+          document.querySelector("#remote_node_name").innerHTML =
+            `${payload.data.remote.name}:${payload.data.remote.id}:${payload.data.remote.group_id}`;
+          document.querySelector("#remote_node_voltage").value =
+            payload.data.remote.voltage;
+          document.querySelector("#remote_node_voltage").title =
+            `${payload.data.remote.voltage.toFixed(3)}v`;
+          this.configure_battery_meter(
+            document.querySelector("#remote_node_voltage"),
+          );
+
+          for (const node of payload.data.nodes) {
+            if (node.id == 255) continue;
+
+            console.log(node);
+
+            this.add_node(node);
+          }
         }
 
         add_node_group(group_id, group_name) {
@@ -248,14 +269,11 @@
           card_div.appendChild(row_div);
 
           node_groups_div.appendChild(card_div);
-          return;
-        }
-
-        remove_node_group(group_id) {
-          return;
         }
 
         add_node(node) {
+          this.NODES[node.id] = node;
+
           console.log(node);
           const node_group_div = document.querySelector(
             `[data-group_id="${node.group_id}"] .row`,
@@ -279,7 +297,7 @@
           const voltage_meter = document.createElement("meter");
           this.configure_battery_meter(voltage_meter);
           voltage_meter.value = node.voltage;
-          voltage_meter.title = `${node.voltage}v`;
+          voltage_meter.title = `${node.voltage.toFixed(3)}v`;
 
           node_div.appendChild(name_b);
           node_div.appendChild(distance_p);
@@ -287,16 +305,11 @@
           node_div.appendChild(voltage_meter);
 
           node_group_div.appendChild(node_div);
-          return;
         }
 
-        update_node(node) {
-          return;
-        }
+        update_node(node) {}
 
-        remove_node(node) {
-          return;
-        }
+        remove_node(node) {}
 
         configure_battery_meter(element) {
           element.min = this.CONE_LIGHT_MIN_VOLTAGE;
@@ -305,8 +318,6 @@
           element.low = this.CONE_LIGHT_VOLTAGE_LOW;
           element.high = this.CONE_LIGHT_VOLTAGE_MED;
           element.optimum = this.CONE_LIGHT_VOLTAGE_HIGH;
-
-          return;
         }
 
         distance_meters(rssi) {

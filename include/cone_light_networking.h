@@ -152,6 +152,7 @@ public:
   ~ConeLightNetworking();
   void configure_web_server();
   void handle_websocket();
+  String websocket_metadata_payload();
   String websocket_payload();
   void update();
   bool espnow_initialized() { return m_espnow_initialized; };

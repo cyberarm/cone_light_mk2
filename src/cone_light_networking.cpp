@@ -65,6 +65,7 @@ void ConeLightNetworking::configure_web_server()
 
   m_websocket_handler->onConnect([this](AsyncWebSocket *server, AsyncWebSocketClient *client) {
     Serial.printf("WS Client %u connected\n", client->id());
+    server->text(client->id(), websocket_metadata_payload());
     server->text(client->id(), websocket_payload());
   });
   m_websocket_handler->onDisconnect([](AsyncWebSocket *server, uint32_t client_id) {
@@ -88,11 +89,12 @@ void ConeLightNetworking::handle_websocket()
 {
 }
 
-String ConeLightNetworking::websocket_payload()
+String ConeLightNetworking::websocket_metadata_payload()
 {
   JsonDocument doc;
   String json;
 
+  doc["data"]["type"] = "metadata";
   doc["data"]["metadata"]["firmware_version"] = CONE_LIGHT_FIRMWARE_VERSION_NAME;
   doc["data"]["metadata"]["protocol_version"] = CONE_LIGHT_FIRMWARE_VERSION;
   doc["data"]["metadata"]["min_voltage"] = VOLTAGE_MIN;
@@ -100,6 +102,28 @@ String ConeLightNetworking::websocket_payload()
   doc["data"]["metadata"]["groups"][0] = CONE_LIGHT_NODE_GROUP_0_NAME;
   doc["data"]["metadata"]["groups"][1] = CONE_LIGHT_NODE_GROUP_1_NAME;
 
+  JsonArray tones = doc["data"]["metadata"]["tones"].to<JsonArray>();
+  for (auto &tone : note_to_freq)
+  {
+    tones.add(tone);
+  }
+  JsonArray songs = doc["data"]["metadata"]["songs"].to<JsonArray>();
+  for (auto &title : cone_light_song_titles)
+  {
+    songs.add(title);
+  }
+
+  serializeJson(doc, json);
+
+  return json;
+}
+
+String ConeLightNetworking::websocket_payload()
+{
+  JsonDocument doc;
+  String json;
+
+  doc["data"]["type"] = "payload";
   doc["data"]["remote"]["id"] = m_cone_light->node_id();
   doc["data"]["remote"]["group_id"] = m_cone_light->node_group_id();
   doc["data"]["remote"]["name"] = m_cone_light->node_name();
