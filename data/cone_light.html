@@ -311,7 +311,7 @@
           });
 
           document
-            .querySelector("#led_control_select_brightness")
+            .querySelector("#led_control_brightness")
             .addEventListener("input", (event) => {
               document.querySelector(
                 "#led_control_brightness_label",
@@ -323,7 +323,46 @@
               document.querySelector("#tone_control_duration_label").innerHTML =
                 `${event.target.value}ms`;
             });
+          document
+            .querySelector("#led_control_submit")
+            .addEventListener("click", (event) => {
+              if (
+                this.websocket &&
+                this.websocket.readyState == WebSocket.OPEN
+              ) {
+                this.handle_led_request();
+              }
+            });
+          document
+            .querySelector("#tone_control_submit")
+            .addEventListener("click", (event) => {
+              if (
+                this.websocket &&
+                this.websocket.readyState == WebSocket.OPEN
+              ) {
+                this.handle_tone_request();
+              }
+            });
+          document
+            .querySelector("#song_control_submit")
+            .addEventListener("click", (event) => {
+              if (
+                this.websocket &&
+                this.websocket.readyState == WebSocket.OPEN
+              ) {
+                this.handle_song_request();
+              }
+            });
 
+          this.connect_websocket();
+
+          console.log(
+            "Cone Light Remote v%s initialization completed.",
+            this.VERSION,
+          );
+        }
+
+        connect_websocket() {
           this.DIALOG.showModal();
 
           this.websocket = new WebSocket(
@@ -333,10 +372,17 @@
             this.DIALOG.close();
             // nuke existing node data
             document.querySelector("#node_groups").innerHTML = "";
+
+            if (this.interval_id) clearInterval(this.interval_id);
+
+            this.interval_id = setInterval(() => {
+              this.update();
+            }, 1_000);
           });
           this.websocket.addEventListener("close", (event) => {
             this.DIALOG.showModal();
             // reconnect!
+            this.connect_websocket();
           });
           this.websocket.addEventListener("message", (event) => {
             this.DIALOG.close();
@@ -352,11 +398,16 @@
                 break;
             }
           });
+        }
 
-          console.log(
-            "Cone Light Remote v%s initialization completed.",
-            this.VERSION,
-          );
+        update() {
+          if (this.websocket && this.websocket.readyState == WebSocket.OPEN) {
+            let data = {};
+            data.data = {};
+            data.data.command = "payload";
+
+            this.websocket.send(JSON.stringify(data));
+          }
         }
 
         handle_metadata(payload) {
@@ -388,13 +439,86 @@
             document.querySelector("#remote_node_voltage"),
           );
 
+          if (!payload.data.nodes) return;
+
+          let changed_node = false;
           for (const node of payload.data.nodes) {
             if (node.id == 255) continue;
 
-            this.add_node(node);
+            const node_div = document.querySelector(
+              `[data-node_id="${node.id}"]`,
+            );
+
+            if (node_div) {
+              this.update_node(node);
+            } else {
+              changed_node = true;
+              this.add_node(node);
+            }
           }
 
-          this.populate_select_node();
+          if (changed_node) this.populate_select_node();
+        }
+
+        handle_led_request() {
+          const color = document.querySelector("#led_control_color");
+          const brightness = document.querySelector("#led_control_brightness");
+          const select_node = document.querySelector(
+            "#tone_control_select_node",
+          );
+
+          let data = {};
+          data.data = {};
+          data.data.command = "color"; // "brightness"
+          data.data.parameters = [color.value, parseInt(brightness.value)];
+
+          this.websocket.send(JSON.stringify(data));
+
+          console.log(data);
+        }
+
+        handle_tone_request() {
+          const select_tone = document.querySelector(
+            "#tone_control_select_tone",
+          );
+          const duration = document.querySelector(
+            "#tone_control_select_duration",
+          );
+          const select_node = document.querySelector(
+            "#tone_control_select_node",
+          );
+
+          let data = {};
+          data.data = {};
+          data.data.command = "tone";
+          data.data.parameters = [
+            parseInt(select_tone.selectedOptions[0].value),
+            parseInt(duration.value),
+          ];
+
+          this.websocket.send(JSON.stringify(data));
+
+          console.log(data);
+        }
+
+        handle_song_request() {
+          const select_song = document.querySelector(
+            "#song_control_select_song",
+          );
+          const select_node = document.querySelector(
+            "#song_control_select_node",
+          );
+
+          let data = {};
+          data.data = {};
+          data.data.command = "song";
+          data.data.parameters = [
+            parseInt(select_song.selectedOptions[0].value),
+          ];
+
+          this.websocket.send(JSON.stringify(data));
+
+          console.log(data);
         }
 
         add_node_group(group_id, group_name) {
@@ -452,12 +576,32 @@
         }
 
         update_node(node) {
-          const node_group_div = document.querySelector(
-            `[data-node_id="${node.id}"]`,
+          const distance_p = document.querySelector(
+            `[data-node_id="${node.id}"] p`,
           );
+          const voltage_meter = document.querySelector(
+            `[data-node_id="${node.id}"] meter`,
+          );
+
+          if (distance_p)
+            distance_p.innerHTML = `${this.distance_feet(this.distance_meters(node.rssi)).toFixed(2)}ft`;
+
+          if (voltage_meter) {
+            voltage_meter.value = node.voltage;
+            voltage_meter.title = `${node.voltage.toFixed(3)}v`;
+          }
         }
 
-        remove_node(node) {}
+        remove_node(node) {
+          const node_group_div = document.querySelector(
+            `[data-group_id="${node.group_id}"]`,
+          );
+          const node_div = document.querySelector(
+            `[data-node_id="${node.id}"]`,
+          );
+
+          if (node_group_div && node_div) node_group_div.removeChild(node_div);
+        }
 
         populate_select_tone() {
           const select_tone = document.querySelector(
@@ -631,15 +775,13 @@
           <div class="row">
             <div class="item">
               <label>Choose color</label>
-              <input type="color" value="#ffffff" />
+              <input id="led_control_color" type="color" value="#ffffff" />
             </div>
             <div class="item">
-              <label for="led_control_select_brightness"
-                >Choose brightness</label
-              >
+              <label for="led_control_brightness">Choose brightness</label>
               <input
-                id="led_control_select_brightness"
-                name="led_control_select_brightness"
+                id="led_control_brightness"
+                name="led_control_brightness"
                 type="range"
                 min="0"
                 max="255"
@@ -675,7 +817,7 @@
                 </label>
               </div>
               <p>&nbsp;</p>
-              <input type="button" value="UPDATE" />
+              <input id="led_control_submit" type="button" value="UPDATE" />
             </div>
           </div>
         </details>
@@ -714,7 +856,7 @@
               ></select>
             </div>
             <div class="item action">
-              <input type="button" value="PLAY" />
+              <input id="tone_control_submit" type="button" value="PLAY" />
             </div>
           </div>
         </details>
@@ -795,7 +937,7 @@
               ></select>
             </div>
             <div class="item action">
-              <input type="button" value="PLAY" />
+              <input id="song_control_submit" type="button" value="PLAY" />
             </div>
           </div>
         </details>

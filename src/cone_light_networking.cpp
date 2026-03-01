@@ -59,7 +59,7 @@ void ConeLightNetworking::configure_web_server()
   m_websocket_handler = new AsyncWebSocketMessageHandler();
   m_websocket = new AsyncWebSocket("/ws", m_websocket_handler->eventHandler());
 
-  m_web_server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+  m_web_server->on("/", HTTP_GET, [this](AsyncWebServerRequest *request) {
     request->send(200, "text/html", data_cone_light_html);
   });
 
@@ -72,21 +72,62 @@ void ConeLightNetworking::configure_web_server()
     Serial.printf("WS Client %u disconnected\n", client_id);
   });
 
-  m_websocket_handler->onError([](AsyncWebSocket *server, AsyncWebSocketClient *client, uint16_t error_code, const char *reason, size_t length) {
+  m_websocket_handler->onError([this](AsyncWebSocket *server, AsyncWebSocketClient *client, uint16_t error_code, const char *reason, size_t length) {
     Serial.printf("WS Client %u error: %u: %s\n", client->id(), error_code, reason);
   });
 
-  m_websocket_handler->onMessage([](AsyncWebSocket *server, AsyncWebSocketClient *client, const uint8_t *data, size_t length) {
+  m_websocket_handler->onMessage([this](AsyncWebSocket *server, AsyncWebSocketClient *client, const uint8_t *data, size_t length) {
     Serial.printf("WS Client %u data: %s\n", client->id(), (const char *)data);
-    // server->textAll(data, len);
+    handle_websocket(server, client, data, length);
   });
 
   m_web_server->addHandler(m_websocket);
   m_web_server->begin();
 }
 
-void ConeLightNetworking::handle_websocket()
+void ConeLightNetworking::handle_websocket(AsyncWebSocket *server, AsyncWebSocketClient *client, const uint8_t *data, size_t length)
 {
+  JsonDocument doc;
+
+  deserializeJson(doc, reinterpret_cast<const char*>(data));
+
+  String command = doc["data"]["command"] | "unknown";
+  uint16_t target_group = doc["data"]["target_group"] | 1024;
+  uint16_t target_node = doc["data"]["target_node"]   | 1024;
+  uint32_t parameter_0 = doc["data"]["parameters"][0] | 0;
+  uint32_t parameter_1 = doc["data"]["parameters"][1] | 0;
+
+  cone_light_network_packet_t packet = {};
+
+  if (command == "payload") {
+    server->text(client->id(), websocket_payload());
+
+  } else if (command == "color") {
+    packet.command_id = m_cone_light->networking()->next_command_id();
+    packet.command_type = (target_group == 255) ? ConeLightNetworkCommand::SET_COLOR : ConeLightNetworkCommand::SET_GROUP_COLOR;
+    packet.command_parameters = parameter_0;
+    packet.command_parameters_extra = (target_group < 255) ? target_group : 255;
+
+    m_cone_light->networking()->broadcast_packet(packet, true);
+
+  } else if (command == "brightness") {
+
+  } else if  (command == "tone") {
+    packet.command_id = m_cone_light->networking()->next_command_id();
+    packet.command_type = ConeLightNetworkCommand::PLAY_TONE;
+    packet.command_parameters = parameter_0;
+    packet.command_parameters_extra = (target_group < 255) ? target_group : 255;
+
+    m_cone_light->networking()->broadcast_packet(packet, true);
+
+  } else if  (command == "song") {
+    packet.command_id = m_cone_light->networking()->next_command_id();
+    packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
+    packet.command_parameters = parameter_0;
+    packet.command_parameters_extra = (target_group < 255) ? target_group : 255;
+
+    m_cone_light->networking()->broadcast_packet(packet, true);
+  }
 }
 
 String ConeLightNetworking::websocket_metadata_payload()
@@ -137,9 +178,9 @@ String ConeLightNetworking::websocket_payload()
         node.node_group_id == CONE_LIGHT_NODE_GROUP_ID_UNSET)
       continue;
 
-    /*  */
-    // if (node.timestamp >= 3000)
-    //   continue;
+    /* exclude nodes that haven't pong'd or broadcasted in 10 seconds */
+    if (m_cone_light->network_time()->timestamp() - node.last_receive_timestamp >= 10'000)
+      continue;
 
     doc["data"]["nodes"][i]["id"] = node.node_id;
     doc["data"]["nodes"][i]["group_id"] = node.node_group_id;

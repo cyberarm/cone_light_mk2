@@ -21,6 +21,7 @@ typedef struct cone_light_networking_node_tracker
   float m_voltage = 0.0f;
   bool m_playing_song = false;
 
+  uint32_t last_receive_timestamp = 0;
   uint32_t timestamp = 0;
   uint8_t node_id = 255;
   uint8_t node_group_id = 255;
@@ -52,7 +53,6 @@ typedef struct cone_light_networking_node_tracker
       // Set fixed node data
       memcpy(m_address, esp_now_info->src_addr, 6);
 
-      timestamp = packet.timestamp;
       node_id = packet.node_id;
       node_group_id = packet.node_group_id;
       strncpy(node_name, packet.node_name, 7);
@@ -71,6 +71,8 @@ typedef struct cone_light_networking_node_tracker
     // Update node data
     m_rssi = esp_now_info->rx_ctrl->rssi;
 
+    last_receive_timestamp = millis();
+    timestamp = packet.timestamp;
     packet_id = packet.packet_id;
     command_id = packet.command_id;
 
@@ -151,7 +153,7 @@ public:
   ConeLightNetworking(ConeLight *cone_light);
   ~ConeLightNetworking();
   void configure_web_server();
-  void handle_websocket();
+  void handle_websocket(AsyncWebSocket *server, AsyncWebSocketClient *client, const uint8_t *data, size_t length);
   String websocket_metadata_payload();
   String websocket_payload();
   void update();
