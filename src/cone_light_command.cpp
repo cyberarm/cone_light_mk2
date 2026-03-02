@@ -158,7 +158,7 @@ void ConeLightCommand_NetColor::handle(ConeLight *cone_light, std::vector<String
 void ConeLightCommand_Config::handle(ConeLight *cone_light, std::vector<String> arguments)
 {
   Serial.printf("Firmware Info: %s v%s (internal v%d)\n", CONE_LIGHT_PRODUCT_NAME, CONE_LIGHT_FIRMWARE_VERSION_NAME, CONE_LIGHT_FIRMWARE_VERSION);
-  Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %s)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), (cone_light->node_grandmaster_clock() ? "true" : "false"));
+  Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %s, remote: %s, access point password: %s)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), (cone_light->node_grandmaster_clock() ? "true" : "false"), (cone_light->node_remote() ? "true" : "false"), cone_light->node_access_point_password());
 }
 
 // CONFIGURE
@@ -169,11 +169,13 @@ void ConeLightCommand_Configure::handle(ConeLight *cone_light, std::vector<Strin
 
   String node_name = arguments[2];
   bool node_grandmaster_clock = arguments[3][0] == 't';
+  bool node_remote = arguments[4][0] == 't';
+  String node_access_point_password = arguments[5];
 
-  cone_light->reconfigure_node(node_id, node_group, node_name, node_grandmaster_clock);
+  cone_light->reconfigure_node(node_id, node_group, node_name, node_grandmaster_clock, node_remote, node_access_point_password);
 
   Serial.println("Reconfigured node.");
-  Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %s)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), (cone_light->node_grandmaster_clock() ? "true" : "false"));
+  Serial.printf("Node Info: %s (id: %d, group: %d, grandmaster clock: %s, remote: %s, access point password: %s)\n", cone_light->node_name().c_str(), cone_light->node_id(), cone_light->node_group_id(), (cone_light->node_grandmaster_clock() ? "true" : "false"), (cone_light->node_remote() ? "true" : "false"), cone_light->node_access_point_password());
 }
 
 // MEMORY_USAGE

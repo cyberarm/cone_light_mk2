@@ -97,7 +97,8 @@ void ConeLightInputHandler::handle_lid(int raw_state)
 
     m_cone_light->lid_event(current_state);
 
-    Serial.printf("LID CHANGED: %s -> %s | %d\n", "LID", lid_state.c_str(), millis());
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("LID CHANGED: %s -> %s | %d\n", "LID", lid_state.c_str(), millis());
   }
 }
 

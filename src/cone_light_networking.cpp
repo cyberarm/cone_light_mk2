@@ -64,20 +64,24 @@ void ConeLightNetworking::configure_web_server()
   });
 
   m_websocket_handler->onConnect([this](AsyncWebSocket *server, AsyncWebSocketClient *client) {
-    Serial.printf("WS Client %u connected\n", client->id());
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("WS Client %u connected\n", client->id());
     server->text(client->id(), websocket_metadata_payload());
     server->text(client->id(), websocket_payload());
   });
   m_websocket_handler->onDisconnect([](AsyncWebSocket *server, uint32_t client_id) {
-    Serial.printf("WS Client %u disconnected\n", client_id);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("WS Client %u disconnected\n", client_id);
   });
 
   m_websocket_handler->onError([this](AsyncWebSocket *server, AsyncWebSocketClient *client, uint16_t error_code, const char *reason, size_t length) {
-    Serial.printf("WS Client %u error: %u: %s\n", client->id(), error_code, reason);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("WS Client %u error: %u: %s\n", client->id(), error_code, reason);
   });
 
   m_websocket_handler->onMessage([this](AsyncWebSocket *server, AsyncWebSocketClient *client, const uint8_t *data, size_t length) {
-    Serial.printf("WS Client %u data: %s\n", client->id(), (const char *)data);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("WS Client %u data: %s\n", client->id(), (const char *)data);
     handle_websocket(server, client, data, length);
   });
 
@@ -297,7 +301,8 @@ void ConeLightNetworking::on_data_received(const esp_now_recv_info_t *esp_now_in
   // Received packet cannot be handled, node identifier mismatch or repeated packet/command id
   if (!m_known_nodes[packet.node_id].ingest_packet(esp_now_info, packet))
   {
-    Serial.printf("Networking: Rejected packet due to node identifier mismatch or repeated packet/command id.\n");
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("Networking: Rejected packet due to node identifier mismatch or repeated packet/command id.\n");
     return;
   }
 

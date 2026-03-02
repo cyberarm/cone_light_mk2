@@ -60,7 +60,7 @@ public:
   bool node_grandmaster_clock();
   bool node_remote();
   String node_access_point_password();
-  bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock);
+  bool reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock, bool node_remote, String node_access_point_password);
   void boot_complete();
   bool screensaver() { return m_screensaver; };
   void update_screensaver();

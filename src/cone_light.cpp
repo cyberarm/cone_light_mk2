@@ -146,19 +146,23 @@ String ConeLight::node_access_point_password()
   return m_node_access_point_password;
 }
 
-bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock)
+bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock, bool node_remote, String node_access_point_password)
 {
   m_preferences.begin(CONE_LIGHT_PREFERENCES_ID);
   m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_ID, node_id);
   m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, node_group);
   m_preferences.putString(CONE_LIGHT_PREFERENCES_NODE_NAME, node_name);
   m_preferences.putBool(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, node_grandmaster_clock);
+  m_preferences.putBool(CONE_LIGHT_PREFERENCES_NODE_REMOTE, node_remote);
+  m_preferences.putString(CONE_LIGHT_PREFERENCES_NODE_ACCESS_POINT_PASSWORD, node_access_point_password);
   m_preferences.end();
 
   m_node_id = node_id;
   m_node_group = node_group;
   m_node_name = node_name;
   m_node_grandmaster_clock = node_grandmaster_clock;
+  m_node_remote = node_remote;
+  m_node_access_point_password = node_access_point_password;
 
   return true;
 }

@@ -140,8 +140,8 @@ public:
   ConeLightCommand_Configure()
   {
     m_name = "configure";
-    m_help = "configure <node_id> <node_group_id> <node_name> <node_grandmaster_clock> | configure 0 1 HOBBIT false | configures node properties";
-    m_argument_count = 4;
+    m_help = "configure <node_id> <node_group_id> <node_name> <node_grandmaster_clock> <node_remote> <node_access_point_password> | configure 0 1 HOBBIT false true password | configures node properties";
+    m_argument_count = 6;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };

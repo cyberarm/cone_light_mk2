@@ -180,13 +180,15 @@ bool ConeLight_App_MainMenu::button_down(ConeLightButton btn)
     if (m_app_index > m_max_app_index)
       m_app_index = 2;
 
-    Serial.printf("%d\n", m_app_index);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("%d\n", m_app_index);
 
     m_needs_redraw = true;
     break;
   case SELECT_BUTTON:
     m_cone_light->current_app()->blur();
-    Serial.printf("SELECTED: %s\n", m_cone_light->applications()[m_app_index]->name().c_str());
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("SELECTED: %s\n", m_cone_light->applications()[m_app_index]->name().c_str());
     m_cone_light->set_current_app(m_cone_light->applications()[m_app_index]);
     m_cone_light->current_app()->focus();
     break;
@@ -197,7 +199,8 @@ bool ConeLight_App_MainMenu::button_down(ConeLightButton btn)
     if (m_app_index > m_max_app_index)
       m_app_index = 2;
 
-    Serial.printf("%d\n", m_app_index);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("%d\n", m_app_index);
 
     m_needs_redraw = true;
     break;
@@ -511,7 +514,8 @@ bool ConeLight_App_Songs::button_down(ConeLightButton btn)
     if (m_song_index > m_max_song_index)
       m_song_index = m_max_song_index;
 
-    Serial.printf("%d\n", m_song_index);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("%d\n", m_song_index);
 
     m_needs_redraw = true;
     break;
@@ -533,7 +537,8 @@ bool ConeLight_App_Songs::button_down(ConeLightButton btn)
     if (m_song_index > m_max_song_index)
       m_song_index = 0;
 
-    Serial.printf("%d\n", m_song_index);
+    if (CONE_LIGHT_DEBUG)
+      Serial.printf("%d\n", m_song_index);
 
     m_needs_redraw = true;
     break;
