@@ -1,0 +1,121 @@
+*
+  padding: 0px
+  margin: 0px
+  box-sizing: border-box
+
+html
+  width: 100%
+  height: 100%
+
+body
+  width: 100%
+  min-height: 100%
+  background: #63452c
+  font-family: system-ui, NotoSans, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif
+  color: #eee
+  display: flex
+  flex-direction: row
+  justify-content: center
+
+dialog
+  &:modal
+    min-width: 100%
+    min-height: 100%
+    background-color: #000d
+    border: none
+    padding: 1rem
+    display: flex
+    flex-direction: row
+    justify-content: center
+    align-items: center
+  .card
+    background-color: #63452c
+    color: #eee
+    max-width: 540px
+    .column
+      justify-content: center
+      max-width: 540px
+      align-items: center
+  img
+    max-width: 128px
+  progress
+    width: 100%
+
+hr
+  margin-top: 1rem
+  border: none
+  height: 1rem
+  background: #0001
+  border-radius: 10pt
+
+details
+  summary
+    cursor: pointer
+
+.container
+  width: 100%
+  max-width: 540pt
+  margin: 1rem
+
+.card
+  display: flex
+  flex-direction: column
+  background: #986a44
+  border-radius: 10pt
+  padding: 0.5rem
+  margin-top: 1rem
+
+  ::marker
+    color: #cdab8f
+    text-shadow: none
+
+  details
+    summary
+      font-size: 1rem
+      font-weight: bold
+
+  .row
+    display: flex
+    flex-direction: row
+    flex-wrap: wrap
+
+  .column
+    display: flex
+    flex-direction: column
+
+  .item
+    color: #210
+    display: flex
+    flex-direction: column
+    background: #cdab8f
+    flex-grow: 1
+    border-radius: 10pt
+    padding: 0.5rem
+    margin: 0.5rem
+
+  .action
+    width: 100%
+
+  .node
+    color: #210
+    display: flex
+    flex-direction: column
+    aspect-ratio: 1/1
+    text-align: center
+    background: #cdab8f
+    border-radius: 10pt
+    padding: 0.5rem
+    margin: 0.5rem
+
+    img
+      width: 100%
+      flex-grow: 1
+
+    meter
+      width: 100%
+
+    @media screen and (width < 540px)
+      min-width: calc(50% - 1rem)
+
+    @media screen and (width >= 540px)
+      max-width: calc(50% - 1rem)
