@@ -221,6 +221,7 @@ class ConeLightRemote {
       this.DIALOG.close();
       // nuke existing node data
       document.querySelector("#node_groups").innerHTML = "";
+      this.NODES = [];
 
       if (this.interval_id) clearInterval(this.interval_id);
 
@@ -288,13 +289,15 @@ class ConeLightRemote {
       document.querySelector("#remote_node_voltage"),
     );
 
-    if (!payload.data.nodes) return;
+    if (!payload.data.nodes) payload.data.nodes = [];
 
     let changed_node = false;
+    let node_ids = [];
     for (const node of payload.data.nodes) {
       if (node.id == 255) continue;
 
       const node_div = document.querySelector(`[data-node_id="${node.id}"]`);
+      node_ids.push(node.id);
 
       if (node_div) {
         this.update_node(node);
@@ -302,6 +305,21 @@ class ConeLightRemote {
         changed_node = true;
         this.add_node(node);
       }
+    }
+
+    for (const node of this.NODES) {
+      if (!node) continue;
+
+      let found = false;
+
+      for (const node_id of node_ids) {
+        if (node.id == node_id) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) this.remove_node(node);
     }
 
     if (changed_node) this.populate_select_node();
@@ -425,11 +443,16 @@ class ConeLightRemote {
 
   remove_node(node) {
     const node_group_div = document.querySelector(
-      `[data-group_id="${node.group_id}"]`,
+      `[data-group_id="${node.group_id}"] .row`,
     );
     const node_div = document.querySelector(`[data-node_id="${node.id}"]`);
 
-    if (node_group_div && node_div) node_group_div.removeChild(node_div);
+    if (node_group_div && node_div) {
+      delete this.NODES[node.id];
+      node_group_div.removeChild(node_div);
+
+      this.populate_select_node();
+    }
   }
 
   populate_select_tone() {
