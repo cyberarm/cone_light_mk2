@@ -674,7 +674,7 @@ void ConeLight_App_ClusterInfo::draw()
   for (size_t i = 0; i < CONE_LIGHT_NETWORKING_MAX_NODES; i++)
   {
     cone_light_networking_node_tracker node = m_cone_light->networking()->node(i);
-    if (node.timestamp == 0)
+    if (node.timestamp == 0 || millis() - node.last_receive_timestamp >= CONE_LIGHT_NETWORKING_PING_TIME_OUT_MS)
       continue;
 
     data_available = true;

@@ -100,12 +100,12 @@ void ConeLightCommand_NetTone::handle(ConeLight *cone_light, std::vector<String>
   uint16_t duration = arguments[1].toInt();
   uint8_t group_id = arguments[2].toInt();
 
-  uint32_t packed_note_duration = uint32_t{note} << 16 | uint32_t{duration};
+  uint32_t packed_note_and_duration = uint32_t{note} << 16 | uint32_t{duration};
 
   cone_light_network_packet_t packet = {};
   packet.command_id = cone_light->networking()->next_command_id();
   packet.command_type = ConeLightNetworkCommand::PLAY_TONE;
-  packet.command_parameters = packed_note_duration;
+  packet.command_parameters = packed_note_and_duration;
   packet.command_parameters_extra = group_id;
 
   cone_light->networking()->broadcast_packet(packet);

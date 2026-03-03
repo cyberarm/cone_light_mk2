@@ -95,11 +95,15 @@ void ConeLightNetworking::handle_websocket(AsyncWebSocket *server, AsyncWebSocke
 
   deserializeJson(doc, reinterpret_cast<const char*>(data));
 
+  // See: https://arduinojson.org/v7/known-issues/#known-issue-6-operators-return-type
   String command = doc["data"]["command"] | "unknown";
-  uint16_t target_group = doc["data"]["target_group"] | 1024;
-  uint16_t target_node = doc["data"]["target_node"]   | 1024;
-  uint32_t parameter_0 = doc["data"]["parameters"][0] | 0;
-  uint32_t parameter_1 = doc["data"]["parameters"][1] | 0;
+  uint16_t target_group = doc["data"]["target_group"] | 1024U;
+  uint16_t target_node = doc["data"]["target_node"]   | 1024U;
+  uint32_t parameter_0 = doc["data"]["parameters"][0] | 0U;
+  uint32_t parameter_1 = doc["data"]["parameters"][1] | 0U;
+
+  if (CONE_LIGHT_DEBUG && command != "payload")
+    Serial.printf("WS: command: %s, target_group: %u, target_node: %u, parameter_0: %u, parameter_1: %u\n", command, target_group, target_node, parameter_0, parameter_1);
 
   cone_light_network_packet_t packet = {};
 
@@ -108,27 +112,35 @@ void ConeLightNetworking::handle_websocket(AsyncWebSocket *server, AsyncWebSocke
 
   } else if (command == "color") {
     packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = (target_group == 255) ? ConeLightNetworkCommand::SET_COLOR : ConeLightNetworkCommand::SET_GROUP_COLOR;
+    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::SET_GROUP_COLOR : ConeLightNetworkCommand::SET_COLOR;
     packet.command_parameters = parameter_0;
-    packet.command_parameters_extra = (target_group < 255) ? target_group : 255;
+    packet.command_parameters_extra = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node;
 
     m_cone_light->networking()->broadcast_packet(packet, true);
 
   } else if (command == "brightness") {
+    packet.command_id = m_cone_light->networking()->next_command_id();
+    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::SET_GROUP_BRIGHTNESS : ConeLightNetworkCommand::SET_BRIGHTNESS;
+    packet.command_parameters = parameter_0;
+    packet.command_parameters_extra = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node;
+
+    m_cone_light->networking()->broadcast_packet(packet, true);
 
   } else if  (command == "tone") {
+    uint32_t packed_note_and_duration = uint32_t{(uint8_t)parameter_0} << 16 | uint32_t{(uint16_t)parameter_1};
+
     packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = ConeLightNetworkCommand::PLAY_TONE;
-    packet.command_parameters = parameter_0;
-    packet.command_parameters_extra = (target_group < 255) ? target_group : 255;
+    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::PLAY_GROUP_TONE : ConeLightNetworkCommand::PLAY_TONE;
+    packet.command_parameters = packed_note_and_duration;
+    packet.command_parameters_extra = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node;
 
     m_cone_light->networking()->broadcast_packet(packet, true);
 
   } else if  (command == "song") {
     packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
+    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::PLAY_GROUP_SONG : ConeLightNetworkCommand::PLAY_SONG;
     packet.command_parameters = parameter_0;
-    packet.command_parameters_extra = (target_group < 255) ? target_group : 255;
+    packet.command_parameters_extra = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node;
 
     m_cone_light->networking()->broadcast_packet(packet, true);
   }
@@ -183,7 +195,7 @@ String ConeLightNetworking::websocket_payload()
       continue;
 
     /* exclude nodes that haven't pong'd or broadcasted in 10 seconds */
-    if (m_cone_light->network_time()->timestamp() - node.last_receive_timestamp >= 10'000)
+    if (m_cone_light->network_time()->timestamp() - node.last_receive_timestamp >= CONE_LIGHT_NETWORKING_PING_TIME_OUT_MS)
       continue;
 
     doc["data"]["nodes"][i]["id"] = node.node_id;

@@ -155,12 +155,12 @@ public:
 class CyberarmSong
 {
 private:
-  CyberarmSongChannel *m_channels[CONE_LIGHT_SONG_CHANNELS] = {};
+  CyberarmSongChannel *m_channels[CONE_LIGHT_NETWORKING_MAX_NODES] = {};
 
 public:
   CyberarmSong()
   {
-    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_NETWORKING_MAX_NODES; i++)
     {
       m_channels[i] = new CyberarmSongChannel();
     }
@@ -171,7 +171,7 @@ public:
   {
     // Serial.printf("Song#update: channel 0 has %d left of %d notes\n", m_channels[0]->currentNote(), m_channels[0]->noteCount());
 
-    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_NETWORKING_MAX_NODES; i++)
     {
       CyberarmSongChannel *channel = m_channels[i];
 
@@ -184,7 +184,7 @@ public:
 
   bool playing()
   {
-    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_NETWORKING_MAX_NODES; i++)
     {
       CyberarmSongChannel *channel = m_channels[i];
 
@@ -197,7 +197,7 @@ public:
 
   void reset()
   {
-    for (size_t i = 0; i < CONE_LIGHT_SONG_CHANNELS; i++)
+    for (size_t i = 0; i < CONE_LIGHT_NETWORKING_MAX_NODES; i++)
     {
       CyberarmSongChannel *channel = m_channels[i];
 
@@ -215,7 +215,7 @@ public:
 
   CyberarmSongChannel *channel(uint8_t channel_id)
   {
-    if (channel_id >= CONE_LIGHT_SONG_CHANNELS)
+    if (channel_id >= CONE_LIGHT_NETWORKING_MAX_NODES)
       return nullptr;
 
     return m_channels[channel_id];

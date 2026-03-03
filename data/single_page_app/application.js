@@ -203,6 +203,8 @@ class ConeLightRemote {
         }
       });
 
+    this.populate_select_node();
+
     this.connect_websocket();
 
     console.log(
@@ -329,11 +331,23 @@ class ConeLightRemote {
     const color = document.querySelector("#led_control_color");
     const brightness = document.querySelector("#led_control_brightness");
     const select_node = document.querySelector("#tone_control_select_node");
+    const brightness_only = document.querySelector(
+      "#led_control_brightness_only",
+    );
+
+    let value = parseInt(
+      parseInt(brightness.value)
+        .toString(16)
+        .padStart(2, "0")
+        .concat(color.value.replace("#", "")),
+      16,
+    );
 
     let data = {};
     data.data = {};
-    data.data.command = "color"; // "brightness"
-    data.data.parameters = [color.value, parseInt(brightness.value)];
+    data.data.command = brightness_only.checked ? "brightness" : "color";
+    this.set_target_node_or_group(data, "led_control_select_node");
+    data.data.parameters = [value];
 
     this.websocket.send(JSON.stringify(data));
 
@@ -348,6 +362,7 @@ class ConeLightRemote {
     let data = {};
     data.data = {};
     data.data.command = "tone";
+    this.set_target_node_or_group(data, "tone_control_select_node");
     data.data.parameters = [
       parseInt(select_tone.selectedOptions[0].value),
       parseInt(duration.value),
@@ -365,11 +380,22 @@ class ConeLightRemote {
     let data = {};
     data.data = {};
     data.data.command = "song";
+    this.set_target_node_or_group(data, "song_control_select_node");
     data.data.parameters = [parseInt(select_song.selectedOptions[0].value)];
 
     this.websocket.send(JSON.stringify(data));
 
     console.log(data);
+  }
+
+  set_target_node_or_group(data, select_id) {
+    const select = document.querySelector(`#${select_id}`);
+
+    if (true) {
+      data.data.target_node = 255;
+    } else {
+      data.data.target_group = 255;
+    }
   }
 
   add_node_group(group_id, group_name) {
@@ -504,37 +530,41 @@ class ConeLightRemote {
 
       select.add(option_all);
 
-      // groups label
-      const optgroup_group = document.createElement("optgroup");
-      optgroup_group.label = "Node Group";
-      select.add(optgroup_group);
+      if (this.GROUPS.length > 0) {
+        // groups label
+        const optgroup_group = document.createElement("optgroup");
+        optgroup_group.label = "Node Group";
+        select.add(optgroup_group);
 
-      // groups
-      let i = 0;
-      for (const group of this.GROUPS) {
-        const option_group = document.createElement("option");
-        option_group.value = `G${i}`;
-        option_group.text = `${i}:${group} Group`;
+        // groups
+        let i = 0;
+        for (const group of this.GROUPS) {
+          const option_group = document.createElement("option");
+          option_group.value = `G${i}`;
+          option_group.text = `${i}:${group} Group`;
 
-        optgroup_group.appendChild(option_group);
+          optgroup_group.appendChild(option_group);
 
-        i++;
+          i++;
+        }
       }
 
-      // nodes label
-      const optgroup_name = document.createElement("optgroup");
-      optgroup_name.label = "Individual Node";
-      select.add(optgroup_name);
+      if (this.NODES.length > 0) {
+        // nodes label
+        const optgroup_name = document.createElement("optgroup");
+        optgroup_name.label = "Individual Node";
+        select.add(optgroup_name);
 
-      // nodes
-      for (const node of this.NODES) {
-        if (!node) continue;
+        // nodes
+        for (const node of this.NODES) {
+          if (!node) continue;
 
-        const option_node = document.createElement("option");
-        option_node.value = `n${node.id}`;
-        option_node.text = `${node.name}:${node.id}:${node.group_id} Node`;
+          const option_node = document.createElement("option");
+          option_node.value = `n${node.id}`;
+          option_node.text = `${node.name}:${node.id}:${node.group_id} Node`;
 
-        optgroup_name.appendChild(option_node);
+          optgroup_name.appendChild(option_node);
+        }
       }
     }
   }

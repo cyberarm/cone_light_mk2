@@ -259,13 +259,18 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
 
   case ConeLightNetworkCommand::SET_COLOR:
   case ConeLightNetworkCommand::SET_GROUP_COLOR:
+  case ConeLightNetworkCommand::SET_BRIGHTNESS:
+  case ConeLightNetworkCommand::SET_GROUP_BRIGHTNESS:
     m_lighting->handle_packet(packet);
     break;
 
   case ConeLightNetworkCommand::PLAY_TONE:
+  case ConeLightNetworkCommand::PLAY_GROUP_TONE:
   case ConeLightNetworkCommand::PLAY_SONG:
+  case ConeLightNetworkCommand::PLAY_GROUP_SONG:
     m_speaker->handle_packet(packet);
     break;
+
   default:
     break;
   }

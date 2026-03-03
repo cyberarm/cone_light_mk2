@@ -85,11 +85,11 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
     return;
   }
 
-  printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", cone_light_song_titles[song_id].c_str(), node_id, cone_light_song_notes[(song_id * CONE_LIGHT_SONG_CHANNELS) + m_cone_light->node_id()].size());
-
   m_song->set_channel(SPEAKER_PIN, node_id, (song_id * CONE_LIGHT_SONG_CHANNELS) + m_cone_light->node_id());
   animate_leds_with_song();
   m_song_playing = true;
+
+  printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", cone_light_song_titles[song_id].c_str(), node_id, m_song->channel(node_id)->song_real_note_count());
 }
 
 void ConeLightSpeaker::play_tone(uint8_t note, uint16_t duration)
@@ -107,22 +107,34 @@ void ConeLightSpeaker::play_tone(uint8_t note, uint16_t duration)
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
 {
-  uint8_t node_group_id = packet.command_parameters_extra;
+  uint8_t node_or_group_id = packet.command_parameters_extra;
 
   // Ignore packets not mean for this node
-  // node group 255 is unset/all groups
-  if (node_group_id != 255 && m_cone_light->node_group_id() != node_group_id)
-    return;
+  // node or group 255 is unset/all groups
+  if (node_or_group_id != 255)
+  {
+    // nodes
+    if (packet.command_type == PLAY_SONG || packet.command_type == PLAY_TONE)
+      if (m_cone_light->node_id() != node_or_group_id)
+        return;
+
+    // groups
+    if (packet.command_type == PLAY_GROUP_SONG || packet.command_type == PLAY_GROUP_TONE)
+      if (m_cone_light->node_group_id() != node_or_group_id)
+        return;
+  }
 
   // TODO: Introduce a time delay?
 
   switch (packet.command_type)
   {
   case PLAY_SONG:
+  case PLAY_GROUP_SONG:
     play_song(packet.command_parameters);
     break;
 
   case PLAY_TONE:
+  case PLAY_GROUP_TONE:
   {
     uint16_t frequency = (packet.command_parameters >> 16 & 0xFFFF);
     uint16_t duration = (packet.command_parameters >> 0 & 0xFFFF);
