@@ -2,8 +2,8 @@ class ConeLightRemote {
   constructor() {
     this.VERSION = "0.1.0";
 
-    this.TX_POWER = -21.0;
-    this.PATH_LOSS = 3.25;
+    this.TX_POWER = 21.0;
+    this.PATH_LOSS = 8.25;
     this.CONE_LIGHT_MIN_VOLTAGE = 4.6;
     this.CONE_LIGHT_MAX_VOLTAGE = 5.6;
     this.CONE_LIGHT_VOLTAGE_LOW = 4.8;
@@ -391,10 +391,13 @@ class ConeLightRemote {
   set_target_node_or_group(data, select_id) {
     const select = document.querySelector(`#${select_id}`);
 
-    if (true) {
-      data.data.target_node = 255;
+    if (Array.from(select.value)[0] === "G") {
+      data.data.target_group = parseInt(select.value.replace("G", ""));
+    }
+    if (Array.from(select.value)[0] === "N") {
+      data.data.target_node = parseInt(select.value.replace("N", ""));
     } else {
-      data.data.target_group = 255;
+      data.data.target_node = 255;
     }
   }
 
@@ -560,7 +563,7 @@ class ConeLightRemote {
           if (!node) continue;
 
           const option_node = document.createElement("option");
-          option_node.value = `n${node.id}`;
+          option_node.value = `N${node.id}`;
           option_node.text = `${node.name}:${node.id}:${node.group_id} Node`;
 
           optgroup_name.appendChild(option_node);
