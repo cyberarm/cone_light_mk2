@@ -169,11 +169,18 @@ class ConeLightRemote {
       item.src = this.CONE_LIGHT_EMBED_ICON;
     });
 
+    const led_auto_update = document.querySelector("#led_control_auto_update");
+    document
+      .querySelector("#led_control_color")
+      .addEventListener("input", (event) => {
+        if (led_auto_update.checked) this.handle_led_request();
+      });
     document
       .querySelector("#led_control_brightness")
       .addEventListener("input", (event) => {
         document.querySelector("#led_control_brightness_label").innerHTML =
           `${event.target.value}`;
+        if (led_auto_update.checked) this.handle_led_request();
       });
     document
       .querySelector("#tone_control_select_duration")
