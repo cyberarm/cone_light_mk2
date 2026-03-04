@@ -4,9 +4,13 @@ require "terser"
 
 root_path = File.expand_path("../data/single_page_app", __dir__)
 
+# native color pickers suck :'(
+coloris_css = File.read("#{root_path}/coloris.min.css")
+coloris_js = File.read("#{root_path}/coloris.min.js")
+
 css = Sass.compile("#{root_path}/style.sass", style: :compressed).css
 js = Terser.compile(File.read("#{root_path}/application.js")) # minify js
-html = Tilt.new("#{root_path}/index.slim").render(nil, css: css, js: js)
+html = Tilt.new("#{root_path}/index.slim").render(nil, coloris_css: coloris_css, coloris_js: coloris_js, css: css, js: js)
 
 File.write("#{root_path}/../cone_light.html", html)
 

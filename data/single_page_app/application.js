@@ -169,17 +169,32 @@ class ConeLightRemote {
       item.src = this.CONE_LIGHT_EMBED_ICON;
     });
 
+    Coloris({
+      theme: "pill",
+      themeMode: "dark",
+      alpha: true,
+      forceAlpha: true,
+      swatches: [
+        /** Coloris doesn't preserve current 'alpha' value when selecting a swatch color :'( */
+        // "#ff3f00",
+        // "#ffbf00",
+        // "#bfff00",
+        // "#3fff00",
+        // "#00ff3f",
+        // "#00ffbf",
+        // "#00bfff",
+        // "#003fff",
+        // "#3f00ff",
+        // "#bf00ff",
+        // "#ff00bf",
+        // "#ff003f",
+      ],
+    });
+
     const led_auto_update = document.querySelector("#led_control_auto_update");
     document
       .querySelector("#led_control_color")
       .addEventListener("input", (event) => {
-        if (led_auto_update.checked) this.handle_led_request();
-      });
-    document
-      .querySelector("#led_control_brightness")
-      .addEventListener("input", (event) => {
-        document.querySelector("#led_control_brightness_label").innerHTML =
-          `${event.target.value}`;
         if (led_auto_update.checked) this.handle_led_request();
       });
     document
@@ -336,19 +351,15 @@ class ConeLightRemote {
 
   handle_led_request() {
     const color = document.querySelector("#led_control_color");
-    const brightness = document.querySelector("#led_control_brightness");
     const select_node = document.querySelector("#tone_control_select_node");
     const brightness_only = document.querySelector(
       "#led_control_brightness_only",
     );
 
-    let value = parseInt(
-      parseInt(brightness.value)
-        .toString(16)
-        .padStart(2, "0")
-        .concat(color.value.replace("#", "")),
-      16,
-    );
+    // convert RGBA to ARGB
+    let color_value = color.value.replace("#", "").slice(0, 6);
+    let brightness_value = color.value.replace("#", "").slice(6, 8);
+    let value = parseInt(`${brightness_value}${color_value}`, 16);
 
     let data = {};
     data.data = {};

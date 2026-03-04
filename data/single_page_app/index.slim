@@ -4,6 +4,8 @@ html[data-theme="dark" lang="en"]
     meta[charset="UTF-8"]
     meta[content="width=device-width, initial-scale=1.0" name="viewport"]
     title Cone Light MK.II System
+    style == coloris_css
+    script == coloris_js
     style == css
     script == js
   body
@@ -39,11 +41,7 @@ html[data-theme="dark" lang="en"]
           .row
             .item
               label Choose color
-              input#led_control_color[type="color" value="#ffffff"]
-            .item
-              label[for="led_control_brightness"] Choose brightness
-              input#led_control_brightness[name="led_control_brightness" type="range" min="0" max="255" value="25"]
-              p#led_control_brightness_label 25
+              input#led_control_color[type="text" value="#ffffff" data-coloris]
             .item
               label[for="led_control_select_node"] Choose node or group
               select#led_control_select_node.select_node[name="led_control_select_node"]
