@@ -20,7 +20,7 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
     return;
   }
 
-  // Set Long Range mode
+  // Set Low Rate mode (enables longer range, probably.)
   esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_LR);
 
   esp_now_register_send_cb(cone_light_networking_send_callback);
@@ -60,7 +60,9 @@ void ConeLightNetworking::configure_web_server()
   m_websocket = new AsyncWebSocket("/ws", m_websocket_handler->eventHandler());
 
   m_web_server->on("/", HTTP_GET, [this](AsyncWebServerRequest *request) {
-    request->send(200, "text/html", data_cone_light_html);
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", data_cone_light_html, data_cone_light_html_len);
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
   });
 
   m_websocket_handler->onConnect([this](AsyncWebSocket *server, AsyncWebSocketClient *client) {
