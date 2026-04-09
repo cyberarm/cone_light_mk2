@@ -4,11 +4,18 @@ class ConeLightRemote {
 
     this.TX_POWER = 21.0;
     this.PATH_LOSS = 8.25;
+
     this.CONE_LIGHT_MIN_VOLTAGE = 4.6;
     this.CONE_LIGHT_MAX_VOLTAGE = 5.6;
     this.CONE_LIGHT_VOLTAGE_LOW = 4.8;
     this.CONE_LIGHT_VOLTAGE_MED = 5.1;
     this.CONE_LIGHT_VOLTAGE_HIGH = 5.3;
+
+    this.REMOTE_MIN_VOLTAGE = 4.2;
+    this.REMOTE_MAX_VOLTAGE = 3.4;
+    this.REMOTE_VOLTAGE_LOW = 3.56;
+    this.REMOTE_VOLTAGE_MED = 3.8;
+    this.REMOTE_VOLTAGE_HIGH = 3.96;
 
     // midi piano note labels
     this.MIDI_NOTES = [
@@ -294,6 +301,9 @@ class ConeLightRemote {
       index++;
     }
 
+    this.REMOTE_MIN_VOLTAGE = payload.data.metadata.min_voltage;
+    this.REMOTE_MAX_VOLTAGE = payload.data.metadata.max_voltage;
+
     this.GROUPS = payload.data.metadata.groups;
     this.TONES = payload.data.metadata.tones;
     this.SONGS = payload.data.metadata.songs;
@@ -311,6 +321,7 @@ class ConeLightRemote {
       `${payload.data.remote.voltage.toFixed(3)}v`;
     this.configure_battery_meter(
       document.querySelector("#remote_node_voltage"),
+      true,
     );
 
     if (!payload.data.nodes) payload.data.nodes = [];
@@ -590,13 +601,23 @@ class ConeLightRemote {
     }
   }
 
-  configure_battery_meter(element) {
-    element.min = this.CONE_LIGHT_MIN_VOLTAGE;
-    element.max = this.CONE_LIGHT_MAX_VOLTAGE;
+  configure_battery_meter(element, remote) {
+    element.min = remote
+      ? this.REMOTE_MIN_VOLTAGE
+      : this.CONE_LIGHT_MIN_VOLTAGE;
+    element.max = remote
+      ? this.REMOTE_MAX_VOLTAGE
+      : this.CONE_LIGHT_MAX_VOLTAGE;
 
-    element.low = this.CONE_LIGHT_VOLTAGE_LOW;
-    element.high = this.CONE_LIGHT_VOLTAGE_MED;
-    element.optimum = this.CONE_LIGHT_VOLTAGE_HIGH;
+    element.low = remote
+      ? this.REMOTE_VOLTAGE_LOW
+      : this.CONE_LIGHT_VOLTAGE_LOW;
+    element.high = remote
+      ? this.REMOTE_VOLTAGE_MED
+      : this.CONE_LIGHT_VOLTAGE_MED;
+    element.optimum = remote
+      ? this.REMOTE_VOLTAGE_HIGH
+      : this.CONE_LIGHT_VOLTAGE_HIGH;
   }
 
   distance_meters(rssi) {
