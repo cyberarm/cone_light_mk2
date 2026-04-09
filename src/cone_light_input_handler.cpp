@@ -4,6 +4,9 @@ ConeLightInputHandler::ConeLightInputHandler(ConeLight *cone_light)
 {
   m_cone_light = cone_light;
 
+  if (!m_cone_light->node_remote())
+    pinMode(LID_PIN, INPUT_PULLUP);
+
   Serial.println("    InputHandler initialized successfully.");
 }
 
@@ -17,7 +20,8 @@ void ConeLightInputHandler::update()
   handle_button(MIDDLE_BUTTON, digitalRead(BTN_B_PIN), m_fuzzy_btn_b_state, m_last_btn_b_state, m_btn_b_state_changed_ms);
   handle_button(DOWN_BUTTON, digitalRead(BTN_C_PIN), m_fuzzy_btn_c_state, m_last_btn_c_state, m_btn_c_state_changed_ms);
 
-  handle_lid(digitalRead(LID_PIN));
+  if (!m_cone_light->node_remote())
+    handle_lid(digitalRead(LID_PIN));
 }
 
 void ConeLightInputHandler::handle_button(ConeLightButton btn, int raw_state, ConeLightEvent &fuzzy_state, ConeLightEvent &previous_state, uint32_t &state_changed_ms)

@@ -3,6 +3,7 @@
 // FIX: Fix ADAFRUIT_SSD1306 and FastLED conflicting with each other
 //      causing an INSANELY long error output that PlatformIO IDE and Arduino IDE
 //      cannot display the initial error...
+#include "cone_light_ambient_light.h"
 #define NO_ADAFRUIT_SSD1306_COLOR_COMPATIBILITY
 
 // Disable Adafruit splash screen

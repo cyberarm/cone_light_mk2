@@ -13,6 +13,7 @@
 #include "cone_light_application.h"
 #include "cone_light_networking.h"
 #include "cone_light_network_time.h"
+#include "cone_light_ambient_light.h"
 
 // Forward declarations... 💔 you C 😿
 class ConeLightCommandHandler;
@@ -24,6 +25,7 @@ class ConeLightVoltage;
 class ConeLightApplication;
 class ConeLightNetworking;
 class ConeLightNetworkTime;
+class ConeLightAmbientLight;
 typedef struct cone_light_network_packet cone_light_network_packet_t;
 
 class ConeLight
@@ -37,6 +39,8 @@ private:
   ConeLightVoltage *m_voltage = nullptr;
   ConeLightNetworking *m_networking = nullptr;
   ConeLightNetworkTime *m_network_time = nullptr;
+  ConeLightAmbientLight *m_ambient_light = nullptr;
+
   ConeLightApplication *m_current_app = nullptr;
   std::vector<ConeLightApplication *> m_applications = {};
   Preferences m_preferences;
@@ -82,4 +86,5 @@ public:
   ConeLightVoltage *voltage() { return m_voltage; }
   ConeLightNetworking *networking() { return m_networking; }
   ConeLightNetworkTime *network_time() { return m_network_time; }
+  ConeLightAmbientLight *ambient_light() { return m_ambient_light; }
 };

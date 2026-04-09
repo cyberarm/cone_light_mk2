@@ -10,8 +10,6 @@ ConeLight::ConeLight()
   pinMode(BTN_B_PIN, INPUT_PULLUP);
   pinMode(BTN_C_PIN, INPUT_PULLUP);
 
-  pinMode(LID_PIN, INPUT_PULLUP);
-
   // Load node specific data from Preferences
   Serial.println("  Loading node preferences data...");
   m_preferences.begin(CONE_LIGHT_PREFERENCES_ID);
@@ -33,6 +31,7 @@ ConeLight::ConeLight()
   m_voltage = new ConeLightVoltage(this);
   m_networking = new ConeLightNetworking(this);
   m_network_time = new ConeLightNetworkTime(this);
+  m_ambient_light = new ConeLightAmbientLight(this);
 
   // Boot/Splash screen
   m_applications.push_back(new ConeLight_App_BootScreen(this));
@@ -60,6 +59,7 @@ ConeLight::ConeLight()
 
 ConeLight::~ConeLight()
 {
+  delete m_ambient_light;
   delete m_network_time;
   delete m_networking;
   delete m_voltage;
@@ -83,6 +83,7 @@ void ConeLight::update()
   m_voltage->update();
   m_networking->update();
   m_network_time->update();
+  m_ambient_light->update();
 
   update_screensaver();
   if (m_screensaver)

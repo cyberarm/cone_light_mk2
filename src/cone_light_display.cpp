@@ -67,11 +67,16 @@ void ConeLightDisplay::draw_widget_bar()
   m_display->drawFastVLine(42 + 24, 0, m_widget_bar_height, SSD1306_WHITE);
 
   // Display LID indicator
-  m_display->print(m_cone_light->input_handler()->lid_open() ? " LID" : "    ");
+  if (!m_cone_light->node_remote())
+    m_display->print(m_cone_light->input_handler()->lid_open() ? " LID" : "    ");
   m_display->drawFastVLine(42 + 24 + 24, 0, m_widget_bar_height, SSD1306_WHITE);
 
   // // Display master clock sync status
   // m_display->print((m_cone_light->network_time()->is_clock_synced() && std::abs(m_cone_light->network_time()->offset()) < 25) ? " SYNC" : "     ");
+
+  // Display ambient light average percentage
+  if (m_cone_light->node_remote())
+    m_display->print(std::format(" {:2d}%", static_cast<uint32_t>(m_cone_light->ambient_light()->ambient_light_average_percentage())).c_str());
 
   // Display battery voltage meter
   const float battery_width = 30;
