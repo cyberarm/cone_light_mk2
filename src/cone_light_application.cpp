@@ -633,11 +633,11 @@ void ConeLight_App_BatteryInfo::draw()
 
   // Minimum voltage
   oled()->setCursor(6, 64 / 2 - 4 + half_widget_height);
-  oled()->printf("%.2fv", VOLTAGE_MIN);
+  oled()->printf("%.2fv", m_cone_light->node_remote() ? VOLTAGE_LIPO_MIN : VOLTAGE_NIMH_MIN);
 
   // Maximum voltage
   oled()->setCursor(96, 64 / 2 - 4 + half_widget_height);
-  oled()->printf("%.2fv", VOLTAGE_MAX);
+  oled()->printf("%.2fv", m_cone_light->node_remote() ? VOLTAGE_LIPO_MAX : VOLTAGE_NIMH_MAX);
 
   // Current voltage
   oled()->setCursor(128 / 2 - 20, 64 / 2 - battery_height / 2 + half_widget_height + battery_height + 4);

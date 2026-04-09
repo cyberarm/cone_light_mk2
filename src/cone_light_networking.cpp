@@ -156,8 +156,8 @@ String ConeLightNetworking::websocket_metadata_payload()
   doc["data"]["type"] = "metadata";
   doc["data"]["metadata"]["firmware_version"] = CONE_LIGHT_FIRMWARE_VERSION_NAME;
   doc["data"]["metadata"]["protocol_version"] = CONE_LIGHT_FIRMWARE_VERSION;
-  doc["data"]["metadata"]["min_voltage"] = VOLTAGE_MIN;
-  doc["data"]["metadata"]["max_voltage"] = VOLTAGE_MAX;
+  doc["data"]["metadata"]["min_voltage"] = m_cone_light->node_remote() ? VOLTAGE_LIPO_MIN : VOLTAGE_NIMH_MIN;
+  doc["data"]["metadata"]["max_voltage"] = m_cone_light->node_remote() ? VOLTAGE_LIPO_MAX : VOLTAGE_NIMH_MAX;
   doc["data"]["metadata"]["groups"][0] = CONE_LIGHT_NODE_GROUP_0_NAME;
   doc["data"]["metadata"]["groups"][1] = CONE_LIGHT_NODE_GROUP_1_NAME;
 

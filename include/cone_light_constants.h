@@ -43,7 +43,7 @@ static constexpr uint8_t CONE_LIGHT_NETWORKING_MAX_NODES = 12;
 static constexpr uint32_t CONE_LIGHT_NETWORKING_PING_TIME_OUT_MS = 10'000;
 
 // Updated whenever changes are made. YYYY.MM.DD
-static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.03.02";
+static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.04.08";
 // Used for backward incompatible changes
 static constexpr uint8_t CONE_LIGHT_FIRMWARE_VERSION = 4;
 
@@ -68,8 +68,11 @@ static constexpr uint8_t CONE_LIGHT_SONG_CHANNELS = 8;
 static constexpr int8_t CONE_LIGHT_SONG_END_NOTE = -64;
 
 // 1.4v * 4
-static constexpr float VOLTAGE_MAX = 5.6f;
+static constexpr float VOLTAGE_NIMH_MAX = 5.6f;
 // 1.15v * 4
-static constexpr float VOLTAGE_MIN = 4.6f;
+static constexpr float VOLTAGE_NIMH_MIN = 4.6f;
+
+static constexpr float VOLTAGE_LIPO_MAX = 4.2f;
+static constexpr float VOLTAGE_LIPO_MIN = 3.4f;
 
 static constexpr uint16_t SCREENSAVER_TIMEOUT_MS = 60'000;

@@ -39,7 +39,7 @@ void ConeLightDisplay::update()
   m_last_battery_meter_width = m_battery_meter_width;
 
   float voltage_ratio = m_cone_light->voltage()->voltage_percentage() / 100.0;
-  m_battery_meter_width = (int8_t)(16 * voltage_ratio);
+  m_battery_meter_width = (int8_t)(28 * voltage_ratio);
 
   m_last_lid_state = m_cone_light->input_handler()->lid_open();
   m_last_sync_state = m_cone_light->network_time()->is_clock_synced();
@@ -74,10 +74,12 @@ void ConeLightDisplay::draw_widget_bar()
   // m_display->print((m_cone_light->network_time()->is_clock_synced() && std::abs(m_cone_light->network_time()->offset()) < 25) ? " SYNC" : "     ");
 
   // Display battery voltage meter
-  m_display->drawRect(103, 3, 20, m_widget_bar_height - 6, SSD1306_WHITE);
-  m_display->drawRect(123, m_widget_bar_height / 2 - 2, 2, 4, SSD1306_WHITE);
+  const float battery_width = 30;
+  m_display->drawRect(93, 3, battery_width, m_widget_bar_height - 6, SSD1306_WHITE);
+  // --- battery electrode
+  m_display->drawRect(93 + battery_width, m_widget_bar_height / 2 - 2, 2, 4, SSD1306_WHITE);
   // --- battery bar
-  m_display->fillRect(105, 5, m_battery_meter_width, m_widget_bar_height - 10, SSD1306_WHITE);
+  m_display->fillRect(95, 5, m_battery_meter_width, m_widget_bar_height - 10, SSD1306_WHITE);
 }
 
 void ConeLightDisplay::draw_up_arrow(uint16_t x, uint16_t y, uint16_t color)

@@ -18,12 +18,6 @@ public:
   void reset();
   float read_voltage();
   float voltage();
-  float voltage_percentage()
-  {
-    return voltage_percentage(m_voltage);
-  }
-  float voltage_percentage(float voltage)
-  {
-    return std::clamp((voltage - VOLTAGE_MIN) / (VOLTAGE_MAX - VOLTAGE_MIN), 0.0f, 1.0f) * 100.0f;
-  }
+  float voltage_percentage();
+  float voltage_percentage(float voltage);
 };

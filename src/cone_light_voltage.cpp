@@ -45,3 +45,16 @@ float ConeLightVoltage::voltage()
 {
   return m_voltage;
 }
+
+float ConeLightVoltage::voltage_percentage()
+{
+  return voltage_percentage(m_voltage);
+}
+
+float ConeLightVoltage::voltage_percentage(float voltage)
+{
+  if (m_cone_light->node_remote())
+    return std::clamp((voltage - VOLTAGE_LIPO_MIN) / (VOLTAGE_LIPO_MAX - VOLTAGE_LIPO_MIN), 0.0f, 1.0f) * 100.0f;
+  else
+    return std::clamp((voltage - VOLTAGE_NIMH_MIN) / (VOLTAGE_NIMH_MAX - VOLTAGE_NIMH_MIN), 0.0f, 1.0f) * 100.0f;
+}
