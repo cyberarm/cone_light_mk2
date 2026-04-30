@@ -23,6 +23,9 @@ ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
   // Set Low Rate mode (enables longer range, probably.)
   esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_LR);
 
+  // Set transmit power
+  esp_wifi_set_max_tx_power(CONE_LIGHT_NETWORKING_TX_POWER);
+
   esp_now_register_send_cb(cone_light_networking_send_callback);
   esp_now_register_recv_cb(cone_light_networking_recv_callback);
 

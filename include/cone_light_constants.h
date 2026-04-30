@@ -41,6 +41,7 @@ static const char *CONE_LIGHT_NETWORKING_PROTOCOL_ID = "CONE";
 static const char *CONE_LIGHT_NETWORKING_ACCESS_POINT_NAME = "Cone Light MK.II System";
 static constexpr uint8_t CONE_LIGHT_NETWORKING_MAX_NODES = 12;
 static constexpr uint32_t CONE_LIGHT_NETWORKING_PING_TIME_OUT_MS = 10'000;
+static constexpr int8_t CONE_LIGHT_NETWORKING_TX_POWER = 80; // = v * 0.25 dBm (20 dBm)
 
 // Updated whenever changes are made. YYYY.MM.DD
 static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.04.08";
