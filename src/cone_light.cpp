@@ -54,6 +54,7 @@ ConeLight::ConeLight()
 
   m_last_input_change_ms = millis();
   m_screensaver = false;
+  m_screensaver_enabled = true;
 
   Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
 }
@@ -281,7 +282,7 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
 void ConeLight::update_screensaver()
 {
   // Put display to 'sleep' after a bit of inactivity to preserve the oled display
-  if (millis() - m_last_input_change_ms >= SCREENSAVER_TIMEOUT_MS)
+  if (m_screensaver_enabled && millis() - m_last_input_change_ms >= SCREENSAVER_TIMEOUT_MS)
   {
     if (!m_screensaver)
     {
@@ -307,4 +308,9 @@ void ConeLight::update_screensaver()
     if (m_current_app)
       m_current_app->focus();
   }
+}
+
+void ConeLight::set_screensaver_enabled(bool enabled)
+{
+  m_screensaver_enabled = enabled;
 }

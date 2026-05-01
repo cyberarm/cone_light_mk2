@@ -224,6 +224,8 @@ ConeLight_App_BigRedButton(ConeLight *cone_light) : ConeLightApplication(cone_li
   m_cone_light = cone_light;
   m_app_name = "Big Red Button";
 };
+void focus();
+void blur();
 void draw();
 bool button_down(ConeLightButton btn);
 bool button_held(ConeLightButton btn);

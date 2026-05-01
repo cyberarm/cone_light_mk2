@@ -51,7 +51,7 @@ private:
   bool m_node_remote = false;
   String m_node_access_point_password = CONE_LIGHT_NODE_ACCESS_POINT_PASSWORD_UNSET;
   uint32_t m_last_input_change_ms = 0;
-  bool m_screensaver = false;
+  bool m_screensaver = false, m_screensaver_enabled = true;
   bool m_muted = CONE_LIGHT_MUTED;
 
 public:
@@ -68,6 +68,7 @@ public:
   void boot_complete();
   bool screensaver() { return m_screensaver; };
   void update_screensaver();
+  void set_screensaver_enabled(bool enabled);
   bool muted() { return m_muted; };
   void set_muted(bool mute) { m_muted = mute; };
   ConeLightApplication *current_app() { return m_current_app; };

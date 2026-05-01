@@ -723,27 +723,36 @@ bool ConeLight_App_ClusterInfo::button_down(ConeLightButton btn)
 //////////////////////////////
 //--- Big Red Button App ---//
 //////////////////////////////
-///
-/// FIXME: DISABLE SCREENSAVER
+void ConeLight_App_BigRedButton::focus()
+{
+  m_needs_redraw = true;
+  m_cone_light->set_screensaver_enabled(false);
+}
+
+void ConeLight_App_BigRedButton::blur()
+{
+  m_cone_light->set_screensaver_enabled(true);
+}
+
 void ConeLight_App_BigRedButton::draw()
 {
-  oled()->setCursor(24, 36);
   oled()->setTextSize(2);
+
+  oled()->setCursor(24, 36);
   oled()->printf("NODE: %d", m_cone_light->node_id());
+
   oled()->setTextSize(1);
+
+  m_needs_redraw = false;
 }
 
 bool ConeLight_App_BigRedButton::button_down(ConeLightButton btn)
 {
-  //--- ignore input from not SELECT button
-  if (btn != SELECT_BUTTON)
-    return false;
-
   cone_light_network_packet_t packet = {};
 
   packet.command_id = m_cone_light->networking()->next_command_id();
   packet.command_type = ConeLightNetworkCommand::NOT_A_COMMAND;
-  packet.command_parameters = 0;
+  packet.command_parameters = btn;
   packet.command_parameters_extra = 0;
 
   m_cone_light->networking()->broadcast_packet(packet, true);
