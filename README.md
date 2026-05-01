@@ -16,6 +16,7 @@ ESP32-C6 MCU connected to an OLED display, 6 WS2812b leds, and an active beeper.
   - Adafruit_GFX
 - AsyncTCP
 - ESPAsyncWebServer
+- ArduinoJson
 
 ## Development
 

@@ -59,13 +59,14 @@ void ConeLightCommand_Song::handle(ConeLight *cone_light, std::vector<String> ar
 void ConeLightCommand_NetSong::handle(ConeLight *cone_light, std::vector<String> arguments)
 {
   uint16_t song_id = arguments[0].toInt();
-  uint8_t group_id = arguments[1].toInt();
+  uint8_t target_node_or_group_id = arguments[1].toInt();
+  bool is_group = arguments[2].charAt(0) == 't';
 
   cone_light_network_packet_t packet = {};
   packet.command_id = cone_light->networking()->next_command_id();
-  packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
+  packet.command_type = is_group ? ConeLightNetworkCommand::PLAY_GROUP_SONG : ConeLightNetworkCommand::PLAY_SONG;
   packet.command_parameters = song_id;
-  packet.command_parameters_extra = group_id;
+  packet.command_parameters_extra = target_node_or_group_id;
 
   cone_light->networking()->broadcast_packet(packet);
   // inject packet into the commanding node to make it handle the command itself too
@@ -98,15 +99,16 @@ void ConeLightCommand_NetTone::handle(ConeLight *cone_light, std::vector<String>
 {
   uint8_t note = arguments[0].toInt();
   uint16_t duration = arguments[1].toInt();
-  uint8_t group_id = arguments[2].toInt();
+  uint8_t target_node_or_group_id = arguments[2].toInt();
+  bool is_group = arguments[3].charAt(0) == 't';
 
   uint32_t packed_note_and_duration = uint32_t{note} << 16 | uint32_t{duration};
 
   cone_light_network_packet_t packet = {};
   packet.command_id = cone_light->networking()->next_command_id();
-  packet.command_type = ConeLightNetworkCommand::PLAY_TONE;
+  packet.command_type = is_group ? ConeLightNetworkCommand::PLAY_GROUP_TONE : ConeLightNetworkCommand::PLAY_TONE;
   packet.command_parameters = packed_note_and_duration;
-  packet.command_parameters_extra = group_id;
+  packet.command_parameters_extra = target_node_or_group_id;
 
   cone_light->networking()->broadcast_packet(packet);
   // inject packet into the commanding node to make it handle the command itself too
@@ -136,7 +138,8 @@ void ConeLightCommand_NetColor::handle(ConeLight *cone_light, std::vector<String
           green = arguments[1].toInt(),
           blue = arguments[2].toInt(),
           brightness = arguments[3].toInt(),
-          group_id = arguments[4].toInt();
+          target_node_or_group_id = arguments[4].toInt();
+  bool is_group = arguments[5].charAt(0) == 't';
 
   uint32_t packed_color = uint32_t{brightness} << 24 |
                           (uint32_t{red} << 16) |
@@ -145,9 +148,9 @@ void ConeLightCommand_NetColor::handle(ConeLight *cone_light, std::vector<String
 
   cone_light_network_packet_t packet = {};
   packet.command_id = cone_light->networking()->next_command_id();
-  packet.command_type = (group_id == 255) ? ConeLightNetworkCommand::SET_COLOR : ConeLightNetworkCommand::SET_GROUP_COLOR;
+  packet.command_type = is_group ? ConeLightNetworkCommand::SET_GROUP_COLOR : ConeLightNetworkCommand::SET_COLOR;
   packet.command_parameters = packed_color;
-  packet.command_parameters_extra = group_id;
+  packet.command_parameters_extra = target_node_or_group_id;
 
   cone_light->networking()->broadcast_packet(packet);
   // inject packet into the commanding node to make it handle the command itself too

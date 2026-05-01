@@ -55,8 +55,8 @@ public:
   ConeLightCommand_NetSong()
   {
     m_name = "net_song";
-    m_help = "net_song <song_id> <group_id> | song 0 255";
-    m_argument_count = 2;
+    m_help = "net_song <song_id> <group_or_node_id> <is_group> | song 0 255 true";
+    m_argument_count = 3;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
@@ -92,8 +92,8 @@ public:
   ConeLightCommand_NetTone()
   {
     m_name = "net_tone";
-    m_help = "net_tone <midi note> <duration milliseconds> <group_id> | tone 68 100 255";
-    m_argument_count = 3;
+    m_help = "net_tone <midi note> <duration milliseconds> <group_or_node_id> <is_group> | tone 68 100 255 true";
+    m_argument_count = 4;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
@@ -116,8 +116,8 @@ public:
   ConeLightCommand_NetColor()
   {
     m_name = "net_color";
-    m_help = "net_color <red> <green> <blue> <brightness> <group_id> | color 210 21 2 255 255";
-    m_argument_count = 5;
+    m_help = "net_color <red> <green> <blue> <brightness> <group_or_node_id> <is_group> | color 210 21 2 255 255 true";
+    m_argument_count = 6;
   };
   void handle(ConeLight *cone_light, std::vector<String> arguments);
 };
