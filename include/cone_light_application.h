@@ -199,6 +199,7 @@ class ConeLight_App_ClusterInfo : public ConeLightApplication
 private:
   uint32_t m_last_refresh_ms = 0;
   const uint32_t m_refresh_interval_ms = 1000;
+
 public:
 ConeLight_App_ClusterInfo(ConeLight *cone_light) : ConeLightApplication(cone_light)
 {
@@ -209,6 +210,24 @@ ConeLight_App_ClusterInfo(ConeLight *cone_light) : ConeLightApplication(cone_lig
 void draw();
 void update();
 bool button_down(ConeLightButton btn);
+};
+
+class ConeLight_App_BigRedButton : public ConeLightApplication
+{
+private:
+  uint32_t m_last_refresh_ms = 0;
+  const uint32_t m_refresh_interval_ms = 1000;
+
+public:
+ConeLight_App_BigRedButton(ConeLight *cone_light) : ConeLightApplication(cone_light)
+{
+  m_cone_light = cone_light;
+  m_app_name = "Big Red Button";
+};
+void draw();
+bool button_down(ConeLightButton btn);
+bool button_held(ConeLightButton btn);
+void espnow_recv(cone_light_network_packet_t packet);
 };
 
 ///////////////////////
