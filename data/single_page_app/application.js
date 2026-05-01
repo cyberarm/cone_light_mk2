@@ -2,9 +2,9 @@ class ConeLightRemote {
   constructor() {
     this.VERSION = "0.1.0";
 
-    this.TX_POWER = 21.0;
-    this.PATH_LOSS = 8.25;
-
+    this.TX_POWER = -21.0;
+    this.PATH_LOSS = 3.45; // FAR
+    this.PATH_LOSS_NEAR = 4.45; // NEAR
     this.CONE_LIGHT_MIN_VOLTAGE = 4.6;
     this.CONE_LIGHT_MAX_VOLTAGE = 5.6;
     this.CONE_LIGHT_VOLTAGE_LOW = 4.8;
