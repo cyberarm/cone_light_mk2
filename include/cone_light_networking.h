@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cone_light_constants.h"
 #include "cone_light_network_packet.h"
 #include "cone_light.h"
 #include <esp_now.h>
@@ -85,11 +86,17 @@ typedef struct cone_light_networking_node_tracker
   // "path loss model"
   const double distance_meters()
   {
-    const double tx_power = -21.0f;
-    const double path_loss = 3.25f;
-    const double exp = (tx_power - m_rssi) / (10 * path_loss);
+    const double normal_distance = pow(10, (RSSI_TX_POWER - m_rssi) / (10 * RSSI_PATH_LOSS));
 
-    return pow(10, exp);
+    // if node is "close" then use `RSSI_PATH_LOSS_NEAR` for better nearby distance approximation
+    if (normal_distance <= RSSI_THRESHOLD_NEAR_METERS)
+      return pow(10, (RSSI_TX_POWER - m_rssi) / (10 * RSSI_PATH_LOSS_NEAR));
+
+    return normal_distance;
+  }
+
+  const double meters_to_feet(double meters) {
+    return (meters * 39.37008) / 12.0;
   }
 
 } cone_light_networking_node_tracker_t;

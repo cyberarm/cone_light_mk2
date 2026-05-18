@@ -5,6 +5,8 @@ class ConeLightRemote {
     this.TX_POWER = -21.0;
     this.PATH_LOSS = 3.45; // FAR
     this.PATH_LOSS_NEAR = 4.45; // NEAR
+    this.THRESHOLD_NEAR_METERS = 16.0;
+
     this.CONE_LIGHT_MIN_VOLTAGE = 4.6;
     this.CONE_LIGHT_MAX_VOLTAGE = 5.6;
     this.CONE_LIGHT_VOLTAGE_LOW = 4.8;
@@ -621,9 +623,13 @@ class ConeLightRemote {
   }
 
   distance_meters(rssi) {
-    let exp = (this.TX_POWER - rssi) / (10 * this.PATH_LOSS);
+    let normal_distance =
+      10 ** ((this.TX_POWER - rssi) / (10 * this.PATH_LOSS));
 
-    return 10 ** exp;
+    if (normal_distance <= this.THRESHOLD_NEAR_METERS)
+      return 10 ** ((this.TX_POWER - rssi) / (10 * this.PATH_LOSS_NEAR));
+
+    return normal_distance;
   }
 
   meters_to_feet(meters) {
