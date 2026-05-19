@@ -22,7 +22,7 @@ ESP32-C6 MCU connected to an OLED display, 6 WS2812b leds, and an active beeper.
 
 ### Arduino IDE
 
-> IMPORTANT: set 'partition scheme' under tools menu to 'No OTA' (2MB/2MB) since compiled firmware is to large to fit with space reserved for Over-The-Air updates.
+> IMPORTANT: set 'partition scheme' under tools menu to 'Huge App' (3MB/1MB) since compiled firmware is to large to fit with space reserved for Over-The-Air updates.
 
 Manually compile with arduino-cli when compilation output gets cut off
 

@@ -65,19 +65,20 @@ class CyberarmSongChannel
   end
 end
 
-def song_to_json(category, name, transpose, notes, durations)
+def song_to_json(category, name, transpose, notes, durations, waterfalled)
   {
     category: category,
     name: name,
     transpose: transpose,
     notes: notes,
-    durations: durations
+    durations: durations,
+    waterfalled: waterfalled
 }.to_json
 end
 
 failed_list = []
 available_channels = 8
-output = File.open("./midis.jsonl", "w") do |f|
+output = File.open("./data/midis.jsonl", "w") do |f|
   # Write abort "song"
   f.puts(
     song_to_json(
@@ -85,7 +86,8 @@ output = File.open("./midis.jsonl", "w") do |f|
       "ABORT PLAYBACK",
       0,
       available_channels.times.map { [-1] },
-      available_channels.times.map { [0] }
+      available_channels.times.map { [0] },
+      false
     )
   )
 
@@ -187,7 +189,8 @@ output = File.open("./midis.jsonl", "w") do |f|
         File.basename(file_path, "_cone_light.mid").split("_").map(&:capitalize).join(" "),
         transpose,
         channels.map { |c| c.notes.map(&:note) },
-        channels.map { |c| c.notes.map(&:duration_ms) }
+        channels.map { |c| c.notes.map(&:duration_ms) },
+        waterfalled
       )
     )
   end
