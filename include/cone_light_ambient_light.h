@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "cone_light_constants.h"
+#include "cone_light.h"
 
 // forward declaration...
 class ConeLight;

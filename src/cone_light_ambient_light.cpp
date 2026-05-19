@@ -4,7 +4,8 @@ ConeLightAmbientLight::ConeLightAmbientLight(ConeLight *cone_light)
 {
   m_cone_light = cone_light;
 
-  pinMode(LDR_PIN, INPUT);
+  if (m_cone_light->node_remote())
+    pinMode(LDR_PIN, INPUT);
 
   Serial.println("    Ambient Light initialized successfully.");
 }
@@ -15,7 +16,7 @@ ConeLightAmbientLight::~ConeLightAmbientLight()
 
 void ConeLightAmbientLight::update()
 {
-  if (millis() - m_last_updated_ms >= m_update_interval_ms)
+  if (m_cone_light->node_remote() && millis() - m_last_updated_ms >= m_update_interval_ms)
   {
     m_last_updated_ms = millis();
 

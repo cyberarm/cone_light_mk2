@@ -33,6 +33,7 @@ void ConeLightDisplay::update()
 {
   // Check wether widget bar needs to be redrawn
   m_widget_bar_needs_redraw = m_last_lid_state != m_cone_light->input_handler()->lid_open() ||
+                              m_last_ambient_light_percentage != m_cone_light->ambient_light()->ambient_light_percentage() ||
                               m_last_sync_state != m_cone_light->network_time()->is_clock_synced() ||
                               m_last_battery_meter_width != m_battery_meter_width;
 
@@ -42,6 +43,7 @@ void ConeLightDisplay::update()
   m_battery_meter_width = (int8_t)(28 * voltage_ratio);
 
   m_last_lid_state = m_cone_light->input_handler()->lid_open();
+  m_last_ambient_light_percentage = m_cone_light->ambient_light()->ambient_light_percentage();
   m_last_sync_state = m_cone_light->network_time()->is_clock_synced();
 }
 
@@ -76,7 +78,7 @@ void ConeLightDisplay::draw_widget_bar()
 
   // Display ambient light average percentage
   if (m_cone_light->node_remote())
-    m_display->print(std::format(" {:2d}%", static_cast<uint32_t>(m_cone_light->ambient_light()->ambient_light_average_percentage())).c_str());
+    m_display->print(std::format(" {:2d}%", static_cast<uint32_t>(m_cone_light->ambient_light()->ambient_light_percentage())).c_str());
 
   // Display battery voltage meter
   const float battery_width = 30;

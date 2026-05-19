@@ -29,6 +29,7 @@ private:
   uint8_t m_last_battery_meter_width = 16;
   uint8_t m_battery_meter_width = 16;
   bool m_last_lid_state = false;
+  float m_last_ambient_light_percentage = 0.0f;
   bool m_last_sync_state = false;
   bool m_widget_bar_needs_redraw = true;
 
