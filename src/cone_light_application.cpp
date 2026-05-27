@@ -20,19 +20,8 @@ ConeLight_App_BootScreen::ConeLight_App_BootScreen(ConeLight *cone_light) : Cone
   m_fullscreen = true;
 
   // Set default color based on node group
-  // GOLD for group 1, TEAL for group 2, and PURPLE for not configured (group 255).
-  if (m_cone_light->node_group_id() == CONE_LIGHT_NODE_GROUP_0)
-  {
-    m_group_color = COLOR_GOLD;
-  }
-  else if (m_cone_light->node_group_id() == CONE_LIGHT_NODE_GROUP_1)
-  {
-    m_group_color = COLOR_TEAL;
-  }
-  else
-  {
-    m_group_color = COLOR_PURPLE;
-  }
+  // GOLD for group 0, TEAL for group 1, BLACK for group 2, and PURPLE for not configured (group 255).
+  m_group_color = m_cone_light->node_group_color();
 
   m_cone_light->lighting()->set_color(m_boot_color);
   m_cone_light->lighting()->set_static_color(m_group_color);
@@ -597,8 +586,7 @@ void ConeLight_App_NodeInfo::draw()
   oled()->setCursor(78, 30);
   oled()->printf("%u:%u", m_cone_light->node_id(), m_cone_light->node_group_id());
   oled()->setCursor(64, 41);
-  oled()->printf("%s", (m_cone_light->node_group_id() == 0) ? CONE_LIGHT_NODE_GROUP_0_NAME : (m_cone_light->node_group_id() == 1) ? CONE_LIGHT_NODE_GROUP_1_NAME
-                                                                                                                                  : CONE_LIGHT_NODE_GROUP_255_NAME);
+  oled()->printf("%s", m_cone_light->node_group_name());
 }
 
 bool ConeLight_App_NodeInfo::button_down(ConeLightButton btn)

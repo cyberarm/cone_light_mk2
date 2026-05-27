@@ -26,6 +26,8 @@ static constexpr uint8_t CONE_LIGHT_NODE_GROUP_0 = 0;
 static const char *CONE_LIGHT_NODE_GROUP_0_NAME = "BACKSTOP";
 static constexpr uint8_t CONE_LIGHT_NODE_GROUP_1 = 1;
 static const char *CONE_LIGHT_NODE_GROUP_1_NAME = "STOPSIGN";
+static constexpr uint8_t CONE_LIGHT_NODE_GROUP_2 = 2;
+static const char *CONE_LIGHT_NODE_GROUP_2_NAME = "TREELINE"; // REMOTE which mounts to the trees
 static constexpr uint8_t CONE_LIGHT_NODE_GROUP_255 = 255;
 static const char *CONE_LIGHT_NODE_GROUP_255_NAME = "!NOT SET";
 
@@ -44,9 +46,9 @@ static constexpr uint32_t CONE_LIGHT_NETWORKING_PING_TIME_OUT_MS = 10'000;
 static constexpr int8_t CONE_LIGHT_NETWORKING_TX_POWER = 80; // = v * 0.25 dBm (20 dBm)
 
 // Updated whenever changes are made. YYYY.MM.DD
-static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.05.18";
+static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.05.26";
 // Used for backward incompatible changes
-static constexpr uint8_t CONE_LIGHT_FIRMWARE_VERSION = 4;
+static constexpr uint8_t CONE_LIGHT_FIRMWARE_VERSION = 5;
 
 static constexpr uint8_t BTN_A_PIN = D10;
 static constexpr uint8_t BTN_B_PIN = D9;

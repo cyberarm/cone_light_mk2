@@ -14,7 +14,7 @@ ConeLight::ConeLight()
   Serial.println("  Loading node preferences data...");
   m_preferences.begin(CONE_LIGHT_PREFERENCES_ID);
   m_node_id = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_ID, CONE_LIGHT_NODE_ID_UNSET);
-  m_node_group = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_ID_UNSET);
+  m_node_group_id = m_preferences.getUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, CONE_LIGHT_NODE_GROUP_ID_UNSET);
   m_node_name = m_preferences.getString(CONE_LIGHT_PREFERENCES_NODE_NAME, CONE_LIGHT_NODE_NAME_UNSET);
   m_node_grandmaster_clock = m_preferences.getBool(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, CONE_LIGHT_NODE_GRAND_MASTER_CLOCK_UNSET_OR_FALSE);
   m_node_remote = m_preferences.getBool(CONE_LIGHT_PREFERENCES_NODE_REMOTE, CONE_LIGHT_NODE_REMOTE_UNSET_OR_FALSE);
@@ -56,7 +56,7 @@ ConeLight::ConeLight()
   m_screensaver = false;
   m_screensaver_enabled = true;
 
-  Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group);
+  Serial.printf("Initialization of node %s (id: %d, group: %d) completed.\n", m_node_name.c_str(), m_node_id, m_node_group_id);
 }
 
 ConeLight::~ConeLight()
@@ -126,12 +126,48 @@ uint8_t ConeLight::node_id()
 
 uint8_t ConeLight::node_group_id()
 {
-  return m_node_group;
+  return m_node_group_id;
 }
 
 String ConeLight::node_name()
 {
   return m_node_name;
+}
+
+String ConeLight::node_group_name()
+{
+  switch (m_node_group_id) {
+  case 0:
+    return CONE_LIGHT_NODE_GROUP_0_NAME;
+    break;
+  case 1:
+    return CONE_LIGHT_NODE_GROUP_1_NAME;
+    break;
+  case 2:
+    return CONE_LIGHT_NODE_GROUP_2_NAME;
+    break;
+  default:
+    return CONE_LIGHT_NODE_GROUP_255_NAME;
+    break;
+  }
+}
+
+CRGB ConeLight::node_group_color()
+{
+  switch (m_node_group_id) {
+  case 0:
+    return COLOR_GOLD;
+    break;
+  case 1:
+    return COLOR_TEAL;
+    break;
+  case 2:
+    return COLOR_BLACK;
+    break;
+  default:
+    return COLOR_PURPLE;
+    break;
+  }
 }
 
 bool ConeLight::node_grandmaster_clock()
@@ -149,11 +185,11 @@ String ConeLight::node_access_point_password()
   return m_node_access_point_password;
 }
 
-bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String node_name, bool node_grandmaster_clock, bool node_remote, String node_access_point_password)
+bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group_id, String node_name, bool node_grandmaster_clock, bool node_remote, String node_access_point_password)
 {
   m_preferences.begin(CONE_LIGHT_PREFERENCES_ID);
   m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_ID, node_id);
-  m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, node_group);
+  m_preferences.putUChar(CONE_LIGHT_PREFERENCES_NODE_GROUP, node_group_id);
   m_preferences.putString(CONE_LIGHT_PREFERENCES_NODE_NAME, node_name);
   m_preferences.putBool(CONE_LIGHT_PREFERENCES_NODE_GRANDMASTER_CLOCK, node_grandmaster_clock);
   m_preferences.putBool(CONE_LIGHT_PREFERENCES_NODE_REMOTE, node_remote);
@@ -161,7 +197,7 @@ bool ConeLight::reconfigure_node(uint8_t node_id, uint8_t node_group, String nod
   m_preferences.end();
 
   m_node_id = node_id;
-  m_node_group = node_group;
+  m_node_group_id = node_group_id;
   m_node_name = node_name;
   m_node_grandmaster_clock = node_grandmaster_clock;
   m_node_remote = node_remote;

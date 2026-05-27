@@ -7,6 +7,8 @@ typedef struct cone_light_network_packet
   char protocol_id[5];
   uint8_t firmware_version;
   uint32_t packet_id;
+  uint8_t flags;
+  uint32_t acknowledgements;
   uint32_t timestamp; // (unsynced) local time of node
   uint8_t node_id;
   char node_name[7];
