@@ -68,3 +68,9 @@ enum ConeLightLEDControlMode
   GROUP,
   ALL
 };
+
+enum ConeLightPongBit
+{
+  IS_REMOTE = 0,
+  IS_PLAYING,
+};

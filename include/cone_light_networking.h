@@ -3,6 +3,7 @@
 #include "cone_light_constants.h"
 #include "cone_light_network_packet.h"
 #include "cone_light.h"
+#include <bitset>
 #include <esp_now.h>
 #include <esp_wifi.h>
 #include <WiFi.h>
@@ -20,6 +21,7 @@ typedef struct cone_light_networking_node_tracker
   uint8_t m_address[6] = {0};
   int16_t m_rssi = 0;
   float m_voltage = 0.0f;
+  bool m_node_remote = false;
   bool m_playing_song = false;
 
   uint32_t last_receive_timestamp = 0;

@@ -670,7 +670,7 @@ void ConeLight_App_ClusterInfo::draw()
                     node.node_name,
                     node.node_id,
                     node.node_group_id,
-                    m_cone_light->voltage()->voltage_percentage(node.m_voltage),
+                    m_cone_light->voltage()->voltage_percentage(node.m_voltage, node.m_node_remote),
                     node.distance_meters());
     line_height += line_height_step;
     oled()->setCursor(0, line_height);

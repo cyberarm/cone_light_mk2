@@ -19,5 +19,5 @@ public:
   float read_voltage();
   float voltage();
   float voltage_percentage();
-  float voltage_percentage(float voltage);
+  float voltage_percentage(float voltage, bool remote);
 };

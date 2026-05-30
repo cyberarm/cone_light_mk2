@@ -1,5 +1,6 @@
 #include "include/cone_light_networking.h"
 #include "include/cone_light_web_spa.h"
+#include <bitset>
 
 ConeLightNetworking::ConeLightNetworking(ConeLight *cone_light)
 {
@@ -354,11 +355,18 @@ void ConeLightNetworking::handle_ping(const cone_light_network_packet_t &packet)
   const float voltage = m_cone_light->voltage()->voltage();
   memcpy(&packed_voltage, &voltage, sizeof(float));
 
+  // Pack some booleans into a uint32_t (unsigned long)
+  std::bitset<32> bits{0};
+  if (m_cone_light->node_remote())
+    bits.set(ConeLightPongBit::IS_REMOTE);
+  if (m_cone_light->speaker()->playing())
+    bits.set(ConeLightPongBit::IS_PLAYING);
+
   cone_light_network_packet_t pong_pkt{
       .command_id = next_command_id(),
       .command_type = ConeLightNetworkCommand::PONG,
       .command_parameters = packed_voltage,
-      .command_parameters_extra = m_cone_light->speaker()->playing()};
+      .command_parameters_extra = bits.to_ulong()};
 
   // reply to sending node, unreliably.
   send_packet(node_address(packet.node_id), pong_pkt, false);
@@ -371,8 +379,11 @@ void ConeLightNetworking::handle_pong(const cone_light_network_packet_t &packet)
   float voltage;
   memcpy(&voltage, &packet.command_parameters, sizeof(float));
 
+  std::bitset<32> bits{packet.command_parameters_extra};
+
   node.m_voltage = voltage;
-  node.m_playing_song = packet.command_parameters_extra;
+  node.m_node_remote = bits.test(ConeLightPongBit::IS_REMOTE);
+  node.m_playing_song = bits.test(ConeLightPongBit::IS_PLAYING);
 }
 
 //--- non-member functions ---//
