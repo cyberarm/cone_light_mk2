@@ -52,7 +52,7 @@ void ConeLightCommand_Song::handle(ConeLight *cone_light, std::vector<String> ar
 {
   uint16_t song_id = arguments[0].toInt();
 
-  cone_light->speaker()->play_song(song_id);
+  cone_light->speaker()->play_song(song_id, cone_light->speaker()->transpose());
 }
 
 // NET_SONG
@@ -61,12 +61,15 @@ void ConeLightCommand_NetSong::handle(ConeLight *cone_light, std::vector<String>
   uint16_t song_id = arguments[0].toInt();
   uint8_t target_node_or_group_id = arguments[1].toInt();
   bool is_group = arguments[2].charAt(0) == 't';
+  uint32_t packed_parameters =
+      uint32_t{target_node_or_group_id} << 8 |
+      (uint32_t{cone_light->speaker()->transpose()} << 0);
 
   cone_light_network_packet_t packet = {};
   packet.command_id = cone_light->networking()->next_command_id();
   packet.command_type = is_group ? ConeLightNetworkCommand::PLAY_GROUP_SONG : ConeLightNetworkCommand::PLAY_SONG;
   packet.command_parameters = song_id;
-  packet.command_parameters_extra = target_node_or_group_id;
+  packet.command_parameters_extra = packed_parameters;
 
   cone_light->networking()->broadcast_packet(packet);
   // inject packet into the commanding node to make it handle the command itself too
@@ -101,6 +104,9 @@ void ConeLightCommand_NetTone::handle(ConeLight *cone_light, std::vector<String>
   uint16_t duration = arguments[1].toInt();
   uint8_t target_node_or_group_id = arguments[2].toInt();
   bool is_group = arguments[3].charAt(0) == 't';
+  uint32_t packed_parameters =
+      uint32_t{target_node_or_group_id} << 8 |
+      (uint32_t{cone_light->speaker()->transpose()} << 0);
 
   uint32_t packed_note_and_duration = uint32_t{note} << 16 | uint32_t{duration};
 
@@ -108,7 +114,7 @@ void ConeLightCommand_NetTone::handle(ConeLight *cone_light, std::vector<String>
   packet.command_id = cone_light->networking()->next_command_id();
   packet.command_type = is_group ? ConeLightNetworkCommand::PLAY_GROUP_TONE : ConeLightNetworkCommand::PLAY_TONE;
   packet.command_parameters = packed_note_and_duration;
-  packet.command_parameters_extra = target_node_or_group_id;
+  packet.command_parameters_extra = packed_parameters;
 
   cone_light->networking()->broadcast_packet(packet);
   // inject packet into the commanding node to make it handle the command itself too

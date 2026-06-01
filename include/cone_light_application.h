@@ -163,6 +163,25 @@ public:
   bool button_down(ConeLightButton btn);
 };
 
+class ConeLight_App_Transpose : public ConeLightApplication
+{
+private:
+  int8_t m_transpose = 0;
+
+public:
+  ConeLight_App_Transpose(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "Transpose";
+    m_fullscreen = false;
+
+    m_transpose = 0;
+  };
+  void draw();
+  bool button_held(ConeLightButton btn);
+  bool button_down(ConeLightButton btn);
+};
+
 class ConeLight_App_NodeInfo : public ConeLightApplication
 {
 public:

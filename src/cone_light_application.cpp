@@ -514,7 +514,7 @@ bool ConeLight_App_Songs::button_down(ConeLightButton btn)
     packet.command_id = m_cone_light->networking()->next_command_id();
     packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
     packet.command_parameters = m_song_index;
-    packet.command_parameters_extra = 255;
+    packet.command_parameters_extra = uint32_t{255} << 8 | (uint32_t{m_cone_light->speaker()->transpose()} << 0);
 
     m_cone_light->networking()->broadcast_packet(packet, true);
     // inject packet into the commanding node to make it handle the command itself too
@@ -556,6 +556,82 @@ bool ConeLight_App_Songs::button_held(ConeLightButton btn)
   }
 
   return false;
+}
+
+/////////////////////////
+//--- TRANSPOSE APP ---//
+/////////////////////////
+void ConeLight_App_Transpose::draw()
+{
+  oled()->setTextWrap(false);
+
+  // Draw UP arrow
+  display()->draw_up_arrow(7, 2 + display()->widget_bar_height());
+  oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
+  // Draw LEFT arrow (back)
+  display()->draw_left_arrow(7, 32 + (display()->widget_bar_height() / 2) - 1);
+  oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
+  // Draw DOWN arrow
+  display()->draw_down_arrow(7, 64 - (9 + 4));
+
+  // Draw vertical line to box off the arrows and select icon
+  oled()->drawFastVLine(20, display()->widget_bar_height(), 64, SSD1306_WHITE);
+
+  // Border
+  oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
+
+  // Labels
+  oled()->setCursor(42, 3 + display()->widget_bar_height());
+  oled()->print(m_cone_light->speaker()->transpose());
+
+  oled()->setTextWrap(true);
+}
+
+bool ConeLight_App_Transpose::button_held(ConeLightButton btn)
+{
+  switch (btn) {
+  case UP_BUTTON:
+    m_cone_light->speaker()->set_transpose(0);
+    return true;
+    break;
+
+  case DOWN_BUTTON:
+    m_cone_light->speaker()->set_transpose(0);
+    return true;
+    break;
+
+  default:
+    return false;
+    break;
+  }
+}
+
+bool ConeLight_App_Transpose::button_down(ConeLightButton btn)
+{
+  switch (btn)
+  {
+  case UP_BUTTON:
+    m_cone_light->speaker()->set_transpose(m_cone_light->speaker()->transpose() + 1);
+
+    m_needs_redraw = true;
+    break;
+  case SELECT_BUTTON:
+  {
+    m_cone_light->set_current_app_main_menu();
+    break;
+  }
+  case DOWN_BUTTON:
+    m_cone_light->speaker()->set_transpose(m_cone_light->speaker()->transpose() - 1);
+
+    m_needs_redraw = true;
+    break;
+
+  default:
+    return false;
+    break;
+  }
+
+  return true;
 }
 
 //////////////////////////////////

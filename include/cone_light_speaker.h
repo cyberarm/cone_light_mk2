@@ -4,6 +4,7 @@
 #include "cyberarm_song.h"
 #include <FastLED.h>
 #include <Tween.h>
+#include <cstdint>
 
 // Forward declaration...
 class ConeLight;
@@ -23,15 +24,18 @@ private:
   CRGB m_led_song_color = {};
   std::vector<int8_t> m_notes = {0};
   std::vector<uint16_t> m_durations = {0};
+  int8_t m_transpose = 0;
 
 public:
   ConeLightSpeaker(ConeLight *cone_light);
   ~ConeLightSpeaker();
   void update();
   void reset();
-  void play_song(uint16_t song_id);
+  void play_song(uint16_t song_id, int8_t transpose = 0);
   void play_tone(uint8_t note, uint16_t duration);
   bool playing() { return m_song->playing(); };
+  int8_t transpose() { return m_transpose; };
+  void set_transpose(int8_t transpose) { m_transpose = transpose; };
 
   void handle_packet(cone_light_network_packet_t packet);
   void animate_leds_with_song();

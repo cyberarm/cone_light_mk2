@@ -213,6 +213,16 @@ class ConeLightRemote {
           `${event.target.value}ms`;
       });
     document
+      .querySelector("#song_control_select_transpose")
+      .addEventListener("input", (event) => {
+        document.querySelector("#song_control_transpose_label").innerHTML =
+          `${event.target.value}`;
+      });
+    document.querySelector("#tone_control_duration_label").innerHTML =
+      `${document.querySelector("#tone_control_select_duration").value}ms`;
+    document.querySelector("#song_control_transpose_label").innerHTML =
+      `${document.querySelector("#song_control_select_transpose").value}`;
+    document
       .querySelector("#led_control_submit")
       .addEventListener("click", (event) => {
         if (this.websocket && this.websocket.readyState == WebSocket.OPEN) {
@@ -406,13 +416,17 @@ class ConeLightRemote {
 
   handle_song_request() {
     const select_song = document.querySelector("#song_control_select_song");
+    const transpose = document.querySelector("#song_control_select_transpose");
     const select_node = document.querySelector("#song_control_select_node");
 
     let data = {};
     data.data = {};
     data.data.command = "song";
     this.set_target_node_or_group(data, "song_control_select_node");
-    data.data.parameters = [parseInt(select_song.selectedOptions[0].value)];
+    data.data.parameters = [
+      parseInt(select_song.selectedOptions[0].value),
+      parseInt(transpose.value),
+    ];
 
     this.websocket.send(JSON.stringify(data));
 

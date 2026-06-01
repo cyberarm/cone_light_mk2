@@ -82,6 +82,11 @@ html[data-theme="dark" lang="en"]
             .item
               label Choose song
               select#song_control_select_song
+              small Songs with an * may rotate baselines and melodies between nodes.
+            .item
+              label[for="song_control_select_transpose"] Choose transpose
+              input#song_control_select_transpose[name="song_control_select_transpose" type="range" min="-36" max="36" value="0"]
+              p#song_control_transpose_label 0
             .item
               label[for="song_control_select_node"] Choose node or group
               select#song_control_select_node.select_node[name="song_control_select_node"]

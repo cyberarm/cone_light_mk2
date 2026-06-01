@@ -42,6 +42,7 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_GroupNodeLEDControl(this));
   m_applications.push_back(new ConeLight_App_AllNodeLEDControl(this));
   m_applications.push_back(new ConeLight_App_Songs(this));
+  m_applications.push_back(new ConeLight_App_Transpose(this));
   m_applications.push_back(new ConeLight_App_NodeInfo(this));
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
   m_applications.push_back(new ConeLight_App_ClusterInfo(this));

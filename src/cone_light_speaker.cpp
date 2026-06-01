@@ -61,7 +61,7 @@ void ConeLightSpeaker::reset()
   m_song->reset();
 }
 
-void ConeLightSpeaker::play_song(uint16_t song_id)
+void ConeLightSpeaker::play_song(uint16_t song_id, int8_t transpose)
 {
   m_song->reset();
 
@@ -85,11 +85,11 @@ void ConeLightSpeaker::play_song(uint16_t song_id)
     return;
   }
 
-  m_song->set_channel(SPEAKER_PIN, node_id, (song_id * CONE_LIGHT_SONG_CHANNELS) + m_cone_light->node_id());
+  m_song->set_channel(SPEAKER_PIN, node_id, (song_id * CONE_LIGHT_SONG_CHANNELS) + m_cone_light->node_id(), -1, 0, transpose);
   animate_leds_with_song();
   m_song_playing = true;
 
-  printf("    Speaker Song: %s, Channel [%d] Notes: %d\n", cone_light_song_titles[song_id].c_str(), node_id, m_song->channel(node_id)->song_real_note_count());
+  printf("    Speaker Song: %s, Channel [%d] Notes: %d, Transpose: %d\n", cone_light_song_titles[song_id].c_str(), node_id, m_song->channel(node_id)->song_real_note_count(), transpose);
 }
 
 void ConeLightSpeaker::play_tone(uint8_t note, uint16_t duration)
@@ -102,12 +102,13 @@ void ConeLightSpeaker::play_tone(uint8_t note, uint16_t duration)
     return;
   }
 
-  m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), 0, note, duration);
+  m_song->set_channel(SPEAKER_PIN, m_cone_light->node_id(), 0, note, duration, 0);
 }
 
 void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
 {
-  uint8_t node_or_group_id = packet.command_parameters_extra;
+  uint8_t node_or_group_id = packet.command_parameters_extra >> 8 & 0xFF;
+  int8_t transpose = packet.command_parameters_extra >> 0;
 
   // Ignore packets not mean for this node
   // node or group 255 is unset/all groups
@@ -130,7 +131,7 @@ void ConeLightSpeaker::handle_packet(cone_light_network_packet_t packet)
   {
   case PLAY_SONG:
   case PLAY_GROUP_SONG:
-    play_song(packet.command_parameters);
+    play_song(packet.command_parameters, transpose);
     break;
 
   case PLAY_TONE:

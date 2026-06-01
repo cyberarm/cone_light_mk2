@@ -30,12 +30,13 @@ private:
 
   int8_t m_note = -1;
   uint16_t m_duration = 0;
+  int8_t m_transpose = 0;
 
 public:
   CyberarmSongChannel() {}
   ~CyberarmSongChannel() {}
 
-  void init(uint8_t pin, uint32_t song_data_index, int8_t note = -1, uint16_t duration = 0)
+  void init(uint8_t pin, uint32_t song_data_index, int8_t note, uint16_t duration, int8_t transpose)
   {
     m_pin = pin;
 
@@ -47,6 +48,7 @@ public:
     m_song_data_index = song_data_index;
     m_note = note;
     m_duration = duration;
+    m_transpose = transpose;
 
     if (note >= 0)
     {
@@ -66,7 +68,7 @@ public:
     }
 
     if (CONE_LIGHT_DEBUG)
-      Serial.printf("Initialized Channel on pin %d with %d notes\n", m_pin, m_song_real_note_count);
+      Serial.printf("Initialized Channel on pin %d, using song data index: %d with %d notes [%p]\n", m_pin, song_data_index, m_song_real_note_count, cone_light_song_notes[song_data_index]);
   }
 
   void reset()
@@ -120,11 +122,12 @@ public:
         if (CONE_LIGHT_DEBUG_WITH_SILENT_SPEAKER)
           ledcWriteTone(m_pin, 0);
         else
-          ledcWriteTone(m_pin, note_to_freq[note]);
+          // play note, transposed if needed. Play silence if transposed note is too high.
+          ledcWriteTone(m_pin, (note + m_transpose >= 128 || note + m_transpose < 0) ? 0 : note_to_freq[note + m_transpose]);
       }
 
       if (CONE_LIGHT_DEBUG)
-        Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, NOTE: %d, DURATION: %ld\n", m_pin, m_current_note_id, note_to_freq[note], note, m_last_note_duration);
+        Serial.printf("PIN: %d, NOTE_ID: %d, FREQUENCY: %d, NOTE: %d, DURATION: %ld, TRANSPOSE: %d\n", m_pin, m_current_note_id, (note + m_transpose >= 128 || note + m_transpose < 0) ? 0 : note_to_freq[note + m_transpose], note, m_last_note_duration, m_transpose);
 
       m_current_note_id++;
     }
@@ -205,12 +208,12 @@ public:
     }
   }
 
-  void set_channel(uint8_t pin, uint8_t channelID, uint32_t song_data_index, int8_t note = -1, uint16_t duration = 0)
+  void set_channel(uint8_t pin, uint8_t channelID, uint32_t song_data_index, int8_t note = -1, uint16_t duration = 0, int8_t transpose = 0)
   {
     CyberarmSongChannel *channel = m_channels[channelID];
 
     channel->reset();
-    channel->init(pin, song_data_index, note, duration);
+    channel->init(pin, song_data_index, note, duration, transpose);
   }
 
   CyberarmSongChannel *channel(uint8_t channel_id)

@@ -106,7 +106,7 @@ void ConeLightNetworking::handle_websocket(AsyncWebSocket *server, AsyncWebSocke
   uint16_t target_group = doc["data"]["target_group"] | 1024U;
   uint16_t target_node = doc["data"]["target_node"]   | 1024U;
   uint32_t parameter_0 = doc["data"]["parameters"][0] | 0U;
-  uint32_t parameter_1 = doc["data"]["parameters"][1] | 0U;
+  int32_t parameter_1 = doc["data"]["parameters"][1] | 0;
 
   if (CONE_LIGHT_DEBUG && command != "payload")
     Serial.printf("WS: command: %s, target_group: %u, target_node: %u, parameter_0: %u, parameter_1: %u\n", command, target_group, target_node, parameter_0, parameter_1);
@@ -143,10 +143,14 @@ void ConeLightNetworking::handle_websocket(AsyncWebSocket *server, AsyncWebSocke
     m_cone_light->networking()->broadcast_packet(packet, true);
 
   } else if  (command == "song") {
+    uint32_t packed_parameters =
+        uint32_t{(target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node} << 8 |
+        (uint32_t{static_cast<int8_t>(parameter_1)} << 0);
+
     packet.command_id = m_cone_light->networking()->next_command_id();
     packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::PLAY_GROUP_SONG : ConeLightNetworkCommand::PLAY_SONG;
     packet.command_parameters = parameter_0;
-    packet.command_parameters_extra = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node;
+    packet.command_parameters_extra = packed_parameters;
 
     m_cone_light->networking()->broadcast_packet(packet, true);
   }
