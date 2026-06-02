@@ -19,6 +19,8 @@ private:
   uint8_t m_history_index = 0;
   uint32_t m_last_updated_ms = 0;
   uint32_t m_update_interval_ms = 3'000;
+  uint32_t m_broadcast_interval_ms = 180'000;
+  uint32_t m_last_broadcast_ms = m_broadcast_interval_ms; // wait `interval` so we have useful data to send
 
 public:
   ConeLightAmbientLight(ConeLight *cone_light);

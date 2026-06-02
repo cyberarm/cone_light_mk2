@@ -28,6 +28,12 @@ void ConeLightAmbientLight::update()
 
     // Serial.printf("AMBIENT LIGHT: %.3fv (%3.1f%%)\n", ambient_light(), ambient_light_percentage());
   }
+
+  // Broadcast ambient light level every 3 minutes to nodes
+  if (m_cone_light->node_remote() && millis() - m_last_broadcast_ms >= m_broadcast_interval_ms)
+  {
+    m_last_broadcast_ms = millis();
+  }
 }
 
 void ConeLightAmbientLight::reset()
