@@ -2,6 +2,7 @@
 
 #include "cone_light_constants.h"
 #include "cone_light_network_packet.h"
+#include "cone_light_network_packets.h"
 #include "cone_light.h"
 #include <bitset>
 #include <esp_now.h>

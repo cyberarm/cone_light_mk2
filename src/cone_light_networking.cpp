@@ -146,14 +146,7 @@ void ConeLightNetworking::handle_websocket(AsyncWebSocket *server, AsyncWebSocke
     m_cone_light->networking()->broadcast_packet(packet, true);
 
   } else if  (command == "song") {
-    uint32_t packed_parameters =
-        uint32_t{(target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node} << 8 |
-        (uint32_t{static_cast<int8_t>(parameter_1)} << 0);
-
-    packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::PLAY_GROUP_SONG : ConeLightNetworkCommand::PLAY_SONG;
-    packet.command_parameters = parameter_0;
-    packet.command_parameters_extra = packed_parameters;
+    packet = cone_light_packet_play_song(parameter_0, static_cast<int8_t>(parameter_1), (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node, target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET);
 
     m_cone_light->networking()->broadcast_packet(packet, true);
   }

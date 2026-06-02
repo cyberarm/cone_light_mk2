@@ -510,11 +510,7 @@ bool ConeLight_App_Songs::button_down(ConeLightButton btn)
     break;
   case SELECT_BUTTON:
   {
-    cone_light_network_packet_t packet = {};
-    packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = ConeLightNetworkCommand::PLAY_SONG;
-    packet.command_parameters = m_song_index;
-    packet.command_parameters_extra = uint32_t{255} << 8 | (uint32_t{m_cone_light->speaker()->transpose()} << 0);
+    cone_light_network_packet_t packet = cone_light_packet_play_song(m_song_index, m_cone_light->speaker()->transpose(), 255);
 
     m_cone_light->networking()->broadcast_packet(packet, true);
     // inject packet into the commanding node to make it handle the command itself too

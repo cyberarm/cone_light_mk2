@@ -61,15 +61,8 @@ void ConeLightCommand_NetSong::handle(ConeLight *cone_light, std::vector<String>
   uint16_t song_id = arguments[0].toInt();
   uint8_t target_node_or_group_id = arguments[1].toInt();
   bool is_group = arguments[2].charAt(0) == 't';
-  uint32_t packed_parameters =
-      uint32_t{target_node_or_group_id} << 8 |
-      (uint32_t{cone_light->speaker()->transpose()} << 0);
 
-  cone_light_network_packet_t packet = {};
-  packet.command_id = cone_light->networking()->next_command_id();
-  packet.command_type = is_group ? ConeLightNetworkCommand::PLAY_GROUP_SONG : ConeLightNetworkCommand::PLAY_SONG;
-  packet.command_parameters = song_id;
-  packet.command_parameters_extra = packed_parameters;
+  cone_light_network_packet_t packet = cone_light_packet_play_song(song_id, cone_light->speaker()->transpose(), target_node_or_group_id, is_group);
 
   cone_light->networking()->broadcast_packet(packet);
   // inject packet into the commanding node to make it handle the command itself too
