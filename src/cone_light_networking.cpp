@@ -117,31 +117,29 @@ void ConeLightNetworking::handle_websocket(AsyncWebSocket *server, AsyncWebSocke
     server->text(client->id(), websocket_payload());
 
   } else if (command == "color") {
-    packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::SET_GROUP_COLOR : ConeLightNetworkCommand::SET_COLOR;
-    packet.command_parameters = parameter_0;
-    packet.command_parameters_extra = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node;
+    packet = cone_light_packet_set_color(
+        parameter_0,
+        (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node,
+        target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET
+    );
 
     m_cone_light->networking()->broadcast_packet(packet, true);
 
   } else if (command == "brightness") {
-    packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::SET_GROUP_BRIGHTNESS : ConeLightNetworkCommand::SET_BRIGHTNESS;
-    packet.command_parameters = parameter_0;
-    packet.command_parameters_extra = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node;
+    packet = cone_light_packet_set_brightness(
+        parameter_0,
+        (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node,
+        target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET
+    );
 
     m_cone_light->networking()->broadcast_packet(packet, true);
 
   } else if  (command == "tone") {
-    uint32_t packed_note_and_duration = uint32_t{(uint8_t)parameter_0} << 16 | uint32_t{(uint16_t)parameter_1};
-    uint32_t packed_parameters =
-        uint32_t{(target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node} << 8 |
-        (uint32_t{static_cast<int8_t>(0)} << 0);
-
-    packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? ConeLightNetworkCommand::PLAY_GROUP_TONE : ConeLightNetworkCommand::PLAY_TONE;
-    packet.command_parameters = packed_note_and_duration;
-    packet.command_parameters_extra = packed_parameters;
+    packet = cone_light_packet_play_tone(
+        parameter_0, parameter_1,
+        (target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET) ? target_group : target_node,
+        target_group < CONE_LIGHT_NODE_GROUP_ID_UNSET
+    );
 
     m_cone_light->networking()->broadcast_packet(packet, true);
 

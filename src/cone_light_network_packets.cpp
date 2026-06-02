@@ -65,36 +65,37 @@ cone_light_packet_clock_node_delay_response(uint32_t timestamp,
 //--- LED CONTROL ---//
 cone_light_network_packet_t
 cone_light_packet_set_color(uint8_t red, uint8_t green, uint8_t blue,
-                            uint8_t brightness, uint8_t node_or_group_id) {
+                            uint8_t brightness, uint8_t node_or_group_id, bool is_group) {
   uint32_t packed_color = uint32_t{brightness} << 24 | (uint32_t{red} << 16) |
                           (uint32_t{green} << 8) | (uint32_t{blue});
 
-  return cone_light_packet_custom(ConeLightNetworkCommand::SET_COLOR,
+  return cone_light_packet_custom(is_group ? ConeLightNetworkCommand::SET_GROUP_COLOR : ConeLightNetworkCommand::SET_COLOR,
                                   packed_color, node_or_group_id);
+}
+
+cone_light_network_packet_t
+cone_light_packet_set_color(uint32_t packed_color, uint8_t node_or_group_id, bool is_group) {
+    return cone_light_packet_custom(is_group ? ConeLightNetworkCommand::SET_GROUP_COLOR : ConeLightNetworkCommand::SET_COLOR,
+                                    packed_color, node_or_group_id);
 }
 
 cone_light_network_packet_t
 cone_light_packet_set_group_color(uint8_t red, uint8_t green, uint8_t blue,
                                   uint8_t brightness,
                                   uint8_t node_or_group_id) {
-  uint32_t packed_color = uint32_t{brightness} << 24 | (uint32_t{red} << 16) |
-                          (uint32_t{green} << 8) | (uint32_t{blue});
-
-  return cone_light_packet_custom(ConeLightNetworkCommand::SET_GROUP_COLOR,
-                                  packed_color, node_or_group_id);
+  return cone_light_packet_set_color(red, green, blue, brightness, node_or_group_id, true);
 }
 
 cone_light_network_packet_t
-cone_light_packet_set_brightness(uint8_t brightness, uint8_t node_or_group_id) {
-  return cone_light_packet_custom(ConeLightNetworkCommand::SET_BRIGHTNESS,
+cone_light_packet_set_brightness(uint8_t brightness, uint8_t node_or_group_id, bool is_group) {
+  return cone_light_packet_custom(is_group ? ConeLightNetworkCommand::SET_GROUP_BRIGHTNESS : ConeLightNetworkCommand::SET_BRIGHTNESS,
                                   brightness, node_or_group_id);
 }
 
 cone_light_network_packet_t
 cone_light_packet_set_group_brightness(uint8_t brightness,
                                        uint8_t node_or_group_id) {
-  return cone_light_packet_custom(ConeLightNetworkCommand::SET_GROUP_BRIGHTNESS,
-                                  brightness, node_or_group_id);
+  return cone_light_packet_set_brightness(brightness, node_or_group_id, true);
 }
 
 //--- TONE / SONG CONTROL ---//

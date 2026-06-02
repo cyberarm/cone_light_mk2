@@ -13,9 +13,7 @@ void ConeLightNetworkTime::broadcast_grandmaster_sync()
 {
   m_last_time_grandmaster_sync_ms = millis();
 
-  cone_light_network_packet_t packet = {};
-  packet.command_id = m_cone_light->networking()->next_command_id();
-  packet.command_type = ConeLightNetworkCommand::CLOCK_GRANDMASTER_SYNC;
+  cone_light_network_packet_t packet = cone_light_packet_clock_grandmaster_sync();
 
   // ConeLightNetworking will set packet timestamp when sending
   m_cone_light->networking()->broadcast_packet(packet);
@@ -26,10 +24,7 @@ void ConeLightNetworkTime::node_delay_request()
   m_last_time_node_delay_request_ms = millis();
   m_node_delay_request_time_ms = millis();
 
-  cone_light_network_packet_t packet = {};
-  packet.command_id = m_cone_light->networking()->next_command_id();
-  packet.command_type = ConeLightNetworkCommand::CLOCK_NODE_DELAY_REQUEST;
-  packet.command_parameters = m_node_delay_request_time_ms;
+  cone_light_network_packet_t packet = cone_light_packet_clock_node_delay_request(m_node_delay_request_time_ms);
 
   // ConeLightNetworking will set packet timestamp when sending
   m_cone_light->networking()->broadcast_packet(packet);
@@ -37,11 +32,7 @@ void ConeLightNetworkTime::node_delay_request()
 
 void ConeLightNetworkTime::node_delay_response(const cone_light_network_packet_t request)
 {
-  cone_light_network_packet_t packet = {};
-  packet.command_id = m_cone_light->networking()->next_command_id();
-  packet.command_type = ConeLightNetworkCommand::CLOCK_NODE_DELAY_RESPONSE;
-  packet.command_parameters = request.timestamp;
-  packet.command_parameters_extra = request.node_id;
+  cone_light_network_packet_t packet = cone_light_packet_clock_node_delay_response(request.timestamp, request.node_id);
 
   // ConeLightNetworking will set packet timestamp when sending
   // TODO: Send packet directly to node instead of broadcasting to all nodes.

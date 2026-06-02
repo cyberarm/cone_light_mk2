@@ -418,16 +418,11 @@ void ConeLight_App_LEDControl::apply_color()
 
   if (m_cone_light_led_control_mode == GROUP || m_cone_light_led_control_mode == ALL)
   {
-    cone_light_network_packet_t packet = {};
-    uint32_t packed_color = uint32_t{m_values[4]} << 24 |
-                            (uint32_t{color.red} << 16) |
-                            (uint32_t{color.green} << 8) |
-                            (uint32_t{color.blue});
-
-    packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = (m_cone_light_led_control_mode == GROUP) ? ConeLightNetworkCommand::SET_GROUP_COLOR : ConeLightNetworkCommand::SET_COLOR;
-    packet.command_parameters = packed_color;
-    packet.command_parameters_extra = m_cone_light->node_group_id();
+    cone_light_network_packet_t packet = cone_light_packet_set_color(
+        color.red, color.green, color.blue, m_values[4],
+        m_cone_light->node_group_id(),
+        m_cone_light_led_control_mode == GROUP
+    );
 
     // send redundant packets if the button is NOT held down
     // FIXME: redundant packets are not sent when button is RELEASED after being HELD
@@ -761,12 +756,7 @@ void ConeLight_App_ClusterInfo::update()
     m_last_refresh_ms = millis();
     m_needs_redraw = true;
 
-    cone_light_network_packet_t packet = {};
-
-    packet.command_id = m_cone_light->networking()->next_command_id();
-    packet.command_type = ConeLightNetworkCommand::PING;
-    packet.command_parameters = 0;
-    packet.command_parameters_extra = 0;
+    cone_light_network_packet_t packet = cone_light_packet_ping();
 
     m_cone_light->networking()->broadcast_packet(packet, true);
   }
@@ -808,12 +798,7 @@ void ConeLight_App_BigRedButton::draw()
 
 bool ConeLight_App_BigRedButton::button_down(ConeLightButton btn)
 {
-  cone_light_network_packet_t packet = {};
-
-  packet.command_id = m_cone_light->networking()->next_command_id();
-  packet.command_type = ConeLightNetworkCommand::NOT_A_COMMAND;
-  packet.command_parameters = btn;
-  packet.command_parameters_extra = 0;
+  cone_light_network_packet_t packet = cone_light_packet_custom(ConeLightNetworkCommand::NOT_A_COMMAND, btn, 0);
 
   m_cone_light->networking()->broadcast_packet(packet, true);
 
@@ -864,10 +849,7 @@ void ConeLight_App_Debug_ESPNow_Sender::update()
   if (millis() - m_last_transmit_ms < 500)
     return;
 
-  cone_light_network_packet_t packet;
-  packet.command_id = m_cone_light->networking()->next_command_id();
-  packet.command_type = ConeLightNetworkCommand::NOT_A_COMMAND;
-  packet.command_parameters = m_packet_id++;
+  cone_light_network_packet_t packet = cone_light_packet_custom(ConeLightNetworkCommand::NOT_A_COMMAND, m_packet_id++, 0);
 
   m_cone_light->networking()->broadcast_packet(packet);
 
