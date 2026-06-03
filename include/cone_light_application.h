@@ -167,6 +167,8 @@ class ConeLight_App_Transpose : public ConeLightApplication
 {
 private:
   int8_t m_transpose = 0;
+  const uint8_t m_transpose_limit = 36;
+  const uint8_t m_octave = 12;
 
 public:
   ConeLight_App_Transpose(ConeLight *cone_light) : ConeLightApplication(cone_light)

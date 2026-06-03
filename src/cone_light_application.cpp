@@ -572,8 +572,16 @@ void ConeLight_App_Transpose::draw()
   oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
 
   // Labels
-  oled()->setCursor(42, 3 + display()->widget_bar_height());
-  oled()->print(m_cone_light->speaker()->transpose());
+  oled()->setCursor(42 - 12, 3 + display()->widget_bar_height());
+  oled()->print("Transpose Songs");
+
+  oled()->setTextSize(2);
+  oled()->setCursor(42, oled()->height() / 2);
+  oled()->printf("%+03d", m_cone_light->speaker()->transpose());
+  oled()->setTextSize(1);
+
+  oled()->setCursor(42, oled()->height() / 2 + 18);
+  oled()->printf("%+d octaves", m_cone_light->speaker()->transpose() / m_octave);
 
   oled()->setTextWrap(true);
 }
@@ -582,12 +590,12 @@ bool ConeLight_App_Transpose::button_held(ConeLightButton btn)
 {
   switch (btn) {
   case UP_BUTTON:
-    m_cone_light->speaker()->set_transpose(0);
+    m_cone_light->speaker()->set_transpose((m_cone_light->speaker()->transpose() == 0) ? m_transpose_limit : 0);
     return true;
     break;
 
   case DOWN_BUTTON:
-    m_cone_light->speaker()->set_transpose(0);
+    m_cone_light->speaker()->set_transpose((m_cone_light->speaker()->transpose() == 0) ? -m_transpose_limit : 0);
     return true;
     break;
 
@@ -599,10 +607,15 @@ bool ConeLight_App_Transpose::button_held(ConeLightButton btn)
 
 bool ConeLight_App_Transpose::button_down(ConeLightButton btn)
 {
+  int8_t transposition = m_cone_light->speaker()->transpose();
+
   switch (btn)
   {
   case UP_BUTTON:
-    m_cone_light->speaker()->set_transpose(m_cone_light->speaker()->transpose() + 1);
+    transposition++;
+    if (transposition > 36)
+      transposition = -36;
+    m_cone_light->speaker()->set_transpose(transposition);
 
     m_needs_redraw = true;
     break;
@@ -612,7 +625,10 @@ bool ConeLight_App_Transpose::button_down(ConeLightButton btn)
     break;
   }
   case DOWN_BUTTON:
-    m_cone_light->speaker()->set_transpose(m_cone_light->speaker()->transpose() - 1);
+    transposition--;
+    if (transposition < -36)
+      transposition = 36;
+    m_cone_light->speaker()->set_transpose(transposition);
 
     m_needs_redraw = true;
     break;
