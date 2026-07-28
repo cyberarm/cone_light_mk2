@@ -641,6 +641,95 @@ bool ConeLight_App_Transpose::button_down(ConeLightButton btn)
   return true;
 }
 
+/////////////////////////////
+//--- AMBIENT LIGHT APP ---//
+/////////////////////////////
+void ConeLight_App_AmbientLight::draw()
+{
+  oled()->setTextWrap(false);
+
+  // title
+  oled()->setCursor(34, display()->widget_bar_height() + 4);
+  oled()->printf("Ambient Light");
+
+  // Draw LEFT arrow (back)
+  display()->draw_left_arrow(7, 2 + display()->widget_bar_height() + 4);
+  oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
+
+  if (!m_cone_light->node_remote())
+  {
+    oled()->setCursor(34, display()->widget_bar_height() + 4 + 12);
+    oled()->printf("Not a remote");
+
+    return;
+  }
+
+  // Draw SELECT icon
+  display()->draw_select_icon(7 + 3, 32 + (display()->widget_bar_height() / 2) - 1);
+  oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
+
+  // Draw vertical line to box off the arrows and select icon
+  oled()->drawFastVLine(20, display()->widget_bar_height(), 64, SSD1306_WHITE);
+
+  // Border
+  oled()->drawRect(0, (display()->widget_bar_height() - 1), 128, 64 - (display()->widget_bar_height() - 1), SSD1306_WHITE);
+
+  uint16_t width = 74;
+  uint16_t height = 8;
+  uint16_t padding = 4;
+  uint16_t x = 24;
+  uint16_t y = oled()->height() / 2 + 12; // display()->widget_bar_height() + 2;
+
+  // CURRENT AMBIENT LIGHT
+  float current_ratio = m_cone_light->ambient_light()->ambient_light_percentage() / 100.0f;
+  // box
+  oled()->drawRect(x, y, width, height, SSD1306_WHITE);
+  // bar
+  oled()->fillRect(x + 2, y + 2, (width - 4) * current_ratio, height - 4, SSD1306_WHITE);
+  // label
+  oled()->setCursor(x + width + 2 + 3, y);
+  oled()->print("CUR");
+
+  // AVERAGE AMBIENT LIGHT
+  float avg_ratio = m_cone_light->ambient_light()->ambient_light_average_percentage() / 100.0f;
+  // box
+  oled()->drawRect(x, y + height + 2, width, 8, SSD1306_WHITE);
+  // bar
+  oled()->fillRect(x + 2, y + height + 2 + 2, (width - 4) * avg_ratio, height - 4, SSD1306_WHITE);
+  // label
+  oled()->setCursor(x + width + 2 + 3, y + height + 2);
+  oled()->print("AVG");
+
+  // Labels
+  oled()->setCursor(x, oled()->height() / 2 + 2);
+  oled()->printf("BROADCAST: %s", m_cone_light->ambient_light()->broadcasting() ? "ON" : "OFF");
+
+  oled()->setTextWrap(true);
+}
+
+bool ConeLight_App_AmbientLight::button_down(ConeLightButton btn)
+{
+  switch (btn)
+  {
+  case UP_BUTTON:
+    m_cone_light->set_current_app_main_menu();
+    break;
+  case SELECT_BUTTON:
+    if (!m_cone_light->node_remote())
+      return false;
+    m_cone_light->ambient_light()->set_broadcasting(!m_cone_light->ambient_light()->broadcasting());
+  {
+    break;
+  }
+
+  default:
+    return false;
+    break;
+  }
+
+  return true;
+}
+
 //////////////////////////////////
 //--- NODE CONFIGURATION APP ---//
 //////////////////////////////////

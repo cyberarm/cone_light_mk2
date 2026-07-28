@@ -43,6 +43,7 @@ ConeLight::ConeLight()
   m_applications.push_back(new ConeLight_App_AllNodeLEDControl(this));
   m_applications.push_back(new ConeLight_App_Songs(this));
   m_applications.push_back(new ConeLight_App_Transpose(this));
+  m_applications.push_back(new ConeLight_App_AmbientLight(this));
   m_applications.push_back(new ConeLight_App_NodeInfo(this));
   m_applications.push_back(new ConeLight_App_BatteryInfo(this));
   m_applications.push_back(new ConeLight_App_ClusterInfo(this));
@@ -301,6 +302,7 @@ void ConeLight::espnow_event(cone_light_network_packet_t packet)
   case ConeLightNetworkCommand::SET_GROUP_COLOR:
   case ConeLightNetworkCommand::SET_BRIGHTNESS:
   case ConeLightNetworkCommand::SET_GROUP_BRIGHTNESS:
+  case ConeLightNetworkCommand::BROADCAST_AMBIENT_LIGHT:
     m_lighting->handle_packet(packet);
     break;
 

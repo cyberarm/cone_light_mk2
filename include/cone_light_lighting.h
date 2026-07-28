@@ -71,4 +71,5 @@ public:
   };
 
   void handle_packet(cone_light_network_packet_t packet);
+  void handle_ambient_light_packet(cone_light_network_packet_t packet);
 };

@@ -184,6 +184,26 @@ public:
   bool button_down(ConeLightButton btn);
 };
 
+class ConeLight_App_AmbientLight : public ConeLightApplication
+{
+private:
+  int8_t m_broadcast = 0;
+  uint32_t m_last_broadcast_ms = 0;
+  const uint32_t m_broadcast_interval_ms = 60'000; // once per minute
+
+public:
+  ConeLight_App_AmbientLight(ConeLight *cone_light) : ConeLightApplication(cone_light)
+  {
+    m_cone_light = cone_light;
+    m_app_name = "Ambient Light";
+    m_fullscreen = false;
+
+    m_last_broadcast_ms = millis();
+  };
+  void draw();
+  bool button_down(ConeLightButton btn);
+};
+
 class ConeLight_App_NodeInfo : public ConeLightApplication
 {
 public:

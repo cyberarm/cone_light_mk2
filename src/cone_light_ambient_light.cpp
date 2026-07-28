@@ -30,9 +30,13 @@ void ConeLightAmbientLight::update()
   }
 
   // Broadcast ambient light level every 3 minutes to nodes
-  if (m_cone_light->node_remote() && millis() - m_last_broadcast_ms >= m_broadcast_interval_ms)
+  if (m_broadcast && m_cone_light->node_remote() && millis() - m_last_broadcast_ms >= m_broadcast_interval_ms)
   {
     m_last_broadcast_ms = millis();
+
+    cone_light_network_packet_t packet = cone_light_packet_broadcast_ambient_light(m_cone_light->ambient_light()->ambient_light_average_percentage() / 100.0f);
+
+    m_cone_light->networking()->broadcast_packet(packet, true);
   }
 }
 

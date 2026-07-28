@@ -1,4 +1,5 @@
 #include "include/cone_light_network_packets.h"
+#include <cstring>
 
 // forward declarations :'(
 class ConeLight;
@@ -96,6 +97,14 @@ cone_light_network_packet_t
 cone_light_packet_set_group_brightness(uint8_t brightness,
                                        uint8_t node_or_group_id) {
   return cone_light_packet_set_brightness(brightness, node_or_group_id, true);
+}
+
+//--- AMBIENT LIGHT ---//
+cone_light_network_packet_t cone_light_packet_broadcast_ambient_light(float ambient_light) {
+    uint32_t packed_ambient_light;
+    memcpy(&packed_ambient_light, &ambient_light, sizeof(float));
+
+    return cone_light_packet_custom(ConeLightNetworkCommand::BROADCAST_AMBIENT_LIGHT, packed_ambient_light, 0);
 }
 
 //--- TONE / SONG CONTROL ---//

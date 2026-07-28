@@ -46,7 +46,7 @@ static constexpr uint32_t CONE_LIGHT_NETWORKING_PING_TIME_OUT_MS = 10'000;
 static constexpr int8_t CONE_LIGHT_NETWORKING_TX_POWER = 80; // = v * 0.25 dBm (20 dBm)
 
 // Updated whenever changes are made. YYYY.MM.DD
-static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.06.03";
+static const char *CONE_LIGHT_FIRMWARE_VERSION_NAME = "2026.07.27";
 // Used for backward incompatible changes
 static constexpr uint8_t CONE_LIGHT_FIRMWARE_VERSION = 5;
 
@@ -84,3 +84,8 @@ static constexpr float RSSI_TX_POWER = -21.0f;
 static constexpr float RSSI_PATH_LOSS = 3.45f;
 static constexpr float RSSI_PATH_LOSS_NEAR = 4.45f;
 static constexpr float RSSI_THRESHOLD_NEAR_METERS = 16.0f;
+
+static constexpr float CONE_LIGHT_AMBIENT_LIGHT_THRESHOLD_RATIO_MAX = 0.35f;
+static constexpr float CONE_LIGHT_AMBIENT_LIGHT_THRESHOLD_RATIO_MIN = 0.5f;
+static constexpr uint8_t CONE_LIGHT_AMBIENT_LIGHT_AUTO_BRIGHTNESS_MAX = 64u; // 25% of max brightness
+static constexpr uint8_t CONE_LIGHT_AMBIENT_LIGHT_AUTO_BRIGHTNESS_MIN = 20u; // ~8% of max brightness

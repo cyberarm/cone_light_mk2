@@ -21,6 +21,7 @@ private:
   uint32_t m_update_interval_ms = 3'000;
   uint32_t m_broadcast_interval_ms = 180'000;
   uint32_t m_last_broadcast_ms = m_broadcast_interval_ms; // wait `interval` so we have useful data to send
+  bool m_broadcast = true;
 
 public:
   ConeLightAmbientLight(ConeLight *cone_light);
@@ -33,4 +34,6 @@ public:
   float ambient_light_percentage();
   float ambient_light_average_percentage();
   float ambient_light_percentage(float ambient_light);
+  bool broadcasting() { return m_broadcast; }
+  void set_broadcasting(bool b) { m_broadcast = b; }
 };

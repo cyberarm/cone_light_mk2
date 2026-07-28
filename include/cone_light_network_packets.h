@@ -20,6 +20,7 @@ cone_light_network_packet_t cone_light_packet_set_color(uint32_t packed_color, u
 cone_light_network_packet_t cone_light_packet_set_group_color(uint8_t red, uint8_t green, uint8_t blue, uint8_t brightness, uint8_t node_or_group_id);
 cone_light_network_packet_t cone_light_packet_set_brightness(uint8_t brightness, uint8_t node_or_group_id, bool is_group = false);
 cone_light_network_packet_t cone_light_packet_set_group_brightness(uint8_t brightness, uint8_t node_or_group_id);
+cone_light_network_packet_t cone_light_packet_broadcast_ambient_light(float ambient_light);
 
 cone_light_network_packet_t cone_light_packet_play_tone(uint8_t note, uint16_t duration, uint8_t node_or_group_id, bool is_group = false);
 cone_light_network_packet_t cone_light_packet_play_group_tone(uint8_t note, uint16_t duration, uint8_t node_or_group_id);
