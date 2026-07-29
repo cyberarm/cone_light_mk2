@@ -109,14 +109,20 @@ void ConeLightLighting::handle_packet(cone_light_network_packet_t packet)
 
 void ConeLightLighting::handle_ambient_light_packet(cone_light_network_packet_t packet)
 {
+  if (!m_cone_light->ambient_light()->automatic_lightness())
+    return;
+
   float ambient_light_ratio;
   uint8_t target_brightness_light;
   memcpy(&ambient_light_ratio, &packet.command_parameters, sizeof(float));
+  m_cone_light->ambient_light()->set_ambient_light_average(ambient_light_ratio * 3.3f);
+
   ambient_light_ratio = std::clamp((ambient_light_ratio / CONE_LIGHT_AMBIENT_LIGHT_THRESHOLD_RATIO_MAX), 0.0f, 1.0f);
 
   target_brightness_light = static_cast<uint8_t>(CONE_LIGHT_AMBIENT_LIGHT_AUTO_BRIGHTNESS_MIN + (CONE_LIGHT_AMBIENT_LIGHT_AUTO_BRIGHTNESS_MAX - CONE_LIGHT_AMBIENT_LIGHT_AUTO_BRIGHTNESS_MIN) * ambient_light_ratio);
 
-  Serial.printf("DEBUG: AMBIENT LIGHT: %.2f, TARGET BRIGHTNESS: %d", ambient_light_ratio, target_brightness_light);
+  if (CONE_LIGHT_DEBUG)
+    Serial.printf("AUTOMATIC LIGHTNESS: AMBIENT LIGHT: %.2f, TARGET BRIGHTNESS: %d\n", ambient_light_ratio, target_brightness_light);
 
   set_brightness(target_brightness_light);
   set_static_brightness(target_brightness_light);

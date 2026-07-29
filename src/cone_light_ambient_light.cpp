@@ -99,3 +99,8 @@ float ConeLightAmbientLight::ambient_light_percentage(float ambient_light)
 {
   return std::clamp(ambient_light / 3.3f, 0.0f, 1.0f) * 100.0f;
 }
+
+void ConeLightAmbientLight::set_ambient_light_average(float ambient_light)
+{
+  m_history[0] = ambient_light;
+}

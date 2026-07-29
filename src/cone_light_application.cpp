@@ -656,14 +656,6 @@ void ConeLight_App_AmbientLight::draw()
   display()->draw_left_arrow(7, 2 + display()->widget_bar_height() + 4);
   oled()->drawFastHLine(0, 28, 20, SSD1306_WHITE);
 
-  if (!m_cone_light->node_remote())
-  {
-    oled()->setCursor(34, display()->widget_bar_height() + 4 + 12);
-    oled()->printf("Not a remote");
-
-    return;
-  }
-
   // Draw SELECT icon
   display()->draw_select_icon(7 + 3, 32 + (display()->widget_bar_height() / 2) - 1);
   oled()->drawFastHLine(0, 48, 20, SSD1306_WHITE);
@@ -681,14 +673,17 @@ void ConeLight_App_AmbientLight::draw()
   uint16_t y = oled()->height() / 2 + 12; // display()->widget_bar_height() + 2;
 
   // CURRENT AMBIENT LIGHT
-  float current_ratio = m_cone_light->ambient_light()->ambient_light_percentage() / 100.0f;
-  // box
-  oled()->drawRect(x, y, width, height, SSD1306_WHITE);
-  // bar
-  oled()->fillRect(x + 2, y + 2, (width - 4) * current_ratio, height - 4, SSD1306_WHITE);
-  // label
-  oled()->setCursor(x + width + 2 + 3, y);
-  oled()->print("CUR");
+  if (m_cone_light->node_remote())
+  {
+    float current_ratio = m_cone_light->ambient_light()->ambient_light_percentage() / 100.0f;
+    // box
+    oled()->drawRect(x, y, width, height, SSD1306_WHITE);
+    // bar
+    oled()->fillRect(x + 2, y + 2, (width - 4) * current_ratio, height - 4, SSD1306_WHITE);
+    // label
+    oled()->setCursor(x + width + 2 + 3, y);
+    oled()->print("CUR");
+  }
 
   // AVERAGE AMBIENT LIGHT
   float avg_ratio = m_cone_light->ambient_light()->ambient_light_average_percentage() / 100.0f;
@@ -702,7 +697,10 @@ void ConeLight_App_AmbientLight::draw()
 
   // Labels
   oled()->setCursor(x, oled()->height() / 2 + 2);
-  oled()->printf("BROADCAST: %s", m_cone_light->ambient_light()->broadcasting() ? "ON" : "OFF");
+  if (m_cone_light->node_remote())
+    oled()->printf("Broadcast: %s", m_cone_light->ambient_light()->broadcasting() ? "ON" : "OFF");
+  else
+    oled()->printf("Lightness: %s", m_cone_light->ambient_light()->automatic_lightness() ? "AUTO" : "MANUAL");
 
   oled()->setTextWrap(true);
 }
@@ -715,9 +713,10 @@ bool ConeLight_App_AmbientLight::button_down(ConeLightButton btn)
     m_cone_light->set_current_app_main_menu();
     break;
   case SELECT_BUTTON:
-    if (!m_cone_light->node_remote())
-      return false;
-    m_cone_light->ambient_light()->set_broadcasting(!m_cone_light->ambient_light()->broadcasting());
+    if (m_cone_light->node_remote())
+      m_cone_light->ambient_light()->set_broadcasting(!m_cone_light->ambient_light()->broadcasting());
+    else
+      m_cone_light->ambient_light()->set_automatic_lightness(!m_cone_light->ambient_light()->automatic_lightness());
   {
     break;
   }
